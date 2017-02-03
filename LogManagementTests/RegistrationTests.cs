@@ -1,4 +1,5 @@
 ﻿using System;
+using LogManagement;
 using LogManagement.Registration;
 using LogManagementTests.Implementations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,13 +12,16 @@ namespace LogManagementTests
         [TestMethod]
         public void TestMethod1()
         {
+            ActivityMonitoring m = new ActivityMonitoring();
+            m.ValidateCurrentCall(this);
+
             IApplicationRegistration applicationRegistration = new ApplicationRegistration("Security Tester");
             applicationRegistration
                 .RegisterComponent(
                     (new ComponentRegistration<Authentication>("Authentication Component"))
                         .RegisterEvent("Validation", authentication => new Func<bool>(authentication.Verify))
-                        .RegisterObservableProperty("Is Administrator", authentication => authentication.AdministratorAccess)
-                        .RegisterObservableProperty("Access Rights", authentication => authentication.AccessRights)
+                        .RegisterObservableParameter("Is Administrator", authentication => authentication.AdministratorAccess)
+                        .RegisterObservableParameter("Access Rights", authentication => authentication.AccessRights)
                 )
                 .RegisterComponent(
                     (new ComponentRegistration<SecurityCredential>("Security Credential Component"))
