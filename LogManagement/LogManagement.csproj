@@ -39,10 +39,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Builder.cs" />
-    <Compile Include="Manager.cs" />
+    <Compile Include="Builders\LogBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Registration.cs" />
+    <Compile Include="Registration\ApplicationRegistration.cs" />
+    <Compile Include="Registration\ComponentRegistration.cs" />
+    <Compile Include="Registration\SystemRegistration.cs" />
+    <Compile Include="Builders\RuleBuilder.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Managers\" />
+    <Folder Include="Rules\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
