@@ -16,8 +16,8 @@ namespace LogManagementTests
                 .RegisterComponent(
                     (new ComponentRegistration<Authentication>("Authentication Component"))
                         .RegisterEvent("Validation", authentication => new Func<bool>(authentication.Verify))
-                        .RegisterPrimitiveProperty("Is Administrator", authentication => authentication.AdministratorAccess)
-                        .RegisterPrimitiveProperty("Access Rights", authentication => authentication.AccessRights)
+                        .RegisterObservableProperty("Is Administrator", authentication => authentication.AdministratorAccess)
+                        .RegisterObservableProperty("Access Rights", authentication => authentication.AccessRights)
                 )
                 .RegisterComponent(
                     (new ComponentRegistration<SecurityCredential>("Security Credential Component"))

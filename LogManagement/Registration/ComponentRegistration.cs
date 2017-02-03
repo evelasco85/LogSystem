@@ -10,7 +10,7 @@ namespace LogManagement.Registration
      public interface IComponentRegistration<T> : IComponentRegistration
     {
         IComponentRegistration<T> RegisterEvent(string eventName, Func<T, Delegate> methodAssociation);
-        IComponentRegistration<T> RegisterPrimitiveProperty<TOut>(string parameterName, Expression<Func<T, TOut>> property);
+        IComponentRegistration<T> RegisterObservableProperty<TOut>(string parameterName, Expression<Func<T, TOut>> property);
     }
 
     public class ComponentRegistration<T> : IComponentRegistration<T>
@@ -29,7 +29,7 @@ namespace LogManagement.Registration
             return this;
         }
 
-        public IComponentRegistration<T> RegisterPrimitiveProperty<TOut>(string parameterName, Expression<Func<T, TOut>> property)
+        public IComponentRegistration<T> RegisterObservableProperty<TOut>(string parameterName, Expression<Func<T, TOut>> property)
         {
             string propertyName = ((MemberExpression)property.Body).Member.Name;
             Type propertyType = ((MemberExpression) property.Body).Member.GetType();
