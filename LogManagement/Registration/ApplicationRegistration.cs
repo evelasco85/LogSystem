@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LogManagement.Registration
 {
@@ -10,6 +11,7 @@ namespace LogManagement.Registration
     public class ApplicationRegistration : IApplicationRegistration
     {
         string _applicationName = String.Empty;
+        IDictionary<string, IComponentRegistration> _componentDictionary = new Dictionary<string, IComponentRegistration>();
 
         public ApplicationRegistration(string applicationName)
         {
@@ -18,7 +20,13 @@ namespace LogManagement.Registration
 
         public IApplicationRegistration RegisterComponent<T>(IComponentRegistration<T> component)
         {
-            throw new NotImplementedException();
+            if (component == null)
+                return this;
+
+            if (_componentDictionary.ContainsKey(component.Identifier))
+                _componentDictionary.Remove(component.Identifier);
+
+            _componentDictionary.Add(component.Identifier, component);
 
             return this;
         }
