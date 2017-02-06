@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Builders\LogBuilder.cs" />
     <Compile Include="ActivityMonitoring.cs" />
+    <Compile Include="Event\EventParameter.cs" />
     <Compile Include="Managers\ActivityManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registration\ApplicationRegistration.cs" />

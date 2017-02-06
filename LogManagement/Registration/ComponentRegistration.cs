@@ -84,8 +84,7 @@ namespace LogManagement.Registration
                 throw new ArgumentException("'propertyExpression' parameter requires a valid property");
             }
 
-            Type propertyType = typeof(TOut);
-            bool primitive = (!propertyType.IsClass) || (propertyType == typeof(string));
+            bool primitive = RegistrationService.GetInstance().IsPrimitive<TOut>();
 
             if(!primitive)
                 throw new ArgumentException("Please register a primitive property");
