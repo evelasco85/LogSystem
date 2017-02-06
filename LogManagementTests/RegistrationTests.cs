@@ -48,7 +48,7 @@ namespace LogManagementTests
             string evName = string.Empty;
             IList<Tuple<string, object>> evParams = null;
 
-            ActivityManager.GetInstance().ComponentInvocation =
+            ActivityManager.GetInstance().OnActivityEmit =
                 (systemName, applicationName, componentName, eventName, parameters) =>
                 {
                     sysName = systemName;

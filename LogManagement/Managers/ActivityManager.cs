@@ -7,12 +7,12 @@ namespace LogManagement.Managers
 {
     public interface IActivityManager
     {
-        ComponentInvocationDelegate ComponentInvocation { get; set; }
+        OnActivityEmitDelegate OnActivityEmit { get; set; }
         void RegisterSystem(ISystemRegistration systemRegistration);
         void EmitCurrentCallInfo<TCallingInstance>(TCallingInstance instance, [CallerMemberName] string memberName = "");
     }
 
-    public delegate void ComponentInvocationDelegate(
+    public delegate void OnActivityEmitDelegate(
         string systemName, string applicationName, string componentName, string eventName,
         IList<Tuple<string, object>> eventParameters);
 
@@ -20,16 +20,16 @@ namespace LogManagement.Managers
     {
         static IActivityManager s_instance = new ActivityManager();
         IActivityMonitoring _monitoring  = new ActivityMonitoring();
-        private ComponentInvocationDelegate _componentInvocation;
+        private OnActivityEmitDelegate _onActivityEmit;
 
         private ActivityManager()
         {
         }
 
-        public ComponentInvocationDelegate ComponentInvocation
+        public OnActivityEmitDelegate OnActivityEmit
         {
-            get { return _componentInvocation; }
-            set { _componentInvocation = value; }
+            get { return _onActivityEmit; }
+            set { _onActivityEmit = value; }
         }
 
         public static IActivityManager GetInstance()
@@ -47,7 +47,7 @@ namespace LogManagement.Managers
         {
             IList<IComponentRegistration> components = _monitoring.GetComponents(instance, memberName);
 
-            if (_componentInvocation == null)
+            if (_onActivityEmit == null)
                 return;
 
             for (int index = 0; index < components.Count; index++)
@@ -58,7 +58,7 @@ namespace LogManagement.Managers
                 string eventName = component.GetEventName(memberName);
                 IList<Tuple<string, object>> parameters = component.GetObservedParameterValues(instance);
 
-                _componentInvocation(
+                _onActivityEmit(
                     system.Name,
                     application.Name,
                     component.Name,
