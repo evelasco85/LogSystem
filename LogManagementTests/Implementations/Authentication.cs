@@ -17,7 +17,7 @@ namespace LogManagementTests.Implementations
         {
             bool violative = (AdministratorAccess == false) && (AccessRights == Rights.Full);
 
-            ActivityManager.GetInstance().ValidateCurrentCall(this);
+            ActivityManager.GetInstance().EmitCurrentCallInfo(this);
 
             return !violative;
         }

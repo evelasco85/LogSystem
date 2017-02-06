@@ -9,7 +9,7 @@ namespace LogManagement.Managers
     {
         ComponentInvocationDelegate ComponentInvocation { get; set; }
         void RegisterSystem(ISystemRegistration systemRegistration);
-        void ValidateCurrentCall<TCallingInstance>(TCallingInstance instance, [CallerMemberName] string memberName = "");
+        void EmitCurrentCallInfo<TCallingInstance>(TCallingInstance instance, [CallerMemberName] string memberName = "");
     }
 
     public delegate void ComponentInvocationDelegate(
@@ -42,7 +42,7 @@ namespace LogManagement.Managers
             _monitoring.AddSystem(systemRegistration);
         }
 
-        public void ValidateCurrentCall<TCallingInstance>(TCallingInstance instance,
+        public void EmitCurrentCallInfo<TCallingInstance>(TCallingInstance instance,
             [CallerMemberName] string memberName = "")
         {
             IList<IComponentRegistration> components = _monitoring.GetComponents(instance, memberName);
