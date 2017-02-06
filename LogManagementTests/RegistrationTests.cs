@@ -65,7 +65,7 @@ namespace LogManagementTests
                 AdministratorAccess = false
             };
 
-            bool verified = auth.Verify();
+            bool verified = auth.Verify();      //This will emit activity detail
 
             Assert.IsFalse(verified);
             Assert.AreEqual("Security System", sysName);
