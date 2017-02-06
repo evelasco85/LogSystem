@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LogManagement;
+﻿using LogManagement.Managers;
 
 namespace LogManagementTests.Implementations
 {
@@ -20,14 +15,15 @@ namespace LogManagementTests.Implementations
 
         public bool Verify()
         {
-            return false;
+            bool violative = (AdministratorAccess == false) && (AccessRights == Rights.Full);
+
+            ActivityManager.GetInstance().ValidateCurrentCall(this);
+
+            return !violative;
         }
 
         public Authentication()
         {
-            //Test-only: Example of anomalous rights
-            AccessRights = Rights.Full;
-            AdministratorAccess = false;
         }
     }
 }

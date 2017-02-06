@@ -8,13 +8,21 @@ namespace LogManagementTests.Implementations
 {
     public class SecurityCredential
     {
+        public string Username { get; set; }
+        public string Password { get; set; }
+
         public void SetCredentials(string username, string password)
         {
+            Username = username;
+            Password = password;
         }
 
         public bool ValidateCredentialInput()
         {
-            return false;
+            string badPassword = "@dm1n";
+            bool isValid = !Password.Contains(badPassword);
+
+            return isValid;
         }
     }
 }

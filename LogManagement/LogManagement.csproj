@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Builders\LogBuilder.cs" />
     <Compile Include="ActivityMonitoring.cs" />
+    <Compile Include="Managers\ActivityManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registration\ApplicationRegistration.cs" />
     <Compile Include="Registration\ComponentRegistration.cs" />
@@ -49,7 +50,6 @@
     <Compile Include="Services\RegistrationService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Managers\" />
     <Folder Include="Rules\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

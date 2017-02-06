@@ -15,7 +15,7 @@ namespace LogManagement.Registration
 
      public interface IComponentRegistration<T> : IComponentRegistration
      {
-         IComponentRegistration<T> RegisterEvent(string eventName, Expression<Func<T, Delegate>> methodExpression);
+         IComponentRegistration<T> RegisterObservableEvent(string eventName, Expression<Func<T, Delegate>> methodExpression);
         IComponentRegistration<T> RegisterObservableParameter<TOut>(string parameterName, Expression<Func<T, TOut>> propertyExpression);
     }
 
@@ -37,7 +37,7 @@ namespace LogManagement.Registration
             _className = RegistrationService.GetInstance().GetClassName<T>();
         }
 
-        public IComponentRegistration<T> RegisterEvent(string eventName, Expression<Func<T, Delegate>> methodExpression)
+        public IComponentRegistration<T> RegisterObservableEvent(string eventName, Expression<Func<T, Delegate>> methodExpression)
         {
             if ((string.IsNullOrEmpty(eventName)) || (methodExpression == null))
                 return this;

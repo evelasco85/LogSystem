@@ -1,5 +1,6 @@
 ﻿using System;
 using LogManagement;
+using LogManagement.Managers;
 using LogManagement.Registration;
 using LogManagementTests.Implementations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,21 +13,18 @@ namespace LogManagementTests
         [TestMethod]
         public void TestMethod1()
         {
-            ActivityMonitoring m = new ActivityMonitoring();
-            m.ValidateCurrentCall(this);
-
             IApplicationRegistration applicationRegistration = new ApplicationRegistration("Security Tester");
             applicationRegistration
                 .RegisterComponent(
                     (new ComponentRegistration<Authentication>("Authentication Component"))
-                        .RegisterEvent("Validation", authentication => new Func<bool>(authentication.Verify))
+                        .RegisterObservableEvent("Validation", authentication => new Func<bool>(authentication.Verify))
                         .RegisterObservableParameter("Is Administrator", authentication => authentication.AdministratorAccess)
                         .RegisterObservableParameter("Access Rights", authentication => authentication.AccessRights)
                 )
                 .RegisterComponent(
                     (new ComponentRegistration<SecurityCredential>("Security Credential Component"))
-                    .RegisterEvent("Credential Setup", securityCredential => new Action<string, string>(securityCredential.SetCredentials))
-                    .RegisterEvent("Credential Input Validation", securityCredential => new Func<bool>(securityCredential.ValidateCredentialInput))
+                    .RegisterObservableEvent("Credential Setup", securityCredential => new Action<string, string>(securityCredential.SetCredentials))
+                    .RegisterObservableEvent("Credential Input Validation", securityCredential => new Func<bool>(securityCredential.ValidateCredentialInput))
 
                 );
 
@@ -35,6 +33,18 @@ namespace LogManagementTests
             systemRegistration
                 .RegisterApplication(applicationRegistration)
                 .RegisterApplication(new ApplicationRegistration("Dummy Application"));
+
+
+            ActivityManager.GetInstance().RegisterSystem(systemRegistration);
+
+            Authentication auth = new Authentication()
+            {
+                //Violative rights, non-administrator w/full access?
+                AccessRights = Rights.Full,
+                AdministratorAccess = false
+            };
+
+            bool verified = auth.Verify();
         }
     }
 }
