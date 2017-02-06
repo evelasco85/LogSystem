@@ -9,7 +9,7 @@ namespace LogManagement
     public interface IActivityMonitoring
     {
         void AddSystem(ISystemRegistration system);
-        void ValidateCurrentCall<TCallingInstance>(TCallingInstance instance, string memberName);
+        IList<IComponentRegistration> GetComponents<TCallingInstance>(TCallingInstance instance, string memberName);
     }
 
     public class ActivityMonitoring : IActivityMonitoring
@@ -27,7 +27,7 @@ namespace LogManagement
             _registrationContainers.Add(system.Name, system);
         }
 
-        public void ValidateCurrentCall<TCallingInstance>(TCallingInstance instance, string memberName)
+        public IList<IComponentRegistration> GetComponents<TCallingInstance>(TCallingInstance instance, string memberName)
         {
             string className = RegistrationService.GetInstance().GetClassName<TCallingInstance>();
 
@@ -35,14 +35,7 @@ namespace LogManagement
                 .SelectMany(kvp => kvp.Value.GetComponents(className))
                 .ToList();
 
-            for (int index = 0; index < components.Count; index++)
-            {
-                IComponentRegistration component = components[index];
-                IApplicationRegistration application = component.Application;
-                ISystemRegistration system = application.SystemRegistration;
-
-                
-            }
+            return components;
         }
     }
 }

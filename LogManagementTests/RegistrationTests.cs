@@ -1,5 +1,6 @@
 ﻿using System;
-using LogManagement;
+using System.Collections.Generic;
+using System.Linq;
 using LogManagement.Managers;
 using LogManagement.Registration;
 using LogManagementTests.Implementations;
@@ -10,8 +11,8 @@ namespace LogManagementTests
     [TestClass]
     public class RegistrationTests
     {
-        [TestMethod]
-        public void TestMethod1()
+        [TestInitialize]
+        public void Initialize()
         {
             IApplicationRegistration applicationRegistration = new ApplicationRegistration("Security Tester");
             applicationRegistration
@@ -34,8 +35,28 @@ namespace LogManagementTests
                 .RegisterApplication(applicationRegistration)
                 .RegisterApplication(new ApplicationRegistration("Dummy Application"));
 
-
+            
             ActivityManager.GetInstance().RegisterSystem(systemRegistration);
+        }
+
+        [TestMethod]
+        public void TestValidateCurrentCall()
+        {
+            string sysName = string.Empty;
+            string appName = string.Empty;
+            string compName = string.Empty;
+            string evName = string.Empty;
+            IList<Tuple<string, object>> evParams = null;
+
+            ActivityManager.GetInstance().ComponentInvocation =
+                (systemName, applicationName, componentName, eventName, parameters) =>
+                {
+                    sysName = systemName;
+                    appName = applicationName;
+                    compName = componentName;
+                    evName = eventName;
+                    evParams = parameters;
+                };
 
             Authentication auth = new Authentication()
             {
@@ -45,6 +66,16 @@ namespace LogManagementTests
             };
 
             bool verified = auth.Verify();
+
+            Assert.IsFalse(verified);
+            Assert.AreEqual("Security System", sysName);
+            Assert.AreEqual("Security Tester", appName);
+            Assert.AreEqual("Authentication Component", compName);
+            Assert.AreEqual("Validation", evName);
+            Assert.IsTrue((evParams != null) && (evParams.Count == 2));
+
+            Assert.AreEqual(Rights.Full, evParams.Where(p => p.Item1 == "Access Rights").First().Item2);
+            Assert.AreEqual(false, evParams.Where(p => p.Item1 == "Is Administrator").First().Item2);
         }
     }
 }
