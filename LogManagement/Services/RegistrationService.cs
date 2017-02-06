@@ -6,6 +6,7 @@ namespace LogManagement.Services
     {
         string GetClassName<T>();
         bool IsPrimitive<T>();
+        bool IsPrimitive(Type propertyType);
     }
 
     public class RegistrationService : IRegistrationService
@@ -28,10 +29,12 @@ namespace LogManagement.Services
 
         public bool IsPrimitive<T>()
         {
-            Type propertyType = typeof(T);
-            bool primitive = (!propertyType.IsClass) || (propertyType == typeof(string));
+            return IsPrimitive(typeof(T));
+        }
 
-            return primitive;
+        public bool IsPrimitive(Type propertyType)
+        {
+            return (!propertyType.IsClass) || (propertyType == typeof(string));
         }
     }
 }

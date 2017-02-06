@@ -1,17 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 namespace LogManagement.Event
 {
     public interface IEventParameter
     {
-        
+        string ParameterName { get; }
+        void SetPropertyInfo(PropertyInfo propertyInfo);
+        object GetValue(object instance);
     }
 
-    public class EventParameter<T> : IEventParameter
+    public interface IEventParameter<T> : IEventParameter
     {
+    }
+
+    public class EventParameter : IEventParameter
+    {
+        private string _parameterName;
+        private PropertyInfo _propertyInfo;
+
+        public string ParameterName
+        {
+            get { return _parameterName; }
+        }
+        
+        public EventParameter(string parameterName)
+        {
+            _parameterName = parameterName;
+
+            //bool primitive = RegistrationService.GetInstance().IsPrimitive<T>();
+
+            //if (!primitive)
+            //    throw new ArgumentException("Only primitive types are required for event parameter");
+        }
+
+        public void SetPropertyInfo(PropertyInfo propertyInfo)
+        {
+            _propertyInfo = propertyInfo;
+        }
+
+        public object GetValue(object instance)
+        {
+            return _propertyInfo.GetValue(instance);;
+        }
     }
 }
