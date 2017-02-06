@@ -8,7 +8,7 @@ namespace LogManagement.Event.Parameters
         object Value { get; set; }
     }
 
-    public class EventVariable : EventBoolean, IEventVariable
+    public class EventVariable : EventData, IEventVariable
     {
         string _name;
 
@@ -24,11 +24,11 @@ namespace LogManagement.Event.Parameters
             _name = name;
         }
 
-        public override bool Evaluate(IEventContext context)
+        public override object GetData(IEventContext context)
         {
-            //IEventVariable variable = context.GetVariable(_name);
+            IEventVariable variable = context.GetVariable(_name);
 
-            return true;
+            return variable.Value;
         }
     }
 }

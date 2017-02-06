@@ -1,10 +1,7 @@
-﻿using LogManagement.Event.Parameters;
-
-namespace LogManagement.Event.Conditions
+﻿namespace LogManagement.Event.Conditions
 {
     public interface IEventAndExpression
     {
-        
     }
 
     public class EventAndExpression : EventBoolean, IEventAndExpression

@@ -18,6 +18,22 @@ namespace LogManagementTests
             context.Assign(x, "1");
 
             bool result = resultExpression.Evaluate(context);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void TestMethod2()
+        {
+            EventVariable x = new EventVariable("index");
+            EventBoolean resultExpression = new EventGreatherThanExpression(x, new EventLiteral(1));
+            EventContext context = new EventContext();
+
+            context.Assign(x, 2);
+
+            bool result = resultExpression.Evaluate(context);
+
+            Assert.IsTrue(result);
         }
     }
 }

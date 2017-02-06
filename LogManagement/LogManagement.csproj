@@ -41,12 +41,14 @@
   <ItemGroup>
     <Compile Include="Builders\LogBuilder.cs" />
     <Compile Include="ActivityMonitoring.cs" />
-    <Compile Include="Event\EventCondition.cs" />
+    <Compile Include="Event\Conditions\EventLessThanExpression.cs" />
+    <Compile Include="Event\Conditions\EventGreatherThanExpression.cs" />
     <Compile Include="Event\EventContext.cs" />
     <Compile Include="Event\EventParameter.cs" />
     <Compile Include="Event\Conditions\EventEqualExpression.cs" />
     <Compile Include="Event\Conditions\EventAndExpression.cs" />
     <Compile Include="Event\Conditions\EventBoolean.cs" />
+    <Compile Include="Event\Parameters\EventData.cs" />
     <Compile Include="Event\Parameters\EventLiteral.cs" />
     <Compile Include="Event\Conditions\EventOrExpression.cs" />
     <Compile Include="Event\Parameters\EventVariable.cs" />

@@ -1,24 +1,25 @@
-﻿namespace LogManagement.Event.Conditions
+﻿using LogManagement.Event.Parameters;
+
+namespace LogManagement.Event.Conditions
 {
     public interface IEventEqualExpression
     {
-        
     }
 
     public class EventEqualExpression : EventBoolean, IEventEqualExpression
     {
-        private IEventBoolean _operand1;
-        private IEventBoolean _operand2;
+        private IEventData _data1;
+        private IEventData _data2;
 
         public override bool Evaluate(IEventContext context)
         {
-            return _operand1.Evaluate(context) && _operand2.Evaluate(context);
+            return _data1.GetData(context) == _data2.GetData(context);
         }
 
-        public EventEqualExpression(IEventBoolean operand1, IEventBoolean operand2)
+        public EventEqualExpression(IEventData data1, IEventData data2)
         {
-            _operand1 = operand1;
-            _operand2 = operand2;
+            _data1 = data1;
+            _data2 = data2;
         }
     }
 }

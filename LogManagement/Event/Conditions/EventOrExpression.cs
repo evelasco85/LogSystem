@@ -2,7 +2,6 @@
 {
     public interface IEventOrExpression
     {
-        
     }
 
     public class EventOrExpression : EventBoolean, IEventOrExpression
