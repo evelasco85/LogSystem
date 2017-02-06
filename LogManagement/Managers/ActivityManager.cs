@@ -13,7 +13,6 @@ namespace LogManagement.Managers
     {
         static IActivityManager s_instance = new ActivityManager();
         IActivityMonitoring _monitoring  = new ActivityMonitoring();
-        private ISystemRegistration _systemRegistration;
 
         private ActivityManager()
         {
@@ -26,7 +25,7 @@ namespace LogManagement.Managers
 
         public void RegisterSystem(ISystemRegistration systemRegistration)
         {
-            _systemRegistration = systemRegistration;
+            _monitoring.AddSystem(systemRegistration);
         }
 
         public void ValidateCurrentCall<TCallingInstance>(TCallingInstance instance,

@@ -16,13 +16,13 @@ namespace LogManagementTests
             IApplicationRegistration applicationRegistration = new ApplicationRegistration("Security Tester");
             applicationRegistration
                 .RegisterComponent(
-                    (new ComponentRegistration<Authentication>("Authentication Component"))
+                    (new ComponentRegistration<Authentication>("Authentication Component", applicationRegistration))
                         .RegisterObservableEvent("Validation", authentication => new Func<bool>(authentication.Verify))
                         .RegisterObservableParameter("Is Administrator", authentication => authentication.AdministratorAccess)
                         .RegisterObservableParameter("Access Rights", authentication => authentication.AccessRights)
                 )
                 .RegisterComponent(
-                    (new ComponentRegistration<SecurityCredential>("Security Credential Component"))
+                    (new ComponentRegistration<SecurityCredential>("Security Credential Component", applicationRegistration))
                     .RegisterObservableEvent("Credential Setup", securityCredential => new Action<string, string>(securityCredential.SetCredentials))
                     .RegisterObservableEvent("Credential Input Validation", securityCredential => new Func<bool>(securityCredential.ValidateCredentialInput))
 

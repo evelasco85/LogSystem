@@ -6,9 +6,10 @@ using LogManagement.Services;
 
 namespace LogManagement.Registration
 {
-    public interface IComponentRegistration
+    public interface IComponentRegistration : IRegistration
     {
-        string BusinessComponentName { get; }
+        IApplicationRegistration Application { get; }
+        bool MatchClass(string className);
         string ClassName { get; }
         string Identifier { get; }
     }
@@ -19,22 +20,31 @@ namespace LogManagement.Registration
         IComponentRegistration<T> RegisterObservableParameter<TOut>(string parameterName, Expression<Func<T, TOut>> propertyExpression);
     }
 
-    public class ComponentRegistration<T> : IComponentRegistration<T>
+    public class ComponentRegistration<T> : Registration, IComponentRegistration<T>
     {
-        private string _businessComponentName = string.Empty;
         private string _className = string.Empty;
+        private IApplicationRegistration _applicationRegistration;
 
-        public string BusinessComponentName { get { return _businessComponentName; } }
         public string ClassName { get { return _className; } }
-        public string Identifier { get { return string.Format("{0}|{1}", _businessComponentName, _className); } }
+        public string Identifier { get { return string.Format("{0}|{1}", Name, _className); } }
 
         IDictionary<string, string> _eventDictionary = new Dictionary<string, string>();
         IDictionary<string, PropertyInfo> _parameterDictionary = new Dictionary<string, PropertyInfo>();
- 
-        public ComponentRegistration(string businessComponentName)
+
+        public IApplicationRegistration Application
         {
-            _businessComponentName = businessComponentName;
+            get { return _applicationRegistration; }
+        }
+
+        public ComponentRegistration(string businessComponentName, IApplicationRegistration application) : base(businessComponentName)
+        {
             _className = RegistrationService.GetInstance().GetClassName<T>();
+            _applicationRegistration = application;
+        }
+
+        public bool MatchClass(string className)
+        {
+            return className == _className;
         }
 
         public IComponentRegistration<T> RegisterObservableEvent(string eventName, Expression<Func<T, Delegate>> methodExpression)
