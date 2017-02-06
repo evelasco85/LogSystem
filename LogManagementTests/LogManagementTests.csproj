@@ -54,6 +54,7 @@
     <Compile Include="Implementations\SecurityCredential.cs" />
     <Compile Include="RegistrationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitTest1.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LogManagement\LogManagement.csproj">

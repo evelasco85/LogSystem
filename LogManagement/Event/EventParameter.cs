@@ -9,10 +9,6 @@ namespace LogManagement.Event
         object GetValue(object instance);
     }
 
-    public interface IEventParameter<T> : IEventParameter
-    {
-    }
-
     public class EventParameter : IEventParameter
     {
         private string _parameterName;
