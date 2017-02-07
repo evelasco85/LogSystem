@@ -110,11 +110,15 @@ namespace LogManagementTests
                     });
 
                     RuleManager.GetInstance().InvokeMatchingRules(context,
-                        () => {
-                                  errorMessage = "Non-administrator should have limited access rights!";
+                        () =>
+                        {
+                            errorMessage = "Non-administrator should have limited access rights!";
+                            Console.WriteLine(errorMessage);
                         },
-                        () => {
-                                  errorMessage = "Rule validation was invoked but access-rights is a non-violation";
+                        () =>
+                        {
+                            errorMessage = "Rule validation was invoked but access-rights is a non-violation";
+                            Console.WriteLine(errorMessage);
                         });
                 };
 
