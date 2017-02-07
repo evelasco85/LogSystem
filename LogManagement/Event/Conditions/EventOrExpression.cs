@@ -6,7 +6,7 @@
 
     public class EventOrExpression : EventBoolean, IEventOrExpression
     {
-         private IEventBoolean _operand1;
+        private IEventBoolean _operand1;
         private IEventBoolean _operand2;
 
         public override bool Evaluate(IEventContext context)

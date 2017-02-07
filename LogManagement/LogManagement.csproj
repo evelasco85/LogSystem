@@ -51,6 +51,7 @@
     <Compile Include="Event\Parameters\EventData.cs" />
     <Compile Include="Event\Parameters\EventLiteral.cs" />
     <Compile Include="Event\Conditions\EventOrExpression.cs" />
+    <Compile Include="Event\Parameters\EventLiteralBoolean.cs" />
     <Compile Include="Event\Parameters\EventVariable.cs" />
     <Compile Include="Managers\ActivityManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

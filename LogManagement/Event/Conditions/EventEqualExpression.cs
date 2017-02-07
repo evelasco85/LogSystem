@@ -1,4 +1,5 @@
-﻿using LogManagement.Event.Parameters;
+﻿using System;
+using LogManagement.Event.Parameters;
 
 namespace LogManagement.Event.Conditions
 {
@@ -13,7 +14,9 @@ namespace LogManagement.Event.Conditions
 
         public override bool Evaluate(IEventContext context)
         {
-            return _data1.GetData(context) == _data2.GetData(context);
+            IComparable comparable = (IComparable)_data1.GetData(context);
+
+            return (comparable != null) && comparable.CompareTo(_data2.GetData(context)) == 0;
         }
 
         public EventEqualExpression(IEventData data1, IEventData data2)
