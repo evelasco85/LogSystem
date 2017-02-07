@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LogManagement.Event;
 using LogManagement.Event.Conditions;
 using LogManagement.Event.Parameters;
@@ -14,6 +15,9 @@ namespace LogManagementTests
     {
         IVariable _isAdminVar = new Variable("Is Administrator");
         private IVariable _accessRightsVar = new Variable("Access Rights");
+        const string AUTHENTICATION_COMPONENT_NAME = "Authentication Component";
+        const string AUTHENTICATION_EVENT_NAME = "Validation";
+
 
         [TestInitialize]
         public void Initialize()
@@ -21,8 +25,8 @@ namespace LogManagementTests
             IApplicationRegistration applicationRegistration = new ApplicationRegistration("Security Tester");
             applicationRegistration
                 .RegisterComponent(
-                    (new ComponentRegistration<Authentication>("Authentication Component", applicationRegistration))
-                        .RegisterObservableEvent("Validation", authentication => new Func<bool>(authentication.Verify))
+                    (new ComponentRegistration<Authentication>(AUTHENTICATION_COMPONENT_NAME, applicationRegistration))
+                        .RegisterObservableEvent(AUTHENTICATION_EVENT_NAME, authentication => new Func<bool>(authentication.Verify))
                         .RegisterObservableParameter(_isAdminVar.Name, authentication => authentication.AdministratorAccess)
                         .RegisterObservableParameter(_accessRightsVar.Name, authentication => authentication.AccessRights)
                 )
@@ -46,8 +50,10 @@ namespace LogManagementTests
         [TestMethod]
         public void TestRuleValidation()
         {
-            IVariable componentVar = new Variable("Component Name");
-            IVariable eventNameVar = new Variable("EventName");
+            string componentVarName = "Component Name";
+            string eventVarName = "EventName";
+            IVariable componentVar = new Variable(componentVarName);
+            IVariable eventNameVar = new Variable(eventVarName);
 
             IRule accessRightsViolationRule = new Rule(Guid.NewGuid().ToString());
 
@@ -58,8 +64,8 @@ namespace LogManagementTests
                 .RegisterVariable(_accessRightsVar, true);
 
             //Event-trigger condition
-            IBooleanBase componentCondition = new EqualToExpression(componentVar, new Literal("Authentication Component"));
-            IBooleanBase eventCondition = new EqualToExpression(eventNameVar, new Literal("Validation"));
+            IBooleanBase componentCondition = new EqualToExpression(componentVar, new Literal(AUTHENTICATION_COMPONENT_NAME));
+            IBooleanBase eventCondition = new EqualToExpression(eventNameVar, new Literal(AUTHENTICATION_EVENT_NAME));
             IBooleanBase matchingEventCondition = new AndExpression(componentCondition, eventCondition);
 
             //Parameter-trigger condition
@@ -80,22 +86,19 @@ namespace LogManagementTests
                     IContext context = new Context();
 
                     context
-                        .Assign("Component Name", componentName)
-                        .Assign("EventName", eventName);
+                        .Assign(componentVarName, componentName)
+                        .Assign(eventVarName, eventName);
 
-                    for (int index = 0; index < parameters.Count; index++)
+                    ((List<Tuple<string, object>>)parameters).ForEach(parameter =>
                     {
-                        Tuple<string, object> parameter = parameters[index];
-
                         context.Assign(parameter.Item1, parameter.Item2);
-                    }
+                    });
 
-                    accessRightsViolationRule.Validate(context, () =>
-                    {
-                        errorMessage = "Non-administrator should have limited access rights!";
-                    },
-                        () =>
-                        {
+                    accessRightsViolationRule.Validate(context,
+                        () =>{
+                            errorMessage = "Non-administrator should have limited access rights!";
+                        },
+                        () =>{
                             errorMessage = "Rule validation was invoked but access-rights is a non-violation";
                         });
                 };
