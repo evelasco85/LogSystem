@@ -56,8 +56,8 @@ namespace LogManagementTests
             IRule accessRightsViolationRule = new Rule();
 
             accessRightsViolationRule
-                .RegisterVariable(compVar)
-                .RegisterVariable(evNameVar)
+                .RegisterVariable(compVar, true)
+                .RegisterVariable(evNameVar, true)
                 .RegisterVariable(isAdminVar, true)
                 .RegisterVariable(accessRightsVar, true)
                 ;
