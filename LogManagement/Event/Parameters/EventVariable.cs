@@ -1,6 +1,4 @@
-﻿using LogManagement.Event.Conditions;
-
-namespace LogManagement.Event.Parameters
+﻿namespace LogManagement.Event.Parameters
 {
     public interface IEventVariable
     {

@@ -1,10 +1,8 @@
-﻿namespace LogManagement.Event.Conditions
-{
-    public interface IEventAndExpression
-    {
-    }
+﻿using LogManagement.Event.Parameters;
 
-    public class EventAndExpression : EventBoolean, IEventAndExpression
+namespace LogManagement.Event.Conditions
+{
+    public class EventAndExpression : EventBoolean
     {
         private IEventBoolean _operand1;
         private IEventBoolean _operand2;

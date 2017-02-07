@@ -3,11 +3,7 @@ using LogManagement.Event.Parameters;
 
 namespace LogManagement.Event.Conditions
 {
-    public interface IEventGreatherThanExpression
-    {
-    }
-
-    public class EventGreatherThanExpression : EventBoolean, IEventGreatherThanExpression
+    public class EventGreatherThanExpression : EventBoolean
     {
         private IEventData _data1;
         private IEventData _data2;

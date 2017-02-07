@@ -1,13 +1,6 @@
-﻿using System;
-using LogManagement.Event.Conditions;
-
-namespace LogManagement.Event.Parameters
+﻿namespace LogManagement.Event.Parameters
 {
-    public interface IEventLiteral
-    {
-    }
-
-    public class EventLiteral : EventData, IEventLiteral
+    public class EventLiteral : EventData
     {
         private object _value;
 

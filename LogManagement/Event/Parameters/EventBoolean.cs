@@ -1,4 +1,4 @@
-﻿namespace LogManagement.Event.Conditions
+﻿namespace LogManagement.Event.Parameters
 {
     public interface IEventBoolean
     {

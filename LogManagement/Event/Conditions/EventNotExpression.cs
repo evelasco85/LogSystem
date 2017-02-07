@@ -1,4 +1,6 @@
-﻿namespace LogManagement.Event.Conditions
+﻿using LogManagement.Event.Parameters;
+
+namespace LogManagement.Event.Conditions
 {
     public class EventNotExpression : EventBoolean
     {

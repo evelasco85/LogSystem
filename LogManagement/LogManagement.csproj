@@ -46,9 +46,9 @@
     <Compile Include="Event\Conditions\EventNotExpression.cs" />
     <Compile Include="Event\EventContext.cs" />
     <Compile Include="Event\EventParameter.cs" />
-    <Compile Include="Event\Conditions\EventEqualExpression.cs" />
+    <Compile Include="Event\Conditions\EventEqualToExpression.cs" />
     <Compile Include="Event\Conditions\EventAndExpression.cs" />
-    <Compile Include="Event\Conditions\EventBoolean.cs" />
+    <Compile Include="Event\Parameters\EventBoolean.cs" />
     <Compile Include="Event\Parameters\EventData.cs" />
     <Compile Include="Event\Parameters\EventLiteral.cs" />
     <Compile Include="Event\Conditions\EventOrExpression.cs" />
