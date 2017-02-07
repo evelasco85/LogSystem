@@ -15,7 +15,7 @@ namespace LogManagement.Event
         string Id { get; }
         SuccessfulConditionsInvokedDelegate SuccessfulResultInvocation { get; set; }
         FailedConditionsInvokedDelegate FailedResultInvocation { get; set; }
-
+        IList<IVariable> GetVariables();
         IRule AddVariableScope(IVariable variable);
         IRule AddVariableScope(IVariable variable, bool requiredForInvocation);
         IRuleValidation SetCondition(IBooleanBase condition);
@@ -102,6 +102,13 @@ namespace LogManagement.Event
         {
             SetCondition(condition, null, null);
             return this;
+        }
+
+        public IList<IVariable> GetVariables()
+        {
+            return _variables
+                .Select(kvp => kvp.Value)
+                .ToList();
         }
 
         public bool CanInvokeRule(IContext context)

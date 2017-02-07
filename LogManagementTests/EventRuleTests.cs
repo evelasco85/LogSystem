@@ -16,7 +16,7 @@ namespace LogManagementTests
         IVariable _isAdminVar = new Variable("Is Administrator");
         private IVariable _accessRightsVar = new Variable("Access Rights");
         IVariable _componentVar = new Variable("Component Name");
-        IVariable _eventNameVar = new Variable("EventName");
+        IVariable _eventNameVar = new Variable("Event Name");
 
         const string AUTHENTICATION_COMPONENT_NAME = "Authentication Component";
         const string AUTHENTICATION_EVENT_NAME = "Validation";
