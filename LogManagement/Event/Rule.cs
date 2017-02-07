@@ -7,19 +7,19 @@ namespace LogManagement.Event
     public interface IRule
     {
         IRule RegisterVariable(IVariable variable);
-        IRule RegisterCondition(IEventBoolean condition);
+        IRule RegisterCondition(IBooleanBase condition);
 
         void Validate(IContext context, SuccessfulConditionsInvokedDelegate successfulResultInvocation,
             FailedConditionsInvokedDelegate failedResultInvocation);
     }
 
-    public delegate void SuccessfulConditionsInvokedDelegate(IList<IEventBoolean> successfulConditions);
-    public delegate void FailedConditionsInvokedDelegate(IList<IEventBoolean> failedConditions);
+    public delegate void SuccessfulConditionsInvokedDelegate(IList<IBooleanBase> successfulConditions);
+    public delegate void FailedConditionsInvokedDelegate(IList<IBooleanBase> failedConditions);
 
     public class Rule : IRule
     {
         IDictionary<string, IVariable> _variables = new Dictionary<string, IVariable>();
-        IList<IEventBoolean> _conditions = new List<IEventBoolean>();
+        IList<IBooleanBase> _conditions = new List<IBooleanBase>();
 
         public IRule RegisterVariable(IVariable variable)
         {
@@ -34,7 +34,7 @@ namespace LogManagement.Event
             return this;
         }
 
-        public IRule RegisterCondition(IEventBoolean condition)
+        public IRule RegisterCondition(IBooleanBase condition)
         {
             _conditions.Add(condition);
 
@@ -46,12 +46,12 @@ namespace LogManagement.Event
             if(context == null)
                 return;
 
-            IList<IEventBoolean> successfulConditions = new List<IEventBoolean>();
-            IList<IEventBoolean> failedConditions = new List<IEventBoolean>();
+            IList<IBooleanBase> successfulConditions = new List<IBooleanBase>();
+            IList<IBooleanBase> failedConditions = new List<IBooleanBase>();
 
             for (int index = 0; index < _conditions.Count; index++)
             {
-                IEventBoolean condition = _conditions[index];
+                IBooleanBase condition = _conditions[index];
                 bool success = condition.Evaluate(context);
 
                 if(success)

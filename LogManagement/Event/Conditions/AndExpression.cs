@@ -4,15 +4,15 @@ namespace LogManagement.Event.Conditions
 {
     public class AndExpression : BooleanBase
     {
-        private IEventBoolean _operand1;
-        private IEventBoolean _operand2;
+        private IBooleanBase _operand1;
+        private IBooleanBase _operand2;
 
         public override bool Evaluate(IContext context)
         {
             return _operand1.Evaluate(context) && _operand2.Evaluate(context);
         }
 
-        public AndExpression(IEventBoolean operand1, IEventBoolean operand2)
+        public AndExpression(IBooleanBase operand1, IBooleanBase operand2)
         {
             _operand1 = operand1;
             _operand2 = operand2;

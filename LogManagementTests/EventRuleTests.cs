@@ -49,13 +49,13 @@ namespace LogManagementTests
             IVariable isAdminVar = new Variable("Is Administrator");
             IVariable accessRightsVar = new Variable("Access Rights");
 
-            IEventBoolean compCondition = new EqualToExpression(compVar, new Literal("Authentication Component"));
-            IEventBoolean evNameCondition = new EqualToExpression(evNameVar, new Literal("Validation"));
-            IEventBoolean compEventCondition = new AndExpression(compCondition, evNameCondition);
-            IEventBoolean accessRightsCondition = new EqualToExpression(accessRightsVar, new Literal(Rights.Full));
-            IEventBoolean isAdministratorCondition = new EqualToExpression(isAdminVar, new Literal(true));
-            IEventBoolean notAllowedAccessRightsCondition = new AndExpression(accessRightsCondition, new NotExpression(isAdministratorCondition));
-            IEventBoolean condition = new AndExpression(compEventCondition, notAllowedAccessRightsCondition);
+            IBooleanBase compCondition = new EqualToExpression(compVar, new Literal("Authentication Component"));
+            IBooleanBase evNameCondition = new EqualToExpression(evNameVar, new Literal("Validation"));
+            IBooleanBase compEventCondition = new AndExpression(compCondition, evNameCondition);
+            IBooleanBase accessRightsCondition = new EqualToExpression(accessRightsVar, new Literal(Rights.Full));
+            IBooleanBase isAdministratorCondition = new EqualToExpression(isAdminVar, new Literal(true));
+            IBooleanBase notAllowedAccessRightsCondition = new AndExpression(accessRightsCondition, new NotExpression(isAdministratorCondition));
+            IBooleanBase condition = new AndExpression(compEventCondition, notAllowedAccessRightsCondition);
 
             IRule accessRightsViolationRule = new Rule();
 

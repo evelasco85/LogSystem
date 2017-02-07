@@ -4,9 +4,9 @@ namespace LogManagement.Event.Conditions
 {
     public class NotExpression : BooleanBase
     {
-        private IEventBoolean _boolean;
+        private IBooleanBase _boolean;
 
-        public NotExpression(IEventBoolean boolean)
+        public NotExpression(IBooleanBase boolean)
         {
             _boolean = boolean;
         }
