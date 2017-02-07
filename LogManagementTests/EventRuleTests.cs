@@ -50,10 +50,8 @@ namespace LogManagementTests
         [TestMethod]
         public void TestRuleValidation()
         {
-            string componentVarName = "Component Name";
-            string eventVarName = "EventName";
-            IVariable componentVar = new Variable(componentVarName);
-            IVariable eventNameVar = new Variable(eventVarName);
+            IVariable componentVar = new Variable("Component Name");
+            IVariable eventNameVar = new Variable("EventName");
 
             IRule accessRightsViolationRule = new Rule(Guid.NewGuid().ToString());
 
@@ -86,8 +84,8 @@ namespace LogManagementTests
                     IContext context = new Context();
 
                     context
-                        .Assign(componentVarName, componentName)
-                        .Assign(eventVarName, eventName);
+                        .Assign(componentVar.Name, componentName)
+                        .Assign(eventNameVar.Name, eventName);
 
                     ((List<Tuple<string, object>>)parameters).ForEach(parameter =>
                     {
