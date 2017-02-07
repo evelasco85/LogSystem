@@ -43,6 +43,7 @@
     <Compile Include="ActivityMonitoring.cs" />
     <Compile Include="Event\Conditions\EventLessThanExpression.cs" />
     <Compile Include="Event\Conditions\EventGreatherThanExpression.cs" />
+    <Compile Include="Event\Conditions\EventNotExpression.cs" />
     <Compile Include="Event\EventContext.cs" />
     <Compile Include="Event\EventParameter.cs" />
     <Compile Include="Event\Conditions\EventEqualExpression.cs" />

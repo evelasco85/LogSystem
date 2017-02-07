@@ -13,12 +13,13 @@ namespace LogManagementTests
         {
             EventVariable x = new EventVariable("index");
             EventBoolean resultExpression = new EventEqualExpression(x, new EventLiteral("1"));
-            EventBoolean all = new EventAndExpression(resultExpression, EventLiteralBoolean.False());
+            EventBoolean all = new EventAndExpression(resultExpression, EventLiteralBoolean.True());
             EventContext context = new EventContext();
 
             context.Assign(x, "1");
 
-            bool result = all.Evaluate(context);
+            bool invertResult = (new EventNotExpression(all)).Evaluate(context);
+            bool result =  all.Evaluate(context);
 
             Assert.IsTrue(result);
         }
