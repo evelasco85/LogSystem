@@ -9,7 +9,7 @@ namespace LogManagementTests
     public class InterpreterTests
     {
         [TestMethod]
-        public void TestMethod1()
+        public void TestCondition()
         {
             Variable x = new Variable("index");
             BooleanBase resultExpression = new EqualToExpression(x, new Literal("L1", "1"));
@@ -25,7 +25,7 @@ namespace LogManagementTests
         }
 
         [TestMethod]
-        public void TestMethod2()
+        public void TestCondition2()
         {
             Variable x = new Variable("index");
             BooleanBase resultExpression = new GreatherThanExpression(x, new Literal("L2", 1));
