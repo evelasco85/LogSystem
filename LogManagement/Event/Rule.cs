@@ -4,22 +4,25 @@ using LogManagement.Event.Parameters;
 
 namespace LogManagement.Event
 {
-    public interface IRule
+    public interface IRuleValidation
     {
-        IRule RegisterVariable(IVariable variable);
-        IRule RegisterCondition(IBooleanBase condition);
-
         void Validate(IContext context, SuccessfulConditionsInvokedDelegate successfulResultInvocation,
-            FailedConditionsInvokedDelegate failedResultInvocation);
+           FailedConditionsInvokedDelegate failedResultInvocation);
     }
 
-    public delegate void SuccessfulConditionsInvokedDelegate(IList<IBooleanBase> successfulConditions);
-    public delegate void FailedConditionsInvokedDelegate(IList<IBooleanBase> failedConditions);
+    public interface IRule : IRuleValidation
+    {
+        IRule RegisterVariable(IVariable variable);
+        IRuleValidation RegisterCondition(IBooleanBase condition);
+    }
+
+    public delegate void SuccessfulConditionsInvokedDelegate();
+    public delegate void FailedConditionsInvokedDelegate();
 
     public class Rule : IRule
     {
         IDictionary<string, IVariable> _variables = new Dictionary<string, IVariable>();
-        IList<IBooleanBase> _conditions = new List<IBooleanBase>();
+        private IBooleanBase _condition;
 
         public IRule RegisterVariable(IVariable variable)
         {
@@ -34,9 +37,9 @@ namespace LogManagement.Event
             return this;
         }
 
-        public IRule RegisterCondition(IBooleanBase condition)
+        public IRuleValidation RegisterCondition(IBooleanBase condition)
         {
-            _conditions.Add(condition);
+            _condition = condition;
 
             return this;
         }
@@ -46,25 +49,15 @@ namespace LogManagement.Event
             if(context == null)
                 return;
 
-            IList<IBooleanBase> successfulConditions = new List<IBooleanBase>();
-            IList<IBooleanBase> failedConditions = new List<IBooleanBase>();
+            bool success = _condition.Evaluate(context);
 
-            for (int index = 0; index < _conditions.Count; index++)
+            if ((success) && (successfulResultInvocation != null))
+                    successfulResultInvocation();
+            else
             {
-                IBooleanBase condition = _conditions[index];
-                bool success = condition.Evaluate(context);
-
-                if(success)
-                    successfulConditions.Add(condition);
-                else
-                    failedConditions.Add(condition);
+                if (failedResultInvocation != null)
+                    failedResultInvocation();
             }
-
-            if (successfulResultInvocation != null)
-                successfulResultInvocation(successfulConditions);
-
-            if (failedResultInvocation != null)
-                failedResultInvocation(failedConditions);
         }
     }
 }

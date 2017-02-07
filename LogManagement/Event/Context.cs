@@ -32,8 +32,8 @@ namespace LogManagement.Event
 
         public object GetVariable(string variableName)
         {
-            if(!_contextData.ContainsKey(variableName))
-                throw new ArgumentException(string.Format("Variable with name '{0}' is not found in current context", variableName));
+            if (!_contextData.ContainsKey(variableName))
+                return null;
 
             return _contextData[variableName];
         }

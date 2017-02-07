@@ -42,7 +42,7 @@ namespace LogManagementTests
         }
 
         [TestMethod]
-        public void TestMethod1()
+        public void TestRuleValidation()
         {
             IVariable compVar = new Variable("Component Name");
             IVariable evNameVar = new Variable("EventName");
@@ -86,11 +86,11 @@ namespace LogManagementTests
                         context.Assign(parameter.Item1, parameter.Item2);
                     }
 
-                    accessRightsViolationRule.Validate(context, successfulConditions =>
+                    accessRightsViolationRule.Validate(context, () =>
                     {
                         errorMessage = "Non-administrator should have limited access rights!";
                     },
-                        failingConditions =>
+                        () =>
                         {
                             
                         });
