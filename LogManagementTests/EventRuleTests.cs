@@ -15,12 +15,14 @@ namespace LogManagementTests
     {
         IVariable _isAdminVar = new Variable("Is Administrator");
         private IVariable _accessRightsVar = new Variable("Access Rights");
+        IVariable _componentVar = new Variable("Component Name");
+        IVariable _eventNameVar = new Variable("EventName");
+
         const string AUTHENTICATION_COMPONENT_NAME = "Authentication Component";
         const string AUTHENTICATION_EVENT_NAME = "Validation";
+         
 
-
-        [TestInitialize]
-        public void Initialize()
+        void PerformRegistrations()
         {
             IApplicationRegistration applicationRegistration = new ApplicationRegistration("Security Tester");
             applicationRegistration
@@ -47,23 +49,19 @@ namespace LogManagementTests
             ActivityManager.GetInstance().RegisterSystem(systemRegistration);
         }
 
-        [TestMethod]
-        public void TestRuleValidation()
+        void SetupRules()
         {
-            IVariable componentVar = new Variable("Component Name");
-            IVariable eventNameVar = new Variable("EventName");
-
             IRule accessRightsViolationRule = new Rule(Guid.NewGuid().ToString());
 
             accessRightsViolationRule
-                .AddVariableScope(componentVar)
-                .AddVariableScope(eventNameVar)
+                .AddVariableScope(_componentVar)
+                .AddVariableScope(_eventNameVar)
                 .AddVariableScope(_isAdminVar, true)
                 .AddVariableScope(_accessRightsVar, true);
 
             //Event-trigger condition
-            IBooleanBase componentCondition = new EqualToExpression(componentVar, new Literal(AUTHENTICATION_COMPONENT_NAME));
-            IBooleanBase eventCondition = new EqualToExpression(eventNameVar, new Literal(AUTHENTICATION_EVENT_NAME));
+            IBooleanBase componentCondition = new EqualToExpression(_componentVar, new Literal(AUTHENTICATION_COMPONENT_NAME));
+            IBooleanBase eventCondition = new EqualToExpression(_eventNameVar, new Literal(AUTHENTICATION_EVENT_NAME));
             IBooleanBase matchingEventCondition = new AndExpression(componentCondition, eventCondition);
 
             //Parameter-trigger condition
@@ -74,8 +72,27 @@ namespace LogManagementTests
             //Trigger condition
             IBooleanBase triggerCondition = new AndExpression(matchingEventCondition, notAllowedAccessRightsCondition);
 
-            accessRightsViolationRule.SetCondition(triggerCondition);
+            accessRightsViolationRule.SetCondition(triggerCondition,
+                () =>{
+                    Console.WriteLine("Successfully invoked");
+                },
+                () =>{
+                    Console.WriteLine("Failed to invoked");
+                });
 
+            RuleManager.GetInstance().AddRule(accessRightsViolationRule);
+        }
+
+        [TestInitialize]
+        public void Initialize()
+        {
+            PerformRegistrations();
+            SetupRules();
+        }
+
+        [TestMethod]
+        public void TestRuleValidation()
+        {
             string errorMessage = "Rule validation not invoked";
 
             ActivityManager.GetInstance().OnActivityEmit =
@@ -84,24 +101,21 @@ namespace LogManagementTests
                     IContext context = new Context();
 
                     context
-                        .Assign(componentVar.Name, componentName)
-                        .Assign(eventNameVar.Name, eventName);
+                        .Assign(_componentVar.Name, componentName)
+                        .Assign(_eventNameVar.Name, eventName);
 
-                    ((List<Tuple<string, object>>)parameters).ForEach(parameter =>
+                    ((List<Tuple<string, object>>) parameters).ForEach(parameter =>
                     {
                         context.Assign(parameter.Item1, parameter.Item2);
                     });
 
-                    if (accessRightsViolationRule.CanInvokeRule(context))
-                    {
-                        accessRightsViolationRule.Validate(context,
-                            () => {
-                                      errorMessage = "Non-administrator should have limited access rights!";
-                            },
-                            () => {
-                                      errorMessage = "Rule validation was invoked but access-rights is a non-violation";
-                            });
-                    }
+                    RuleManager.GetInstance().InvokeMatchingRules(context,
+                        () => {
+                                  errorMessage = "Non-administrator should have limited access rights!";
+                        },
+                        () => {
+                                  errorMessage = "Rule validation was invoked but access-rights is a non-violation";
+                        });
                 };
 
             Authentication auth = new Authentication()

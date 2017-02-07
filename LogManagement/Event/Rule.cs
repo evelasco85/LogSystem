@@ -7,16 +7,21 @@ namespace LogManagement.Event
 {
     public interface IRuleValidation
     {
-        void Validate(IContext context, SuccessfulConditionsInvokedDelegate successfulResultInvocation,
-           FailedConditionsInvokedDelegate failedResultInvocation);
+        void Validate(IContext context);
     }
 
     public interface IRule : IRuleValidation
     {
         string Id { get; }
+        SuccessfulConditionsInvokedDelegate SuccessfulResultInvocation { get; set; }
+        FailedConditionsInvokedDelegate FailedResultInvocation { get; set; }
+
         IRule AddVariableScope(IVariable variable);
         IRule AddVariableScope(IVariable variable, bool requiredForInvocation);
         IRuleValidation SetCondition(IBooleanBase condition);
+        IRuleValidation SetCondition(IBooleanBase condition,
+            SuccessfulConditionsInvokedDelegate successfulResultInvocation,
+            FailedConditionsInvokedDelegate failedResultInvocation);
         bool CanInvokeRule(IContext context);
     }
 
@@ -30,9 +35,24 @@ namespace LogManagement.Event
         IDictionary<string, bool> _requiredVariables = new Dictionary<string, bool>();
         private IBooleanBase _condition;
 
+        public SuccessfulConditionsInvokedDelegate _successfulResultInvocation;
+        public FailedConditionsInvokedDelegate _failedResultInvocation;
+
         public string Id
         {
             get { return _id; }
+        }
+
+        public SuccessfulConditionsInvokedDelegate SuccessfulResultInvocation
+        {
+            get { return _successfulResultInvocation; }
+            set { _successfulResultInvocation = value; }
+        }
+
+        public FailedConditionsInvokedDelegate FailedResultInvocation
+        {
+            get { return _failedResultInvocation; }
+            set { _failedResultInvocation = value; }
         }
 
         public Rule(string id)
@@ -61,10 +81,20 @@ namespace LogManagement.Event
             return this;
         }
 
-        public IRuleValidation SetCondition(IBooleanBase condition)
+        public IRuleValidation SetCondition(IBooleanBase condition, 
+            SuccessfulConditionsInvokedDelegate successfulResultInvocation, 
+            FailedConditionsInvokedDelegate failedResultInvocation)
         {
             _condition = condition;
+            _successfulResultInvocation = successfulResultInvocation;
+            _failedResultInvocation = failedResultInvocation;
 
+            return this;
+        }
+
+        public IRuleValidation SetCondition(IBooleanBase condition)
+        {
+            SetCondition(condition, null, null);
             return this;
         }
 
@@ -78,19 +108,19 @@ namespace LogManagement.Event
             return !requiredVariables.Except(contextVariableNames).Any();
         }
 
-        public void Validate(IContext context, SuccessfulConditionsInvokedDelegate successfulResultInvocation, FailedConditionsInvokedDelegate failedResultInvocation)
+        public void Validate(IContext context)
         {
             if (context == null)
                 return;
 
             bool success = _condition.Evaluate(context);
 
-            if ((success) && (successfulResultInvocation != null))
-                    successfulResultInvocation();
+            if ((success) && (_successfulResultInvocation != null))
+                _successfulResultInvocation();
             else
             {
-                if (failedResultInvocation != null)
-                    failedResultInvocation();
+                if (_failedResultInvocation != null)
+                    _failedResultInvocation();
             }
         }
     }

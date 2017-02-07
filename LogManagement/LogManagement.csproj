@@ -55,6 +55,7 @@
     <Compile Include="Event\Parameters\LiteralBoolean.cs" />
     <Compile Include="Event\Parameters\Variable.cs" />
     <Compile Include="Managers\ActivityManager.cs" />
+    <Compile Include="Managers\RuleManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registration\ApplicationRegistration.cs" />
     <Compile Include="Registration\ComponentRegistration.cs" />
