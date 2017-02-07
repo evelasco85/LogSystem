@@ -2,11 +2,11 @@
 
 namespace LogManagement.Event.Conditions
 {
-    public class EventNotExpression : EventBoolean
+    public class NotExpression : EventBoolean
     {
         private IEventBoolean _boolean;
 
-        public EventNotExpression(IEventBoolean boolean)
+        public NotExpression(IEventBoolean boolean)
         {
             _boolean = boolean;
         }

@@ -2,7 +2,7 @@
 
 namespace LogManagement.Event.Conditions
 {
-    public class EventAndExpression : EventBoolean
+    public class AndExpression : EventBoolean
     {
         private IEventBoolean _operand1;
         private IEventBoolean _operand2;
@@ -12,7 +12,7 @@ namespace LogManagement.Event.Conditions
             return _operand1.Evaluate(context) && _operand2.Evaluate(context);
         }
 
-        public EventAndExpression(IEventBoolean operand1, IEventBoolean operand2)
+        public AndExpression(IEventBoolean operand1, IEventBoolean operand2)
         {
             _operand1 = operand1;
             _operand2 = operand2;

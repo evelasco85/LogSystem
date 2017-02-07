@@ -3,7 +3,7 @@ using LogManagement.Event.Parameters;
 
 namespace LogManagement.Event.Conditions
 {
-    public class EventEqualToExpression : EventBoolean
+    public class EqualToExpression : EventBoolean
     {
         private IEventData _data1;
         private IEventData _data2;
@@ -15,7 +15,7 @@ namespace LogManagement.Event.Conditions
             return (comparable != null) && comparable.CompareTo(_data2.GetData(context)) == 0;
         }
 
-        public EventEqualToExpression(IEventData data1, IEventData data2)
+        public EqualToExpression(IEventData data1, IEventData data2)
         {
             _data1 = data1;
             _data2 = data2;

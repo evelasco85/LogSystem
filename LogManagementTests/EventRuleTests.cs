@@ -49,31 +49,31 @@ namespace LogManagementTests
             IEventVariable isAdminVar = new EventVariable("Is Administrator");
             IEventVariable accessRightsVar = new EventVariable("Access Rights");
 
-            IEventBoolean compCondition = new EventEqualToExpression(compVar, new EventLiteral("Authentication Component"));
-            IEventBoolean evNameCondition = new EventEqualToExpression(evNameVar, new EventLiteral("Validation"));
-            IEventBoolean compEventCondition = new EventAndExpression(compCondition, evNameCondition);
-            IEventBoolean accessRightsCondition = new EventEqualToExpression(accessRightsVar, new EventLiteral(Rights.Full));
-            IEventBoolean isAdministratorCondition = new EventEqualToExpression(isAdminVar, new EventLiteral(true));
-            IEventBoolean notAllowedAccessRightsCondition = new EventAndExpression(accessRightsCondition, new EventNotExpression(isAdministratorCondition));
-            IEventBoolean condition = new EventAndExpression(compEventCondition, notAllowedAccessRightsCondition);
+            IEventBoolean compCondition = new EqualToExpression(compVar, new EventLiteral("Authentication Component"));
+            IEventBoolean evNameCondition = new EqualToExpression(evNameVar, new EventLiteral("Validation"));
+            IEventBoolean compEventCondition = new AndExpression(compCondition, evNameCondition);
+            IEventBoolean accessRightsCondition = new EqualToExpression(accessRightsVar, new EventLiteral(Rights.Full));
+            IEventBoolean isAdministratorCondition = new EqualToExpression(isAdminVar, new EventLiteral(true));
+            IEventBoolean notAllowedAccessRightsCondition = new AndExpression(accessRightsCondition, new NotExpression(isAdministratorCondition));
+            IEventBoolean condition = new AndExpression(compEventCondition, notAllowedAccessRightsCondition);
 
-            IEventRule rule = new EventRule();
+            IEventRule accessRightsViolationRule = new EventRule();
 
-            rule
+            accessRightsViolationRule
                 .RegisterVariable(compVar)
                 .RegisterVariable(evNameVar)
                 .RegisterVariable(isAdminVar)
                 .RegisterVariable(accessRightsVar)
                 ;
 
-            rule.RegisterCondition(condition);
+            accessRightsViolationRule.RegisterCondition(condition);
 
             string errorMessage = string.Empty;
 
             ActivityManager.GetInstance().OnActivityEmit =
                 (systemName, applicationName, componentName, eventName, parameters) =>
                 {
-                    rule
+                    accessRightsViolationRule
                         .RegisterContextValue("Component Name", componentName)
                         .RegisterContextValue("EventName", eventName);
 
@@ -81,11 +81,11 @@ namespace LogManagementTests
                     {
                         Tuple<string, object> parameter = parameters[index];
 
-                        rule.RegisterContextValue(parameter.Item1, parameter.Item2);
+                        accessRightsViolationRule.RegisterContextValue(parameter.Item1, parameter.Item2);
                     }
                     
 
-                    rule.Validate(successfulConditions =>
+                    accessRightsViolationRule.Validate(successfulConditions =>
                     {
                         errorMessage = "Non-administrator should have limited access rights!";
                     },
