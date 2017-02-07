@@ -44,51 +44,55 @@ namespace LogManagementTests
         [TestMethod]
         public void TestMethod1()
         {
-            IList<Tuple<string, object>> evParams = null;
-
-            IEventVariable sysVar = new EventVariable("System Name");
-            IEventVariable appVar = new EventVariable("Application Name");
             IEventVariable compVar = new EventVariable("Component Name");
             IEventVariable evNameVar = new EventVariable("EventName");
+            IEventVariable isAdminVar = new EventVariable("Is Administrator");
+            IEventVariable accessRightsVar = new EventVariable("Access Rights");
 
-            IEventBoolean sysCondition = new EventEqualToExpression(sysVar, new EventLiteral("SS", "Security System"));
-            IEventBoolean appCondition = new EventEqualToExpression(appVar, new EventLiteral("ST", "Security Testers"));
-            IEventBoolean compCondition = new EventEqualToExpression(compVar, new EventLiteral("AC", "Authentication Component"));
-            IEventBoolean evNameCondition = new EventEqualToExpression(evNameVar, new EventLiteral("Val", "Validation"));
-            
+            IEventBoolean compCondition = new EventEqualToExpression(compVar, new EventLiteral("value", "Authentication Component"));
+            IEventBoolean evNameCondition = new EventEqualToExpression(evNameVar, new EventLiteral("value", "Validation"));
+            IEventBoolean compEventCondition = new EventAndExpression(compCondition, evNameCondition);
+            IEventBoolean accessRightsCondition = new EventEqualToExpression(accessRightsVar, new EventLiteral("value", Rights.Full));
+            IEventBoolean isAdministratorCondition = new EventEqualToExpression(isAdminVar, new EventLiteral("value", true));
+            IEventBoolean notAllowedAccessRightsCondition = new EventAndExpression(accessRightsCondition, new EventNotExpression(isAdministratorCondition));
+            IEventBoolean condition = new EventAndExpression(compEventCondition, notAllowedAccessRightsCondition);
+
             IEventRule rule = new EventRule();
 
             rule
-                .RegisterVariable(sysVar)
-                .RegisterVariable(appVar)
                 .RegisterVariable(compVar)
-                .RegisterVariable(evNameVar);
+                .RegisterVariable(evNameVar)
+                .RegisterVariable(isAdminVar)
+                .RegisterVariable(accessRightsVar)
+                ;
 
-            rule
-                .RegisterCondition(sysCondition)
-                .RegisterCondition(appCondition)
-                .RegisterCondition(compCondition)
-                .RegisterCondition(evNameCondition);
+            rule.RegisterCondition(condition);
+
+            string errorMessage = string.Empty;
 
             ActivityManager.GetInstance().OnActivityEmit =
                 (systemName, applicationName, componentName, eventName, parameters) =>
                 {
                     rule
-                        .RegisterContextValue("System Name", systemName)
-                        .RegisterContextValue("Application Name", applicationName)
                         .RegisterContextValue("Component Name", componentName)
                         .RegisterContextValue("EventName", eventName);
 
+                    for (int index = 0; index < parameters.Count; index++)
+                    {
+                        Tuple<string, object> parameter = parameters[index];
+
+                        rule.RegisterContextValue(parameter.Item1, parameter.Item2);
+                    }
+                    
+
                     rule.Validate(successfulConditions =>
                     {
-                        
+                        errorMessage = "Non-administrator should have limited access rights!";
                     },
                         failingConditions =>
                         {
                             
                         });
-
-                    evParams = parameters;
                 };
 
             Authentication auth = new Authentication()
@@ -100,6 +104,7 @@ namespace LogManagementTests
 
             bool verified = auth.Verify();      //This will emit activity detail
 
+            Assert.AreEqual("Non-administrator should have limited access rights!", errorMessage);
         }
     }
 }

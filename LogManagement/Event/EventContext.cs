@@ -37,7 +37,7 @@ namespace LogManagement.Event
                 throw new ArgumentException("'variableName' parameter is required");
 
             if (!_contextData.ContainsKey(variableName))
-                throw new ArgumentException(string.Format("Parameter with name '{0}' is not found", variableName));
+                return;
 
             IEventVariable variable = _contextData[variableName];
 
