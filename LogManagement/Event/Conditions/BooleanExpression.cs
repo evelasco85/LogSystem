@@ -1,4 +1,6 @@
-﻿namespace LogManagement.Event.Parameters
+﻿using LogManagement.Event.Parameters;
+
+namespace LogManagement.Event.Conditions
 {
     public class BooleanExpression: BooleanBase
     {
