@@ -5,7 +5,6 @@ namespace LogManagement.Event.Parameters
     public interface IVariable : IData
     {
         string Name { get; }
-        object Value { get; set; }
     }
 
     public class Variable : Data, IVariable
@@ -17,8 +16,6 @@ namespace LogManagement.Event.Parameters
             get { return _name; }
         }
 
-        public object Value { get; set; }
-
         public Variable(string name)
         {
             _name = name;
@@ -26,9 +23,7 @@ namespace LogManagement.Event.Parameters
 
         public override object GetData(IContext context)
         {
-            Value = context.GetVariable(_name);
-
-            return Value;
+            return context.GetVariable(_name);
         }
 
         public override string GetSyntax(IContext context)
