@@ -6,11 +6,10 @@ namespace LogManagement.Event
 {
     public interface IEventRule
     {
-        IEventRule RegisterContextValue(string variableName, object value);
         IEventRule RegisterVariable(IEventVariable variable);
         IEventRule RegisterCondition(IEventBoolean condition);
 
-        void Validate(SuccessfulConditionsInvokedDelegate successfulResultInvocation,
+        void Validate(IEventContext context, SuccessfulConditionsInvokedDelegate successfulResultInvocation,
             FailedConditionsInvokedDelegate failedResultInvocation);
     }
 
@@ -19,7 +18,6 @@ namespace LogManagement.Event
 
     public class EventRule : IEventRule
     {
-        IEventContext _context = new EventContext();
         IDictionary<string, IEventVariable> _variables = new Dictionary<string, IEventVariable>();
         IList<IEventBoolean> _conditions = new List<IEventBoolean>();
 
@@ -32,7 +30,6 @@ namespace LogManagement.Event
                 throw new ArgumentException(string.Format("Variable with name '{0}' is already registered", variable.Name));
 
             _variables.Add(variable.Name, variable);
-            _context.Assign(variable, null);
 
             return this;
         }
@@ -44,9 +41,9 @@ namespace LogManagement.Event
             return this;
         }
 
-        public void Validate(SuccessfulConditionsInvokedDelegate successfulResultInvocation, FailedConditionsInvokedDelegate failedResultInvocation)
+        public void Validate(IEventContext context, SuccessfulConditionsInvokedDelegate successfulResultInvocation, FailedConditionsInvokedDelegate failedResultInvocation)
         {
-            if(_context.HasNullValue())     //Ignore this rule if variables are not 'completely assigned' set
+            if(context == null)
                 return;
 
             IList<IEventBoolean> successfulConditions = new List<IEventBoolean>();
@@ -55,7 +52,7 @@ namespace LogManagement.Event
             for (int index = 0; index < _conditions.Count; index++)
             {
                 IEventBoolean condition = _conditions[index];
-                bool success = condition.Evaluate(_context);
+                bool success = condition.Evaluate(context);
 
                 if(success)
                     successfulConditions.Add(condition);
@@ -68,15 +65,6 @@ namespace LogManagement.Event
 
             if (failedResultInvocation != null)
                 failedResultInvocation(failedConditions);
-
-            _context.ClearAssignedValues();
-        }
-
-        public IEventRule RegisterContextValue(string variableName, object value)
-        {
-            _context.Assign(variableName, value);
-
-            return this;
         }
     }
 }

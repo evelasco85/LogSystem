@@ -16,7 +16,7 @@ namespace LogManagementTests
             EventBoolean all = new AndExpression(resultExpression, EventLiteralBoolean.True());
             EventContext context = new EventContext();
 
-            context.Assign(x, "1");
+            context.Assign(x.Name, "1");
 
             bool invertResult = (new NotExpression(all)).Evaluate(context);
             bool result =  all.Evaluate(context);
@@ -31,7 +31,7 @@ namespace LogManagementTests
             EventBoolean resultExpression = new GreatherThanExpression(x, new EventLiteral("L2", 1));
             EventContext context = new EventContext();
 
-            context.Assign(x, 2);
+            context.Assign(x.Name, 2);
 
             bool result = resultExpression.Evaluate(context);
 

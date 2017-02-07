@@ -26,7 +26,7 @@ namespace LogManagement.Event.Parameters
 
         public override object GetData(IEventContext context)
         {
-            Value = context.GetVariable(_name).Value;
+            Value = context.GetVariable(_name);
 
             return Value;
         }

@@ -73,19 +73,20 @@ namespace LogManagementTests
             ActivityManager.GetInstance().OnActivityEmit =
                 (systemName, applicationName, componentName, eventName, parameters) =>
                 {
-                    accessRightsViolationRule
-                        .RegisterContextValue("Component Name", componentName)
-                        .RegisterContextValue("EventName", eventName);
+                    IEventContext context = new EventContext();
+
+                    context
+                        .Assign("Component Name", componentName)
+                        .Assign("EventName", eventName);
 
                     for (int index = 0; index < parameters.Count; index++)
                     {
                         Tuple<string, object> parameter = parameters[index];
 
-                        accessRightsViolationRule.RegisterContextValue(parameter.Item1, parameter.Item2);
+                        context.Assign(parameter.Item1, parameter.Item2);
                     }
-                    
 
-                    accessRightsViolationRule.Validate(successfulConditions =>
+                    accessRightsViolationRule.Validate(context, successfulConditions =>
                     {
                         errorMessage = "Non-administrator should have limited access rights!";
                     },
