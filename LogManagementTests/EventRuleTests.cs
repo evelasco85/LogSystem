@@ -110,6 +110,7 @@ namespace LogManagementTests
 
             bool verified = auth.Verify();      //This will emit activity detail
 
+            Assert.IsFalse(verified);
             Assert.AreEqual("Non-administrator should have limited access rights!", errorMessage);
         }
     }
