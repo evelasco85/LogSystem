@@ -74,10 +74,10 @@ namespace LogManagementTests
 
             accessRightsViolationRule.SetCondition(triggerCondition,
                 () =>{
-                    Console.WriteLine("Successfully invoked");
+                    Console.WriteLine("Access rights violation alert!");
                 },
                 () =>{
-                    Console.WriteLine("Failed to invoked");
+                    Console.WriteLine("All is well...");
                 });
 
             RuleManager.GetInstance().AddRule(accessRightsViolationRule);
