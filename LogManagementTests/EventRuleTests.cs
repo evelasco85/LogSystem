@@ -56,10 +56,10 @@ namespace LogManagementTests
             IRule accessRightsViolationRule = new Rule(Guid.NewGuid().ToString());
 
             accessRightsViolationRule
-                .RegisterVariable(componentVar)
-                .RegisterVariable(eventNameVar)
-                .RegisterVariable(_isAdminVar, true)
-                .RegisterVariable(_accessRightsVar, true);
+                .AddVariableScope(componentVar)
+                .AddVariableScope(eventNameVar)
+                .AddVariableScope(_isAdminVar, true)
+                .AddVariableScope(_accessRightsVar, true);
 
             //Event-trigger condition
             IBooleanBase componentCondition = new EqualToExpression(componentVar, new Literal(AUTHENTICATION_COMPONENT_NAME));
@@ -74,7 +74,7 @@ namespace LogManagementTests
             //Trigger condition
             IBooleanBase triggerCondition = new AndExpression(matchingEventCondition, notAllowedAccessRightsCondition);
 
-            accessRightsViolationRule.RegisterCondition(triggerCondition);
+            accessRightsViolationRule.SetCondition(triggerCondition);
 
             string errorMessage = "Rule validation not invoked";
 
@@ -92,7 +92,7 @@ namespace LogManagementTests
                         context.Assign(parameter.Item1, parameter.Item2);
                     });
 
-                    if (accessRightsViolationRule.CanInvoke(context))
+                    if (accessRightsViolationRule.CanInvokeRule(context))
                     {
                         accessRightsViolationRule.Validate(context,
                             () => {

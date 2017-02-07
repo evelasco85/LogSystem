@@ -14,10 +14,10 @@ namespace LogManagement.Event
     public interface IRule : IRuleValidation
     {
         string Id { get; }
-        IRule RegisterVariable(IVariable variable);
-        IRule RegisterVariable(IVariable variable, bool requiredForInvocation);
-        IRuleValidation RegisterCondition(IBooleanBase condition);
-        bool CanInvoke(IContext context);
+        IRule AddVariableScope(IVariable variable);
+        IRule AddVariableScope(IVariable variable, bool requiredForInvocation);
+        IRuleValidation SetCondition(IBooleanBase condition);
+        bool CanInvokeRule(IContext context);
     }
 
     public delegate void SuccessfulConditionsInvokedDelegate();
@@ -40,14 +40,14 @@ namespace LogManagement.Event
             _id = id;
         }
 
-        public IRule RegisterVariable(IVariable variable)
+        public IRule AddVariableScope(IVariable variable)
         {
-            RegisterVariable(variable, false);
+            AddVariableScope(variable, false);
 
             return this;
         }
 
-        public IRule RegisterVariable(IVariable variable, bool requiredForInvocation)
+        public IRule AddVariableScope(IVariable variable, bool requiredForInvocation)
         {
             if (variable == null)
                 throw new ArgumentException("'variable' parameter is required");
@@ -61,14 +61,14 @@ namespace LogManagement.Event
             return this;
         }
 
-        public IRuleValidation RegisterCondition(IBooleanBase condition)
+        public IRuleValidation SetCondition(IBooleanBase condition)
         {
             _condition = condition;
 
             return this;
         }
 
-        public bool CanInvoke(IContext context)
+        public bool CanInvokeRule(IContext context)
         {
             IEnumerable<string> contextVariableNames = context.GetVariableNameList();
             IEnumerable<string> requiredVariables = _requiredVariables
