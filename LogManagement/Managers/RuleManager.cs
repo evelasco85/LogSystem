@@ -61,16 +61,16 @@ namespace LogManagement.Managers
                 SuccessfulConditionsInvokedDelegate originalSuccessfulResultInvocation = rule.SuccessfulResultInvocation;
                 FailedConditionsInvokedDelegate originalFailedResultInvocation = rule.FailedResultInvocation;
 
-                rule.SuccessfulResultInvocation = () =>
+                rule.SuccessfulResultInvocation = (resultContext, resultRule) =>
                 {
-                    InvokeRuleDelegate(originalSuccessfulResultInvocation);
-                    InvokeRuleDelegate(additionalSuccessfulResultInvocation);
+                    InvokeRuleDelegate(resultContext, resultRule, originalSuccessfulResultInvocation);
+                    InvokeRuleDelegate(resultContext, resultRule, additionalSuccessfulResultInvocation);
                 };
 
-                rule.FailedResultInvocation = () =>
+                rule.FailedResultInvocation = (resultContext, resultRule) =>
                 {
-                    InvokeRuleDelegate(originalFailedResultInvocation);
-                    InvokeRuleDelegate(additionalFailedResultInvocation);
+                    InvokeRuleDelegate(resultContext, resultRule, originalFailedResultInvocation);
+                    InvokeRuleDelegate(resultContext, resultRule, additionalFailedResultInvocation);
                 };
 
                 rule.Validate(context);
@@ -81,15 +81,15 @@ namespace LogManagement.Managers
             });
         }
 
-        void InvokeRuleDelegate(SuccessfulConditionsInvokedDelegate successfulResultInvocation)
+        void InvokeRuleDelegate(IContext resultContext, IRule resultRule, SuccessfulConditionsInvokedDelegate successfulResultInvocation)
         {
             if (successfulResultInvocation != null)
-                successfulResultInvocation();
+                successfulResultInvocation(resultContext, resultRule);
         }
-        void InvokeRuleDelegate(FailedConditionsInvokedDelegate failedResultInvocation)
+        void InvokeRuleDelegate(IContext resultContext, IRule resultRule, FailedConditionsInvokedDelegate failedResultInvocation)
         {
             if (failedResultInvocation != null)
-                failedResultInvocation();
+                failedResultInvocation(resultContext, resultRule);
         }
     }
 }

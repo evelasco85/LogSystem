@@ -7,7 +7,7 @@ namespace LogManagement.Event
     public interface IContext
     {
         IContext Assign(string variableName, object value);
-        object GetVariable(string variableName);
+        object GetValue(string variableName);
         IEnumerable<string> GetVariableNameList();
         void Clear();
     }
@@ -32,7 +32,7 @@ namespace LogManagement.Event
             return this;
         }
 
-        public object GetVariable(string variableName)
+        public object GetValue(string variableName)
         {
             if (!_contextData.ContainsKey(variableName))
                 return null;

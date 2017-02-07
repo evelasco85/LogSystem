@@ -23,7 +23,7 @@ namespace LogManagement.Event.Parameters
 
         public override object GetData(IContext context)
         {
-            return context.GetVariable(_name);
+            return context.GetValue(_name);
         }
 
         public override string GetSyntax(IContext context)

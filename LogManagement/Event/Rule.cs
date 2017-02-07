@@ -22,11 +22,12 @@ namespace LogManagement.Event
         IRuleValidation SetCondition(IBooleanBase condition,
             SuccessfulConditionsInvokedDelegate successfulResultInvocation,
             FailedConditionsInvokedDelegate failedResultInvocation);
+        IBooleanBase GetCondition();
         bool CanInvokeRule(IContext context);
     }
 
-    public delegate void SuccessfulConditionsInvokedDelegate();
-    public delegate void FailedConditionsInvokedDelegate();
+    public delegate void SuccessfulConditionsInvokedDelegate(IContext resultContext, IRule resultRule);
+    public delegate void FailedConditionsInvokedDelegate(IContext resultContext, IRule resultRule);
 
     public class Rule : IRule
     {
@@ -92,6 +93,11 @@ namespace LogManagement.Event
             return this;
         }
 
+        public IBooleanBase GetCondition()
+        {
+            return _condition;
+        }
+
         public IRuleValidation SetCondition(IBooleanBase condition)
         {
             SetCondition(condition, null, null);
@@ -116,11 +122,11 @@ namespace LogManagement.Event
             bool success = _condition.Evaluate(context);
 
             if ((success) && (_successfulResultInvocation != null))
-                _successfulResultInvocation();
+                _successfulResultInvocation(context, this);
             else
             {
                 if (_failedResultInvocation != null)
-                    _failedResultInvocation();
+                    _failedResultInvocation(context, this);
             }
         }
     }

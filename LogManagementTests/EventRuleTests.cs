@@ -73,10 +73,12 @@ namespace LogManagementTests
             IBooleanBase triggerCondition = new AndExpression(matchingEventCondition, notAllowedAccessRightsCondition);
 
             accessRightsViolationRule.SetCondition(triggerCondition,
-                () =>{
+                (resultContext, resultRule) =>
+                {
                     Console.WriteLine("Access rights violation alert!");
                 },
-                () =>{
+                (resultContext, resultRule) =>
+                {
                     Console.WriteLine("All is well...");
                 });
 
@@ -110,15 +112,16 @@ namespace LogManagementTests
                     });
 
                     RuleManager.GetInstance().InvokeMatchingRules(context,
-                        () =>
+                        (resultContext, resultRule) =>
                         {
                             errorMessage = "Non-administrator should have limited access rights!";
                             Console.WriteLine(errorMessage);
+                            Console.WriteLine("Condition: {0}", resultRule.GetCondition().GetSyntax(resultContext));
                         },
-                        () =>
+                        (resultContext, resultRule) =>
                         {
                             errorMessage = "Rule validation was invoked but access-rights is a non-violation";
-                            Console.WriteLine(errorMessage);
+                            Console.WriteLine("Condition: {0}", resultRule.GetCondition().GetSyntax(resultContext));
                         });
                 };
 
