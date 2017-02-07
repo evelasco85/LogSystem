@@ -49,11 +49,11 @@ namespace LogManagementTests
             IEventVariable isAdminVar = new EventVariable("Is Administrator");
             IEventVariable accessRightsVar = new EventVariable("Access Rights");
 
-            IEventBoolean compCondition = new EventEqualToExpression(compVar, new EventLiteral("value", "Authentication Component"));
-            IEventBoolean evNameCondition = new EventEqualToExpression(evNameVar, new EventLiteral("value", "Validation"));
+            IEventBoolean compCondition = new EventEqualToExpression(compVar, new EventLiteral("Authentication Component"));
+            IEventBoolean evNameCondition = new EventEqualToExpression(evNameVar, new EventLiteral("Validation"));
             IEventBoolean compEventCondition = new EventAndExpression(compCondition, evNameCondition);
-            IEventBoolean accessRightsCondition = new EventEqualToExpression(accessRightsVar, new EventLiteral("value", Rights.Full));
-            IEventBoolean isAdministratorCondition = new EventEqualToExpression(isAdminVar, new EventLiteral("value", true));
+            IEventBoolean accessRightsCondition = new EventEqualToExpression(accessRightsVar, new EventLiteral(Rights.Full));
+            IEventBoolean isAdministratorCondition = new EventEqualToExpression(isAdminVar, new EventLiteral(true));
             IEventBoolean notAllowedAccessRightsCondition = new EventAndExpression(accessRightsCondition, new EventNotExpression(isAdministratorCondition));
             IEventBoolean condition = new EventAndExpression(compEventCondition, notAllowedAccessRightsCondition);
 

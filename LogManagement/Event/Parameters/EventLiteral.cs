@@ -13,6 +13,10 @@ namespace LogManagement.Event.Parameters
             _name = literalName;
         }
 
+        public EventLiteral(object value) : this("Value", value)
+        {
+        }
+
         public override object GetData(IEventContext context)
         {
             return _value;
