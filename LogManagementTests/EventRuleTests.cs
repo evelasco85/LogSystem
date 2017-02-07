@@ -49,6 +49,14 @@ namespace LogManagementTests
             IVariable componentVar = new Variable("Component Name");
             IVariable eventNameVar = new Variable("EventName");
 
+            IRule accessRightsViolationRule = new Rule(Guid.NewGuid().ToString());
+
+            accessRightsViolationRule
+                .RegisterVariable(componentVar)
+                .RegisterVariable(eventNameVar)
+                .RegisterVariable(_isAdminVar, true)
+                .RegisterVariable(_accessRightsVar, true);
+
             //Event-trigger condition
             IBooleanBase componentCondition = new EqualToExpression(componentVar, new Literal("Authentication Component"));
             IBooleanBase eventCondition = new EqualToExpression(eventNameVar, new Literal("Validation"));
@@ -61,15 +69,6 @@ namespace LogManagementTests
 
             //Trigger condition
             IBooleanBase triggerCondition = new AndExpression(matchingEventCondition, notAllowedAccessRightsCondition);
-
-            IRule accessRightsViolationRule = new Rule(Guid.NewGuid().ToString());
-
-            accessRightsViolationRule
-                .RegisterVariable(componentVar)
-                .RegisterVariable(eventNameVar)
-                .RegisterVariable(_isAdminVar, true)
-                .RegisterVariable(_accessRightsVar, true)
-                ;
 
             accessRightsViolationRule.RegisterCondition(triggerCondition);
 
