@@ -7,7 +7,9 @@ namespace LogManagement.Event
     public interface IEventContext
     {
         void Assign(IEventVariable variable, object value);
+        void Assign(string variableName, object value);
         IEventVariable GetVariable(string variableName);
+        void Clear();
     }
 
     public class EventContext : IEventContext
@@ -27,12 +29,30 @@ namespace LogManagement.Event
             _contextData.Add(variable.Name, variable);
         }
 
+        public void Assign(string variableName, object value)
+        {
+            if (string.IsNullOrEmpty(variableName))
+                throw new ArgumentException("'variableName' parameter is required");
+
+            if (!_contextData.ContainsKey(variableName))
+                throw new ArgumentException(string.Format("Parameter with name '{0}' is not found", variableName));
+
+            IEventVariable variable = _contextData[variableName];
+
+            variable.Value = value;
+        }
+
         public IEventVariable GetVariable(string variableName)
         {
             if(!_contextData.ContainsKey(variableName))
-                throw new ArgumentException("Variable with name '{0}' is not found in current context", variableName);
+                throw new ArgumentException(string.Format("Variable with name '{0}' is not found in current context", variableName));
 
             return _contextData[variableName];
+        }
+
+        public void Clear()
+        {
+            _contextData.Clear();
         }
     }
 }

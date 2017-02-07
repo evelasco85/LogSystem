@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using LogManagement.Event;
+using LogManagement.Event.Conditions;
+using LogManagement.Event.Parameters;
 using LogManagement.Managers;
 using LogManagement.Registration;
 using LogManagementTests.Implementations;
@@ -9,7 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace LogManagementTests
 {
     [TestClass]
-    public class RegistrationTests
+    public class EventRuleTests
     {
         [TestInitialize]
         public void Initialize()
@@ -35,26 +37,57 @@ namespace LogManagementTests
                 .RegisterApplication(applicationRegistration)
                 .RegisterApplication(new ApplicationRegistration("Dummy Application"));
 
-            
+
             ActivityManager.GetInstance().RegisterSystem(systemRegistration);
         }
 
         [TestMethod]
-        public void TestValidateCurrentCall()
+        public void TestMethod1()
         {
-            string sysName = string.Empty;
-            string appName = string.Empty;
-            string compName = string.Empty;
-            string evName = string.Empty;
             IList<Tuple<string, object>> evParams = null;
+
+            IEventVariable sysVar = new EventVariable("System Name");
+            IEventVariable appVar = new EventVariable("Application Name");
+            IEventVariable compVar = new EventVariable("Component Name");
+            IEventVariable evNameVar = new EventVariable("EventName");
+
+            IEventBoolean sysCondition = new EventEqualToExpression(sysVar, new EventLiteral("Security System"));
+            IEventBoolean appCondition = new EventEqualToExpression(appVar, new EventLiteral("Security Testers"));
+            IEventBoolean compCondition = new EventEqualToExpression(compVar, new EventLiteral("Authentication Component"));
+            IEventBoolean evNameCondition = new EventEqualToExpression(evNameVar, new EventLiteral("Validation"));
+            
+            IEventRule rule = new EventRule();
+
+            rule
+                .RegisterVariable(sysVar)
+                .RegisterVariable(appVar)
+                .RegisterVariable(compVar)
+                .RegisterVariable(evNameVar);
+
+            rule
+                .RegisterCondition(sysCondition)
+                .RegisterCondition(appCondition)
+                .RegisterCondition(compCondition)
+                .RegisterCondition(evNameCondition);
 
             ActivityManager.GetInstance().OnActivityEmit =
                 (systemName, applicationName, componentName, eventName, parameters) =>
                 {
-                    sysName = systemName;
-                    appName = applicationName;
-                    compName = componentName;
-                    evName = eventName;
+                    rule
+                        .RegisterContextValue("System Name", systemName)
+                        .RegisterContextValue("Application Name", applicationName)
+                        .RegisterContextValue("Component Name", componentName)
+                        .RegisterContextValue("EventName", eventName);
+
+                    rule.Validate(successfulConditions =>
+                    {
+                        
+                    },
+                        failingConditions =>
+                        {
+                            
+                        });
+
                     evParams = parameters;
                 };
 
@@ -67,15 +100,6 @@ namespace LogManagementTests
 
             bool verified = auth.Verify();      //This will emit activity detail
 
-            Assert.IsFalse(verified);
-            Assert.AreEqual("Security System", sysName);
-            Assert.AreEqual("Security Tester", appName);
-            Assert.AreEqual("Authentication Component", compName);
-            Assert.AreEqual("Validation", evName);
-            Assert.IsTrue((evParams != null) && (evParams.Count == 2));
-
-            Assert.AreEqual(Rights.Full, evParams.Where(p => p.Item1 == "Access Rights").First().Item2);
-            Assert.AreEqual(false, evParams.Where(p => p.Item1 == "Is Administrator").First().Item2);
         }
     }
 }

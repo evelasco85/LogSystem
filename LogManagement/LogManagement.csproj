@@ -45,9 +45,10 @@
     <Compile Include="Event\Conditions\EventGreatherThanExpression.cs" />
     <Compile Include="Event\Conditions\EventNotExpression.cs" />
     <Compile Include="Event\EventContext.cs" />
-    <Compile Include="Event\EventParameter.cs" />
+    <Compile Include="Event\EventParameter%28forDeletion%29.cs" />
     <Compile Include="Event\Conditions\EventEqualToExpression.cs" />
     <Compile Include="Event\Conditions\EventAndExpression.cs" />
+    <Compile Include="Event\EventRule.cs" />
     <Compile Include="Event\Parameters\EventBoolean.cs" />
     <Compile Include="Event\Parameters\EventData.cs" />
     <Compile Include="Event\Parameters\EventLiteral.cs" />

@@ -1,6 +1,6 @@
 ﻿namespace LogManagement.Event.Parameters
 {
-    public interface IEventVariable
+    public interface IEventVariable : IEventData
     {
         string Name { get; }
         object Value { get; set; }
