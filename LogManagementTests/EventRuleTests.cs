@@ -49,26 +49,22 @@ namespace LogManagementTests
             IVariable isAdminVar = new Variable("Is Administrator");
             IVariable accessRightsVar = new Variable("Access Rights");
 
-            IBooleanBase compCondition = new EqualToExpression(compVar, new Literal("Authentication Component"));
-            IBooleanBase evNameCondition = new EqualToExpression(evNameVar, new Literal("Validation"));
-            IBooleanBase compEventCondition = new AndExpression(compCondition, evNameCondition);
             IBooleanBase accessRightsCondition = new EqualToExpression(accessRightsVar, new Literal(Rights.Full));
             IBooleanBase isAdministratorCondition = new EqualToExpression(isAdminVar, new Literal(true));
             IBooleanBase notAllowedAccessRightsCondition = new AndExpression(accessRightsCondition, new NotExpression(isAdministratorCondition));
-            IBooleanBase condition = new AndExpression(compEventCondition, notAllowedAccessRightsCondition);
 
             IRule accessRightsViolationRule = new Rule();
 
             accessRightsViolationRule
                 .RegisterVariable(compVar)
                 .RegisterVariable(evNameVar)
-                .RegisterVariable(isAdminVar)
-                .RegisterVariable(accessRightsVar)
+                .RegisterVariable(isAdminVar, true)
+                .RegisterVariable(accessRightsVar, true)
                 ;
 
-            accessRightsViolationRule.RegisterCondition(condition);
+            accessRightsViolationRule.RegisterCondition(notAllowedAccessRightsCondition);
 
-            string errorMessage = string.Empty;
+            string errorMessage = "Rule validation not invoked";
 
             ActivityManager.GetInstance().OnActivityEmit =
                 (systemName, applicationName, componentName, eventName, parameters) =>
@@ -92,7 +88,7 @@ namespace LogManagementTests
                     },
                         () =>
                         {
-                            
+                            errorMessage = "Rule validation was invoked but access-rights is a non-violation";
                         });
                 };
 

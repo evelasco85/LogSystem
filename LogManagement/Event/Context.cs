@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LogManagement.Event
 {
@@ -7,6 +8,7 @@ namespace LogManagement.Event
     {
         IContext Assign(string variableName, object value);
         object GetVariable(string variableName);
+        IList<string> GetVariableNameList();
         void Clear();
     }
 
@@ -41,6 +43,11 @@ namespace LogManagement.Event
         public void Clear()
         {
             _contextData.Clear();
+        }
+
+        public IList<string> GetVariableNameList()
+        {
+            return _contextData.Keys.ToList();
         }
     }
 }
