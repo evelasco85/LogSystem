@@ -10,6 +10,7 @@ namespace LogManagement.Event
         void Assign(string variableName, object value);
         IEventVariable GetVariable(string variableName);
         void Clear();
+        void ClearAssignedValues();
     }
 
     public class EventContext : IEventContext
@@ -53,6 +54,14 @@ namespace LogManagement.Event
         public void Clear()
         {
             _contextData.Clear();
+        }
+
+        public void ClearAssignedValues()
+        {
+            foreach (KeyValuePair<string, IEventVariable> eventVariable in _contextData)
+            {
+                eventVariable.Value.Value = null;
+            }
         }
     }
 }

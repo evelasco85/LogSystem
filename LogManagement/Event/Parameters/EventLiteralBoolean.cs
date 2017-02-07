@@ -1,4 +1,4 @@
-﻿using LogManagement.Event.Conditions;
+﻿using System;
 
 namespace LogManagement.Event.Parameters
 {
@@ -24,6 +24,11 @@ namespace LogManagement.Event.Parameters
         public override bool Evaluate(IEventContext context)
         {
             return _boolean;
+        }
+
+        public override string GetSyntax(IEventContext context)
+        {
+            return string.Format("[{0}]", _boolean.ToString());
         }
     }
 }

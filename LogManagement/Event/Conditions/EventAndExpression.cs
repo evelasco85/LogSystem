@@ -17,5 +17,13 @@ namespace LogManagement.Event.Conditions
             _operand1 = operand1;
             _operand2 = operand2;
         }
+
+        public override string GetSyntax(IEventContext context)
+        {
+            string syntax1 = _operand1.GetSyntax(context);
+            string syntax2 = _operand2.GetSyntax(context);
+
+            return string.Format("({0} {1} {2})", syntax1, "&&", syntax2);
+        }
     }
 }

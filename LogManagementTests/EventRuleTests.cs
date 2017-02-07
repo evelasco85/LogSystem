@@ -51,10 +51,10 @@ namespace LogManagementTests
             IEventVariable compVar = new EventVariable("Component Name");
             IEventVariable evNameVar = new EventVariable("EventName");
 
-            IEventBoolean sysCondition = new EventEqualToExpression(sysVar, new EventLiteral("Security System"));
-            IEventBoolean appCondition = new EventEqualToExpression(appVar, new EventLiteral("Security Testers"));
-            IEventBoolean compCondition = new EventEqualToExpression(compVar, new EventLiteral("Authentication Component"));
-            IEventBoolean evNameCondition = new EventEqualToExpression(evNameVar, new EventLiteral("Validation"));
+            IEventBoolean sysCondition = new EventEqualToExpression(sysVar, new EventLiteral("SS", "Security System"));
+            IEventBoolean appCondition = new EventEqualToExpression(appVar, new EventLiteral("ST", "Security Testers"));
+            IEventBoolean compCondition = new EventEqualToExpression(compVar, new EventLiteral("AC", "Authentication Component"));
+            IEventBoolean evNameCondition = new EventEqualToExpression(evNameVar, new EventLiteral("Val", "Validation"));
             
             IEventRule rule = new EventRule();
 

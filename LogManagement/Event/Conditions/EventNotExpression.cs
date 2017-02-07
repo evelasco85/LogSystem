@@ -15,5 +15,12 @@ namespace LogManagement.Event.Conditions
         {
             return !_boolean.Evaluate(context);
         }
+
+        public override string GetSyntax(IEventContext context)
+        {
+            string syntax = _boolean.GetSyntax(context);
+
+            return string.Format("!({0})", syntax);
+        }
     }
 }

@@ -20,5 +20,13 @@ namespace LogManagement.Event.Conditions
             _data1 = data1;
             _data2 = data2;
         }
+
+        public override string GetSyntax(IEventContext context)
+        {
+            string syntax1 = _data1.GetSyntax(context);
+            string syntax2 = _data2.GetSyntax(context);
+
+            return string.Format("({0} {1} {2})", syntax1, "<", syntax2);
+        }
     }
 }

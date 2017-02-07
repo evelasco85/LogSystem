@@ -65,6 +65,8 @@ namespace LogManagement.Event
 
             if (failedResultInvocation != null)
                 failedResultInvocation(failedConditions);
+
+            _context.ClearAssignedValues();
         }
 
         public IEventRule RegisterContextValue(string variableName, object value)

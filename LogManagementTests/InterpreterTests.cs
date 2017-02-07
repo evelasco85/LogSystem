@@ -12,7 +12,7 @@ namespace LogManagementTests
         public void TestMethod1()
         {
             EventVariable x = new EventVariable("index");
-            EventBoolean resultExpression = new EventEqualToExpression(x, new EventLiteral("1"));
+            EventBoolean resultExpression = new EventEqualToExpression(x, new EventLiteral("L1", "1"));
             EventBoolean all = new EventAndExpression(resultExpression, EventLiteralBoolean.True());
             EventContext context = new EventContext();
 
@@ -28,7 +28,7 @@ namespace LogManagementTests
         public void TestMethod2()
         {
             EventVariable x = new EventVariable("index");
-            EventBoolean resultExpression = new EventGreatherThanExpression(x, new EventLiteral(1));
+            EventBoolean resultExpression = new EventGreatherThanExpression(x, new EventLiteral("L2", 1));
             EventContext context = new EventContext();
 
             context.Assign(x, 2);

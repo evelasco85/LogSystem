@@ -1,4 +1,6 @@
-﻿namespace LogManagement.Event.Parameters
+﻿using System;
+
+namespace LogManagement.Event.Parameters
 {
     public interface IEventVariable : IEventData
     {
@@ -27,6 +29,11 @@
             IEventVariable variable = context.GetVariable(_name);
 
             return variable.Value;
+        }
+
+        public override string GetSyntax(IEventContext context)
+        {
+            return string.Format("[{0} : {1}]", _name, Convert.ToString(GetData(context)));
         }
     }
 }
