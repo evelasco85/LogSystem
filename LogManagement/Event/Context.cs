@@ -8,7 +8,7 @@ namespace LogManagement.Event
     {
         IContext Assign(string variableName, object value);
         object GetVariable(string variableName);
-        IList<string> GetVariableNameList();
+        IEnumerable<string> GetVariableNameList();
         void Clear();
     }
 
@@ -45,9 +45,9 @@ namespace LogManagement.Event
             _contextData.Clear();
         }
 
-        public IList<string> GetVariableNameList()
+        public IEnumerable<string> GetVariableNameList()
         {
-            return _contextData.Keys.ToList();
+            return _contextData.Keys;
         }
     }
 }

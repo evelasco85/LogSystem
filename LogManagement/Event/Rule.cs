@@ -17,6 +17,7 @@ namespace LogManagement.Event
         IRule RegisterVariable(IVariable variable);
         IRule RegisterVariable(IVariable variable, bool requiredForInvocation);
         IRuleValidation RegisterCondition(IBooleanBase condition);
+        bool CanInvoke(IContext context);
     }
 
     public delegate void SuccessfulConditionsInvokedDelegate();
@@ -67,29 +68,19 @@ namespace LogManagement.Event
             return this;
         }
 
+        public bool CanInvoke(IContext context)
+        {
+            IEnumerable<string> contextVariableNames = context.GetVariableNameList();
+            IEnumerable<string> requiredVariables = _requiredVariables
+                .Where(kvp => kvp.Value == true)
+                .Select(kvp => kvp.Key);
+
+            return !requiredVariables.Except(contextVariableNames).Any();
+        }
+
         public void Validate(IContext context, SuccessfulConditionsInvokedDelegate successfulResultInvocation, FailedConditionsInvokedDelegate failedResultInvocation)
         {
-            if(context == null)
-                return;
-
-            IList<string> contextVariableNames = context.GetVariableNameList();
-            List<string> requiredVariables = _requiredVariables
-                .Where(kvp => kvp.Value == true)
-                .Select(kvp => kvp.Key)
-                .ToList();
-
-            bool performInvocation = true;
-
-            requiredVariables.ForEach(variable =>
-            {
-                if (!contextVariableNames.Contains(variable))
-                {
-                    performInvocation = false;
-                    return ;
-                }
-            });
-
-            if(!performInvocation)
+            if (context == null)
                 return;
 
             bool success = _condition.Evaluate(context);

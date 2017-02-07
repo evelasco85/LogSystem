@@ -92,13 +92,16 @@ namespace LogManagementTests
                         context.Assign(parameter.Item1, parameter.Item2);
                     });
 
-                    accessRightsViolationRule.Validate(context,
-                        () =>{
-                            errorMessage = "Non-administrator should have limited access rights!";
-                        },
-                        () =>{
-                            errorMessage = "Rule validation was invoked but access-rights is a non-violation";
-                        });
+                    if (accessRightsViolationRule.CanInvoke(context))
+                    {
+                        accessRightsViolationRule.Validate(context,
+                            () => {
+                                      errorMessage = "Non-administrator should have limited access rights!";
+                            },
+                            () => {
+                                      errorMessage = "Rule validation was invoked but access-rights is a non-violation";
+                            });
+                    }
                 };
 
             Authentication auth = new Authentication()
