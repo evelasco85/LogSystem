@@ -52,7 +52,7 @@
     <Compile Include="Event\Parameters\Data.cs" />
     <Compile Include="Event\Parameters\Literal.cs" />
     <Compile Include="Event\Conditions\OrExpression.cs" />
-    <Compile Include="Event\Parameters\LiteralBoolean.cs" />
+    <Compile Include="Event\Conditions\BooleanExpression.cs" />
     <Compile Include="Event\Parameters\Variable.cs" />
     <Compile Include="Managers\ActivityManager.cs" />
     <Compile Include="Managers\RuleManager.cs" />

@@ -13,7 +13,7 @@ namespace LogManagementTests
         {
             Variable x = new Variable("index");
             BooleanBase resultExpression = new EqualToExpression(x, new Literal("L1", "1"));
-            BooleanBase all = new AndExpression(resultExpression, LiteralBoolean.True());
+            BooleanBase all = new AndExpression(resultExpression, BooleanExpression.True());
             Context context = new Context();
 
             context.Assign(x.Name, "1");

@@ -1,24 +1,22 @@
-﻿using System;
-
-namespace LogManagement.Event.Parameters
+﻿namespace LogManagement.Event.Parameters
 {
-    public class LiteralBoolean: BooleanBase
+    public class BooleanExpression: BooleanBase
     {
         private bool _boolean;
 
-        private LiteralBoolean(bool boolean)
+        private BooleanExpression(bool boolean)
         {
             _boolean = boolean;
         }
 
         public static BooleanBase True()
         {
-            return new LiteralBoolean(true);
+            return new BooleanExpression(true);
         }
 
         public static BooleanBase False()
         {
-            return new LiteralBoolean(false);
+            return new BooleanExpression(false);
         }
 
         public override bool Evaluate(IContext context)
