@@ -60,12 +60,9 @@
     <Compile Include="Registration\ComponentRegistration.cs" />
     <Compile Include="Registration\Registration.cs" />
     <Compile Include="Registration\SystemRegistration.cs" />
-    <Compile Include="Builders\RuleBuilder.cs" />
     <Compile Include="Services\RegistrationService.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Rules\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

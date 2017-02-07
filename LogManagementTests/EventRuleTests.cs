@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using LogManagement.Event;
 using LogManagement.Event.Conditions;
 using LogManagement.Event.Parameters;
@@ -13,6 +12,9 @@ namespace LogManagementTests
     [TestClass]
     public class EventRuleTests
     {
+        IVariable _isAdminVar = new Variable("Is Administrator");
+        private IVariable _accessRightsVar = new Variable("Access Rights");
+
         [TestInitialize]
         public void Initialize()
         {
@@ -21,8 +23,8 @@ namespace LogManagementTests
                 .RegisterComponent(
                     (new ComponentRegistration<Authentication>("Authentication Component", applicationRegistration))
                         .RegisterObservableEvent("Validation", authentication => new Func<bool>(authentication.Verify))
-                        .RegisterObservableParameter("Is Administrator", authentication => authentication.AdministratorAccess)
-                        .RegisterObservableParameter("Access Rights", authentication => authentication.AccessRights)
+                        .RegisterObservableParameter(_isAdminVar.Name, authentication => authentication.AdministratorAccess)
+                        .RegisterObservableParameter(_accessRightsVar.Name, authentication => authentication.AccessRights)
                 )
                 .RegisterComponent(
                     (new ComponentRegistration<SecurityCredential>("Security Credential Component", applicationRegistration))
@@ -44,25 +46,32 @@ namespace LogManagementTests
         [TestMethod]
         public void TestRuleValidation()
         {
-            IVariable compVar = new Variable("Component Name");
-            IVariable evNameVar = new Variable("EventName");
-            IVariable isAdminVar = new Variable("Is Administrator");
-            IVariable accessRightsVar = new Variable("Access Rights");
+            IVariable componentVar = new Variable("Component Name");
+            IVariable eventNameVar = new Variable("EventName");
 
-            IBooleanBase accessRightsCondition = new EqualToExpression(accessRightsVar, new Literal(Rights.Full));
-            IBooleanBase isAdministratorCondition = new EqualToExpression(isAdminVar, new Literal(true));
+            //Event-trigger condition
+            IBooleanBase componentCondition = new EqualToExpression(componentVar, new Literal("Authentication Component"));
+            IBooleanBase eventCondition = new EqualToExpression(eventNameVar, new Literal("Validation"));
+            IBooleanBase matchingEventCondition = new AndExpression(componentCondition, eventCondition);
+
+            //Parameter-trigger condition
+            IBooleanBase accessRightsCondition = new EqualToExpression(_accessRightsVar, new Literal(Rights.Full));
+            IBooleanBase isAdministratorCondition = new EqualToExpression(_isAdminVar, new Literal(true));
             IBooleanBase notAllowedAccessRightsCondition = new AndExpression(accessRightsCondition, new NotExpression(isAdministratorCondition));
 
-            IRule accessRightsViolationRule = new Rule();
+            //Trigger condition
+            IBooleanBase triggerCondition = new AndExpression(matchingEventCondition, notAllowedAccessRightsCondition);
+
+            IRule accessRightsViolationRule = new Rule(Guid.NewGuid().ToString());
 
             accessRightsViolationRule
-                .RegisterVariable(compVar, true)
-                .RegisterVariable(evNameVar, true)
-                .RegisterVariable(isAdminVar, true)
-                .RegisterVariable(accessRightsVar, true)
+                .RegisterVariable(componentVar)
+                .RegisterVariable(eventNameVar)
+                .RegisterVariable(_isAdminVar, true)
+                .RegisterVariable(_accessRightsVar, true)
                 ;
 
-            accessRightsViolationRule.RegisterCondition(notAllowedAccessRightsCondition);
+            accessRightsViolationRule.RegisterCondition(triggerCondition);
 
             string errorMessage = "Rule validation not invoked";
 

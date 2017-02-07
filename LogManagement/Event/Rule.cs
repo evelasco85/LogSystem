@@ -13,6 +13,7 @@ namespace LogManagement.Event
 
     public interface IRule : IRuleValidation
     {
+        string Id { get; }
         IRule RegisterVariable(IVariable variable);
         IRule RegisterVariable(IVariable variable, bool requiredForInvocation);
         IRuleValidation RegisterCondition(IBooleanBase condition);
@@ -23,9 +24,20 @@ namespace LogManagement.Event
 
     public class Rule : IRule
     {
+        private string _id;
         IDictionary<string, IVariable> _variables = new Dictionary<string, IVariable>();
         IDictionary<string, bool> _requiredVariables = new Dictionary<string, bool>();
         private IBooleanBase _condition;
+
+        public string Id
+        {
+            get { return _id; }
+        }
+
+        public Rule(string id)
+        {
+            _id = id;
+        }
 
         public IRule RegisterVariable(IVariable variable)
         {
