@@ -46,6 +46,9 @@ namespace LogManagement.Event
 
         public void Validate(SuccessfulConditionsInvokedDelegate successfulResultInvocation, FailedConditionsInvokedDelegate failedResultInvocation)
         {
+            if(_context.HasNullValue())     //Ignore this rule if variables are not 'completely assigned' set
+                return;
+
             IList<IEventBoolean> successfulConditions = new List<IEventBoolean>();
             IList<IEventBoolean> failedConditions = new List<IEventBoolean>();
 

@@ -11,6 +11,7 @@ namespace LogManagement.Event
         IEventVariable GetVariable(string variableName);
         void Clear();
         void ClearAssignedValues();
+        bool HasNullValue();
     }
 
     public class EventContext : IEventContext
@@ -62,6 +63,22 @@ namespace LogManagement.Event
             {
                 eventVariable.Value.Value = null;
             }
+        }
+
+        public bool HasNullValue()
+        {
+            bool hasNullValue = false;
+
+            foreach (KeyValuePair<string, IEventVariable> eventVariable in _contextData)
+            {
+                if (eventVariable.Value.Value == null)
+                {
+                    hasNullValue = true;
+                    break;
+                }
+            }
+
+            return hasNullValue;
         }
     }
 }
