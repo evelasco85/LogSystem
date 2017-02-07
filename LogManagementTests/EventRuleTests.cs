@@ -44,20 +44,20 @@ namespace LogManagementTests
         [TestMethod]
         public void TestMethod1()
         {
-            IEventVariable compVar = new EventVariable("Component Name");
-            IEventVariable evNameVar = new EventVariable("EventName");
-            IEventVariable isAdminVar = new EventVariable("Is Administrator");
-            IEventVariable accessRightsVar = new EventVariable("Access Rights");
+            IVariable compVar = new Variable("Component Name");
+            IVariable evNameVar = new Variable("EventName");
+            IVariable isAdminVar = new Variable("Is Administrator");
+            IVariable accessRightsVar = new Variable("Access Rights");
 
-            IEventBoolean compCondition = new EqualToExpression(compVar, new EventLiteral("Authentication Component"));
-            IEventBoolean evNameCondition = new EqualToExpression(evNameVar, new EventLiteral("Validation"));
+            IEventBoolean compCondition = new EqualToExpression(compVar, new Literal("Authentication Component"));
+            IEventBoolean evNameCondition = new EqualToExpression(evNameVar, new Literal("Validation"));
             IEventBoolean compEventCondition = new AndExpression(compCondition, evNameCondition);
-            IEventBoolean accessRightsCondition = new EqualToExpression(accessRightsVar, new EventLiteral(Rights.Full));
-            IEventBoolean isAdministratorCondition = new EqualToExpression(isAdminVar, new EventLiteral(true));
+            IEventBoolean accessRightsCondition = new EqualToExpression(accessRightsVar, new Literal(Rights.Full));
+            IEventBoolean isAdministratorCondition = new EqualToExpression(isAdminVar, new Literal(true));
             IEventBoolean notAllowedAccessRightsCondition = new AndExpression(accessRightsCondition, new NotExpression(isAdministratorCondition));
             IEventBoolean condition = new AndExpression(compEventCondition, notAllowedAccessRightsCondition);
 
-            IEventRule accessRightsViolationRule = new EventRule();
+            IRule accessRightsViolationRule = new Rule();
 
             accessRightsViolationRule
                 .RegisterVariable(compVar)
@@ -73,7 +73,7 @@ namespace LogManagementTests
             ActivityManager.GetInstance().OnActivityEmit =
                 (systemName, applicationName, componentName, eventName, parameters) =>
                 {
-                    IEventContext context = new EventContext();
+                    IContext context = new Context();
 
                     context
                         .Assign("Component Name", componentName)

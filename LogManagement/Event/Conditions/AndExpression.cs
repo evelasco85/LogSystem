@@ -2,12 +2,12 @@
 
 namespace LogManagement.Event.Conditions
 {
-    public class AndExpression : EventBoolean
+    public class AndExpression : BooleanBase
     {
         private IEventBoolean _operand1;
         private IEventBoolean _operand2;
 
-        public override bool Evaluate(IEventContext context)
+        public override bool Evaluate(IContext context)
         {
             return _operand1.Evaluate(context) && _operand2.Evaluate(context);
         }
@@ -18,7 +18,7 @@ namespace LogManagement.Event.Conditions
             _operand2 = operand2;
         }
 
-        public override string GetSyntax(IEventContext context)
+        public override string GetSyntax(IContext context)
         {
             string syntax1 = _operand1.GetSyntax(context);
             string syntax2 = _operand2.GetSyntax(context);

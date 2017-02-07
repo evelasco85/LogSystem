@@ -3,18 +3,18 @@ using System.Collections.Generic;
 
 namespace LogManagement.Event
 {
-    public interface IEventContext
+    public interface IContext
     {
-        IEventContext Assign(string variableName, object value);
+        IContext Assign(string variableName, object value);
         object GetVariable(string variableName);
         void Clear();
     }
 
-    public class EventContext : IEventContext
+    public class Context : IContext
     {
         IDictionary<string, object> _contextData = new Dictionary<string, object>();
 
-        public IEventContext Assign(string variableName, object value)
+        public IContext Assign(string variableName, object value)
         {
             if (string.IsNullOrEmpty(variableName))
                 throw new ArgumentException("'variableName' parameter is required");

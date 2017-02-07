@@ -2,27 +2,27 @@
 
 namespace LogManagement.Event.Parameters
 {
-    public class EventLiteral : EventData
+    public class Literal : Data
     {
         private object _value;
         private string _name;
 
-        public EventLiteral(string literalName, object value)
+        public Literal(string literalName, object value)
         {
             _value = value;
             _name = literalName;
         }
 
-        public EventLiteral(object value) : this("Value", value)
+        public Literal(object value) : this("Value", value)
         {
         }
 
-        public override object GetData(IEventContext context)
+        public override object GetData(IContext context)
         {
             return _value;
         }
 
-        public override string GetSyntax(IEventContext context)
+        public override string GetSyntax(IContext context)
         {
             return string.Format("[{0} : {1}]", _name, Convert.ToString(GetData(context)));
         }

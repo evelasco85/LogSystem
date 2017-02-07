@@ -3,25 +3,25 @@ using LogManagement.Event.Parameters;
 
 namespace LogManagement.Event.Conditions
 {
-    public class EqualToExpression : EventBoolean
+    public class EqualToExpression : BooleanBase
     {
-        private IEventData _data1;
-        private IEventData _data2;
+        private IData _data1;
+        private IData _data2;
 
-        public override bool Evaluate(IEventContext context)
+        public override bool Evaluate(IContext context)
         {
             IComparable comparable = (IComparable)_data1.GetData(context);
 
             return (comparable != null) && comparable.CompareTo(_data2.GetData(context)) == 0;
         }
 
-        public EqualToExpression(IEventData data1, IEventData data2)
+        public EqualToExpression(IData data1, IData data2)
         {
             _data1 = data1;
             _data2 = data2;
         }
 
-        public override string GetSyntax(IEventContext context)
+        public override string GetSyntax(IContext context)
         {
             string syntax1 = _data1.GetSyntax(context);
             string syntax2 = _data2.GetSyntax(context);

@@ -4,24 +4,24 @@ using LogManagement.Event.Parameters;
 
 namespace LogManagement.Event
 {
-    public interface IEventRule
+    public interface IRule
     {
-        IEventRule RegisterVariable(IEventVariable variable);
-        IEventRule RegisterCondition(IEventBoolean condition);
+        IRule RegisterVariable(IVariable variable);
+        IRule RegisterCondition(IEventBoolean condition);
 
-        void Validate(IEventContext context, SuccessfulConditionsInvokedDelegate successfulResultInvocation,
+        void Validate(IContext context, SuccessfulConditionsInvokedDelegate successfulResultInvocation,
             FailedConditionsInvokedDelegate failedResultInvocation);
     }
 
     public delegate void SuccessfulConditionsInvokedDelegate(IList<IEventBoolean> successfulConditions);
     public delegate void FailedConditionsInvokedDelegate(IList<IEventBoolean> failedConditions);
 
-    public class EventRule : IEventRule
+    public class Rule : IRule
     {
-        IDictionary<string, IEventVariable> _variables = new Dictionary<string, IEventVariable>();
+        IDictionary<string, IVariable> _variables = new Dictionary<string, IVariable>();
         IList<IEventBoolean> _conditions = new List<IEventBoolean>();
 
-        public IEventRule RegisterVariable(IEventVariable variable)
+        public IRule RegisterVariable(IVariable variable)
         {
             if (variable == null)
                 throw new ArgumentException("'variable' parameter is required");
@@ -34,14 +34,14 @@ namespace LogManagement.Event
             return this;
         }
 
-        public IEventRule RegisterCondition(IEventBoolean condition)
+        public IRule RegisterCondition(IEventBoolean condition)
         {
             _conditions.Add(condition);
 
             return this;
         }
 
-        public void Validate(IEventContext context, SuccessfulConditionsInvokedDelegate successfulResultInvocation, FailedConditionsInvokedDelegate failedResultInvocation)
+        public void Validate(IContext context, SuccessfulConditionsInvokedDelegate successfulResultInvocation, FailedConditionsInvokedDelegate failedResultInvocation)
         {
             if(context == null)
                 return;

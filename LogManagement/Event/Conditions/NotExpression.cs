@@ -2,7 +2,7 @@
 
 namespace LogManagement.Event.Conditions
 {
-    public class NotExpression : EventBoolean
+    public class NotExpression : BooleanBase
     {
         private IEventBoolean _boolean;
 
@@ -11,12 +11,12 @@ namespace LogManagement.Event.Conditions
             _boolean = boolean;
         }
 
-        public override bool Evaluate(IEventContext context)
+        public override bool Evaluate(IContext context)
         {
             return !_boolean.Evaluate(context);
         }
 
-        public override string GetSyntax(IEventContext context)
+        public override string GetSyntax(IContext context)
         {
             string syntax = _boolean.GetSyntax(context);
 

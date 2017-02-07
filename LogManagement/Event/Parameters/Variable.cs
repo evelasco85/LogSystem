@@ -2,13 +2,13 @@
 
 namespace LogManagement.Event.Parameters
 {
-    public interface IEventVariable : IEventData
+    public interface IVariable : IData
     {
         string Name { get; }
         object Value { get; set; }
     }
 
-    public class EventVariable : EventData, IEventVariable
+    public class Variable : Data, IVariable
     {
         string _name;
 
@@ -19,19 +19,19 @@ namespace LogManagement.Event.Parameters
 
         public object Value { get; set; }
 
-        public EventVariable(string name)
+        public Variable(string name)
         {
             _name = name;
         }
 
-        public override object GetData(IEventContext context)
+        public override object GetData(IContext context)
         {
             Value = context.GetVariable(_name);
 
             return Value;
         }
 
-        public override string GetSyntax(IEventContext context)
+        public override string GetSyntax(IContext context)
         {
             return string.Format("[{0} : {1}]", _name, Convert.ToString(GetData(context)));
         }
