@@ -16,7 +16,7 @@ namespace LogManagementTests
             IList<string>  postFixConditionTokens = RuleParser.GetInstance().ParseConditionToPostFixTokenList(new StringBuilder(conditon));
             
             Assert.AreEqual(15, postFixConditionTokens.Count);
-            Assert.AreEqual("adata==bdata==&&cdata==ddata==&&&&", string.Concat(postFixConditionTokens));
+            Assert.AreEqual("a,data,==,b,data,==,&&,c,data,==,d,data,==,&&,&&", string.Join(",", postFixConditionTokens));
         }
     }
 }
