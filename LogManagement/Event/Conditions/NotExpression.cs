@@ -30,7 +30,7 @@ namespace LogManagement.Event.Conditions
 
         public static string Operator
         {
-            get { return "Not"; }
+            get { return "!"; }
         }
     }
 }
