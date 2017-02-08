@@ -13,6 +13,11 @@ namespace LogManagement.Event.Parameters
             _name = literalName;
         }
 
+        public override string Name
+        {
+            get { return _name; }
+        }
+
         public Literal(object value) : this("Value", value)
         {
         }

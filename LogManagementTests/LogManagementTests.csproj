@@ -55,7 +55,12 @@
     <Compile Include="ActivityManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="InterpreterTests.cs" />
-    <Compile Include="EventRuleTests.cs" />
+    <Compile Include="RuleTests.cs" />
+    <Compile Include="Resources\Syntax.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Syntax.resx</DependentUpon>
+    </Compile>
     <Compile Include="RuleParserTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -63,6 +68,15 @@
       <Project>{b173948c-ba03-4854-89ad-1ce96d300e04}</Project>
       <Name>LogManagement</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Syntax.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Syntax.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\SourceCode1.txt" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

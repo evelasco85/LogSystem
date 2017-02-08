@@ -11,12 +11,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace LogManagementTests
 {
     [TestClass]
-    public class EventRuleTests
+    public class RuleTests
     {
-        IVariable _isAdminVar = new Variable("Is Administrator");
-        private IVariable _accessRightsVar = new Variable("Access Rights");
-        IVariable _componentVar = new Variable("Component Name");
-        IVariable _eventNameVar = new Variable("Event Name");
+        IData _isAdminVar = new Variable("Is Administrator");
+        private IData _accessRightsVar = new Variable("Access Rights");
+        IData _componentVar = new Variable("Component Name");
+        IData _eventNameVar = new Variable("Event Name");
 
         const string AUTHENTICATION_COMPONENT_NAME = "Authentication Component";
         const string AUTHENTICATION_EVENT_NAME = "Validation";

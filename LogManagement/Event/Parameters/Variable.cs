@@ -2,16 +2,11 @@
 
 namespace LogManagement.Event.Parameters
 {
-    public interface IVariable : IData
-    {
-        string Name { get; }
-    }
-
-    public class Variable : Data, IVariable
+    public class Variable : Data
     {
         string _name;
 
-        public string Name
+        public override string Name
         {
             get { return _name; }
         }

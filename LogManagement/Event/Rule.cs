@@ -15,9 +15,9 @@ namespace LogManagement.Event
         string Id { get; }
         SuccessfulConditionsInvokedDelegate SuccessfulResultInvocation { get; set; }
         FailedConditionsInvokedDelegate FailedResultInvocation { get; set; }
-        IList<IVariable> GetVariables();
-        IRule AddVariableScope(IVariable variable);
-        IRule AddVariableScope(IVariable variable, bool requiredForInvocation);
+        IList<IData> GetVariables();
+        IRule AddVariableScope(IData variable);
+        IRule AddVariableScope(IData variable, bool requiredForInvocation);
         IRuleValidation SetCondition(IBooleanBase condition);
         IRuleValidation SetCondition(IBooleanBase condition,
             SuccessfulConditionsInvokedDelegate successfulResultInvocation,
@@ -32,7 +32,7 @@ namespace LogManagement.Event
     public class Rule : IRule
     {
         private string _id;
-        IDictionary<string, IVariable> _variables = new Dictionary<string, IVariable>();
+        IDictionary<string, IData> _variables = new Dictionary<string, IData>();
         IDictionary<string, bool> _requiredVariables = new Dictionary<string, bool>();
         private IBooleanBase _condition;
 
@@ -61,14 +61,14 @@ namespace LogManagement.Event
             _id = id;
         }
 
-        public IRule AddVariableScope(IVariable variable)
+        public IRule AddVariableScope(IData variable)
         {
             AddVariableScope(variable, false);
 
             return this;
         }
 
-        public IRule AddVariableScope(IVariable variable, bool requiredForInvocation)
+        public IRule AddVariableScope(IData variable, bool requiredForInvocation)
         {
             if (variable == null)
                 throw new ArgumentException("'variable' parameter is required");
@@ -104,7 +104,7 @@ namespace LogManagement.Event
             return this;
         }
 
-        public IList<IVariable> GetVariables()
+        public IList<IData> GetVariables()
         {
             return _variables
                 .Select(kvp => kvp.Value)

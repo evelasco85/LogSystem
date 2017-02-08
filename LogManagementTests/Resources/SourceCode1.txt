@@ -1,0 +1,14 @@
+﻿param|a|param 1|true
+param|b|param 2|false
+param|c|param 3|true
+param|d|param 4|false
+
+literal|e|1
+literal|f|"a"
+literal|g|2.2
+literal|h|false
+
+condition: ((a == e) && (b==f)) && ((c == g) && (d == h))
+success:PREDEFINE_ACTION_1
+failure:PREDEFINE_ACTION_1
+
