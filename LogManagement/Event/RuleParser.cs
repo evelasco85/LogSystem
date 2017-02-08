@@ -19,6 +19,12 @@ namespace LogManagement.Event
 
     public class RuleParser : IRuleParser
     {
+        const string OPEN_PARENTHESIS = "(";
+        const string CLOSE_PARENTHESIS = ")";
+        const string SPACE = " ";
+        public const string LABEL_PARAM = "param";
+        public const string LABEL_LITERAL = "literal";
+
         static IRuleParser s_instance = new RuleParser();
 
         private IList<string> _operator = new List<string>
@@ -58,10 +64,6 @@ namespace LogManagement.Event
         private RuleParser()
         {
         }
-
-        const string OPEN_PARENTHESIS = "(";
-        const string CLOSE_PARENTHESIS = ")";
-        const string SPACE = " ";
 
         public IList<string> ParseConditionToPostFixTokenList(StringBuilder data)
         {
@@ -114,7 +116,6 @@ namespace LogManagement.Event
             return tokenList;
         }
 
-
         string GetOperators(ref Stack<string> operatorStack)
         {
             IList<string> token = new List<string>();
@@ -152,7 +153,7 @@ namespace LogManagement.Event
 
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (line.StartsWith("param") || line.StartsWith("literal"))
+                    if (line.StartsWith(LABEL_PARAM) || line.StartsWith(LABEL_LITERAL))
                     {
                         Tuple<string, IData, bool> variable = ConstructVariable(line);
 
