@@ -7,15 +7,20 @@ namespace LogManagement.Event.Conditions
         private IBooleanBase _operand1;
         private IBooleanBase _operand2;
 
-        public override bool Evaluate(IContext context)
+        public static IBooleanBase New(IBooleanBase operand1, IBooleanBase operand2)
         {
-            return _operand1.Evaluate(context) && _operand2.Evaluate(context);
+            return new AndExpression(operand1, operand2);
         }
 
-        public AndExpression(IBooleanBase operand1, IBooleanBase operand2)
+        private AndExpression(IBooleanBase operand1, IBooleanBase operand2)
         {
             _operand1 = operand1;
             _operand2 = operand2;
+        }
+
+        public override bool Evaluate(IContext context)
+        {
+            return _operand1.Evaluate(context) && _operand2.Evaluate(context);
         }
 
         public override string Operator

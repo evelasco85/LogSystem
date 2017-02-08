@@ -8,17 +8,22 @@ namespace LogManagement.Event.Conditions
         private IData _operand1;
         private IData _operand2;
 
+        public static IBooleanBase New(IData operand1, IData operand2)
+        {
+            return new EqualToExpression(operand1, operand2);
+        }
+
+        private EqualToExpression(IData operand1, IData operand2)
+        {
+            _operand1 = operand1;
+            _operand2 = operand2;
+        }
+
         public override bool Evaluate(IContext context)
         {
             IComparable comparable = (IComparable)_operand1.GetData(context);
 
             return (comparable != null) && comparable.CompareTo(_operand2.GetData(context)) == 0;
-        }
-
-        public EqualToExpression(IData operand1, IData operand2)
-        {
-            _operand1 = operand1;
-            _operand2 = operand2;
         }
 
         public override string Operator

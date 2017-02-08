@@ -60,17 +60,17 @@ namespace LogManagementTests
                 .AddVariableScope(_accessRightsVar, true);
 
             //Event-trigger condition
-            IBooleanBase componentCondition = new EqualToExpression(_componentVar, new Literal(AUTHENTICATION_COMPONENT_NAME));
-            IBooleanBase eventCondition = new EqualToExpression(_eventNameVar, new Literal(AUTHENTICATION_EVENT_NAME));
-            IBooleanBase matchingEventCondition = new AndExpression(componentCondition, eventCondition);
+            IBooleanBase componentCondition = EqualToExpression.New(_componentVar, new Literal(AUTHENTICATION_COMPONENT_NAME));
+            IBooleanBase eventCondition = EqualToExpression.New(_eventNameVar, new Literal(AUTHENTICATION_EVENT_NAME));
+            IBooleanBase matchingEventCondition = AndExpression.New(componentCondition, eventCondition);
 
             //Parameter-trigger condition
-            IBooleanBase accessRightsCondition = new EqualToExpression(_accessRightsVar, new Literal(Rights.Full));
-            IBooleanBase isAdministratorCondition = new EqualToExpression(_isAdminVar, new Literal(true));
-            IBooleanBase notAllowedAccessRightsCondition = new AndExpression(accessRightsCondition, new NotExpression(isAdministratorCondition));
+            IBooleanBase accessRightsCondition = EqualToExpression.New(_accessRightsVar, new Literal(Rights.Full));
+            IBooleanBase isAdministratorCondition = EqualToExpression.New(_isAdminVar, new Literal(true));
+            IBooleanBase notAllowedAccessRightsCondition = AndExpression.New(accessRightsCondition, NotExpression.New(isAdministratorCondition));
 
             //Trigger condition
-            IBooleanBase triggerCondition = new AndExpression(matchingEventCondition, notAllowedAccessRightsCondition);
+            IBooleanBase triggerCondition = AndExpression.New(matchingEventCondition, notAllowedAccessRightsCondition);
 
             accessRightsViolationRule.SetCondition(triggerCondition,
                 (resultContext, resultRule) =>

@@ -12,13 +12,13 @@ namespace LogManagementTests
         public void TestCondition()
         {
             Variable x = new Variable("index");
-            BooleanBase resultExpression = new EqualToExpression(x, new Literal("L1", "1"));
-            BooleanBase all = new AndExpression(resultExpression, BooleanExpression.True());
+            IBooleanBase resultExpression = EqualToExpression.New(x, new Literal("L1", "1"));
+            IBooleanBase all = AndExpression.New(resultExpression, BooleanExpression.True());
             Context context = new Context();
 
             context.Assign(x.Name, "1");
 
-            bool invertResult = (new NotExpression(all)).Evaluate(context);
+            bool invertResult = (NotExpression.New(all)).Evaluate(context);
             bool result =  all.Evaluate(context);
 
             Assert.IsTrue(result);
@@ -28,7 +28,7 @@ namespace LogManagementTests
         public void TestCondition2()
         {
             Variable x = new Variable("index");
-            BooleanBase resultExpression = new GreatherThanExpression(x, new Literal("L2", 1));
+            IBooleanBase resultExpression = GreatherThanExpression.New(x, new Literal("L2", 1));
             Context context = new Context();
 
             context.Assign(x.Name, 2);

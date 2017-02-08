@@ -6,7 +6,12 @@ namespace LogManagement.Event.Conditions
     {
         private IBooleanBase _boolean;
 
-        public NotExpression(IBooleanBase boolean)
+        public static IBooleanBase New(IBooleanBase boolean)
+        {
+            return new NotExpression(boolean);
+        }
+
+        private NotExpression(IBooleanBase boolean)
         {
             _boolean = boolean;
         }
