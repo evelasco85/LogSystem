@@ -28,7 +28,7 @@ namespace LogManagement.Event.Conditions
             return string.Format("{0}({1})", Operator, syntax);
         }
 
-        public override string Operator
+        public static string Operator
         {
             get { return "Not"; }
         }

@@ -23,7 +23,7 @@ namespace LogManagement.Event.Conditions
             return _operand1.Evaluate(context) && _operand2.Evaluate(context);
         }
 
-        public override string Operator
+        public static string Operator
         {
             get { return "&&"; }
         }

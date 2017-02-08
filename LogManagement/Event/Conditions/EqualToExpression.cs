@@ -26,7 +26,7 @@ namespace LogManagement.Event.Conditions
             return (comparable != null) && comparable.CompareTo(_operand2.GetData(context)) == 0;
         }
 
-        public override string Operator
+        public static string Operator
         {
             get { return "=="; }
         }

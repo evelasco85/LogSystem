@@ -26,7 +26,7 @@ namespace LogManagement.Event.Conditions
             return _boolean;
         }
 
-        public override string Operator
+        public static string Operator
         {
             get { return string.Empty; }
         }
