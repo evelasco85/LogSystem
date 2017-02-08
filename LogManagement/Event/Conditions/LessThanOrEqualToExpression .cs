@@ -5,28 +5,33 @@ namespace LogManagement.Event.Conditions
 {
     public class LessThanOrEqualToExpression  : BooleanBase
     {
-        private IData _data1;
-        private IData _data2;
+        private IData _operand1;
+        private IData _operand2;
 
         public override bool Evaluate(IContext context)
         {
-            IComparable comparable = (IComparable) _data1.GetData(context);
+            IComparable comparable = (IComparable)_operand1.GetData(context);
 
-            return (comparable != null) && comparable.CompareTo(_data2.GetData(context)) <= 0;
+            return (comparable != null) && comparable.CompareTo(_operand1.GetData(context)) <= 0;
         }
 
-        public LessThanOrEqualToExpression(IData data1, IData data2)
+        public LessThanOrEqualToExpression(IData operand1, IData operand2)
         {
-            _data1 = data1;
-            _data2 = data2;
+            _operand1 = operand1;
+            _operand2 = operand2;
+        }
+
+        public override string Operator
+        {
+            get { return "<="; }
         }
 
         public override string GetSyntax(IContext context)
         {
-            string syntax1 = _data1.GetSyntax(context);
-            string syntax2 = _data2.GetSyntax(context);
+            string syntax1 = _operand1.GetSyntax(context);
+            string syntax2 = _operand2.GetSyntax(context);
 
-            return string.Format("({0} {1} {2})", syntax1, "<=", syntax2);
+            return string.Format("({0} {1} {2})", syntax1, Operator, syntax2);
         }
     }
 }

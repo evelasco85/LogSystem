@@ -20,7 +20,12 @@ namespace LogManagement.Event.Conditions
         {
             string syntax = _boolean.GetSyntax(context);
 
-            return string.Format("Not({0})", syntax);
+            return string.Format("{0}({1})", Operator, syntax);
+        }
+
+        public override string Operator
+        {
+            get { return "Not"; }
         }
     }
 }

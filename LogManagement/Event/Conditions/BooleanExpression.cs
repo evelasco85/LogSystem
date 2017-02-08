@@ -26,6 +26,11 @@ namespace LogManagement.Event.Conditions
             return _boolean;
         }
 
+        public override string Operator
+        {
+            get { return string.Empty; }
+        }
+
         public override string GetSyntax(IContext context)
         {
             return string.Format("[{0}]", _boolean.ToString());

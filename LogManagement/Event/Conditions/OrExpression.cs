@@ -18,12 +18,17 @@ namespace LogManagement.Event.Conditions
             _operand2 = operand2;
         }
 
+        public override string Operator
+        {
+            get { return "||"; }
+        }
+
         public override string GetSyntax(IContext context)
         {
             string syntax1 = _operand1.GetSyntax(context);
             string syntax2 = _operand2.GetSyntax(context);
 
-            return string.Format("({0} {1} {2})", syntax1, "||", syntax2);
+            return string.Format("({0} {1} {2})", syntax1, Operator, syntax2);
         }
     }
 }
