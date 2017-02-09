@@ -8,13 +8,16 @@ namespace LogManagement.Managers
         RetrieveUserDelegate RetrieveUser { get; set; }
         RetrieveSessionIdDelegate RetrieveSessionId { get; set; }
         RetrieveBusinessTransactionIdDelegate RetrieveBusinessTransactionId { get; set; }
-
+        OnLogEmit LogEmit { get; set; }
+        void EmitLog(ILogEntry log);
         ILogEntry CreateLogEntry(Priority priority);
     }
 
     public delegate string RetrieveUserDelegate();
     public delegate string RetrieveSessionIdDelegate();
     public delegate string RetrieveBusinessTransactionIdDelegate();
+
+    public delegate void OnLogEmit(ILogEntry log);
 
     public class LogManager : ILogManager
     {
@@ -23,6 +26,8 @@ namespace LogManagement.Managers
         RetrieveUserDelegate _retrieveUser;
         RetrieveSessionIdDelegate _retrieveSessionId;
         RetrieveBusinessTransactionIdDelegate _retrieveBusinessTransactionId;
+
+        private OnLogEmit _onLogEmit;
 
         private LogManager()
         {
@@ -44,6 +49,12 @@ namespace LogManagement.Managers
         {
             get { return _retrieveBusinessTransactionId; }
             set { _retrieveBusinessTransactionId = value; }
+        }
+
+        public OnLogEmit LogEmit
+        {
+            get { return _onLogEmit; }
+            set { _onLogEmit = value; }
         }
 
         public static ILogManager GetInstance()
@@ -75,6 +86,12 @@ namespace LogManagement.Managers
             };
 
             return log;
+        }
+
+        public void EmitLog(ILogEntry log)
+        {
+            if (_onLogEmit != null)
+                _onLogEmit(log);
         }
     }
 }

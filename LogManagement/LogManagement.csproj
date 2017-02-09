@@ -39,7 +39,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Builders\LogBuilder.cs" />
     <Compile Include="ActivityMonitoring.cs" />
     <Compile Include="Event\Conditions\GreatherThanOrEqualToExpression.cs" />
     <Compile Include="Event\Conditions\LessThanOrEqualToExpression .cs" />
