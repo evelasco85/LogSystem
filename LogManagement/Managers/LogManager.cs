@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using LogManagement.Models;
 
 namespace LogManagement.Managers
@@ -9,6 +8,8 @@ namespace LogManagement.Managers
         RetrieveUserDelegate RetrieveUser { get; set; }
         RetrieveSessionIdDelegate RetrieveSessionId { get; set; }
         RetrieveBusinessTransactionIdDelegate RetrieveBusinessTransactionId { get; set; }
+
+        ILogEntry CreateLogEntry(Priority priority);
     }
 
     public delegate string RetrieveUserDelegate();
@@ -50,7 +51,7 @@ namespace LogManagement.Managers
             return s_instance;
         }
 
-        public ILogEntry CreateLogEntry()
+        public ILogEntry CreateLogEntry(Priority priority)
         {
             if(_retrieveUser == null)
                 throw new NotImplementedException(String.Format("Implementation for member '{0}' is required", "RetrieveUser"));
@@ -66,10 +67,11 @@ namespace LogManagement.Managers
                 DateTime.Now,
                 _retrieveUser(),
                 _retrieveSessionId(),
-                 _retrieveBusinessTransactionId()
+                 _retrieveBusinessTransactionId(),
+                 priority
                 )
             {
-                Status = Status.None
+                Status = Status.None,
             };
 
             return log;

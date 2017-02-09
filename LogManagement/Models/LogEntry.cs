@@ -14,42 +14,42 @@ namespace LogManagement.Models
         /// <summary>
         /// Technical facing
         /// </summary>
-        Debug,
+        Debug = 1,
 
         /// <summary>
         /// Displays expected or business as usual logs
         /// </summary>
-        Info,
+        Info = 2,
 
         /// <summary>
         /// Shows deviation from expectation
         /// </summary>
-        Notice,
+        Notice = 3,
 
         /// <summary>
         /// Shows recurrent deviations or threshold exceeding limits
         /// </summary>
-        Warning,
+        Warning = 4,
 
         /// <summary>
         /// Shows business logic error
         /// </summary>
-        Error,
+        Error = 5,
 
         /// <summary>
         /// Technical error or exception-handling
         /// </summary>
-        Critical,
+        Critical = 6,
 
         /// <summary>
         /// Notification for constant attack, non-showstopper exceptions, or fail-safe invocations
         /// </summary>
-        Alert,
+        Alert = 7,
 
         /// <summary>
         /// Notify showstopper or breaches
         /// </summary>
-        Emergency
+        Emergency = 8
     }
 
     public interface ILogEntry
@@ -65,6 +65,7 @@ namespace LogManagement.Models
         string Component { get; set; }
         string Event { get; set; }
 
+        Priority Priority { get; }
         Status Status { get; set; }
         string Description { get; set; }
         
@@ -82,6 +83,7 @@ namespace LogManagement.Models
         string _user;
          string _sessionId;
          string _transactionId;
+        private Priority _priority;
 
          public TimeZoneInfo TimeZone { get { return _timeZoneInfo; } }
          public DateTime Occurence { get { return _occurence; } }
@@ -95,6 +97,7 @@ namespace LogManagement.Models
         public string Component { get; set; }
         public string Event { get; set; }
 
+        public Priority Priority { get { return _priority; } }
         public Status Status { get; set; }
         public string Description { get; set; }
         
@@ -105,13 +108,14 @@ namespace LogManagement.Models
         public string Reason { get; set; }
 
         public LogEntry(TimeZoneInfo timeZoneInfo, DateTime occurence,
-            string user, string sessionId, string transactionId)
+            string user, string sessionId, string transactionId, Priority priority)
         {
             _timeZoneInfo = timeZoneInfo;
             _occurence = occurence;
             _user = user;
             _sessionId = sessionId;
             _transactionId = transactionId;
+            _priority = priority;
         }
     }
 }
