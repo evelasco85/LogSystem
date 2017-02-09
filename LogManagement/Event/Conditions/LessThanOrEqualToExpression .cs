@@ -13,7 +13,7 @@ namespace LogManagement.Event.Conditions
             return new LessThanOrEqualToExpression(operand1, operand2);
         }
 
-        private LessThanOrEqualToExpression(IData operand1, IData operand2)
+        public LessThanOrEqualToExpression(IData operand1, IData operand2)
         {
             _operand1 = operand1;
             _operand2 = operand2;

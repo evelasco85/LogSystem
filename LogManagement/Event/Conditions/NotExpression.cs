@@ -11,7 +11,7 @@ namespace LogManagement.Event.Conditions
             return new NotExpression(boolean);
         }
 
-        private NotExpression(IBooleanBase boolean)
+        public NotExpression(IBooleanBase boolean)
         {
             _boolean = boolean;
         }

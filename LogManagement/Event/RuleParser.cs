@@ -15,7 +15,10 @@ namespace LogManagement.Event
         bool IsOperator(string input);
         IDictionary<string, Tuple<string, IData, bool>> GetVariables(string sourceCode);
         string GetConditionDeclaration(string sourceCode);
+        Type GetOperatorType(string conditionOperator);
     }
+
+    public delegate IBooleanBase InstantiationDelegate<T>(T operand1, T operand2);
 
     public class RuleParser : IRuleParser
     {
@@ -44,6 +47,30 @@ namespace LogManagement.Event
             LessThanOrEqualToExpression.Operator,
             BooleanExpression.Operator,
         };
+
+        private IDictionary<string, Type> _conditionDictionary = new Dictionary<string, Type>
+        {
+            {AndExpression.Operator, typeof(AndExpression)},
+            {OrExpression.Operator, typeof(OrExpression)},
+            {NotExpression.Operator, typeof(NotExpression)},
+            {EqualToExpression.Operator, typeof(EqualToExpression)},
+            {GreatherThanExpression.Operator, typeof(GreatherThanExpression)},
+            {GreatherThanOrEqualToExpression.Operator, typeof(GreatherThanOrEqualToExpression)},
+            {LessThanExpression.Operator, typeof(LessThanExpression)},
+            {LessThanOrEqualToExpression.Operator, typeof(LessThanOrEqualToExpression)},
+            {BooleanExpression.Operator, typeof(BooleanExpression)},
+        };
+
+        public Type GetOperatorType(string conditionOperator)
+        {
+            return _conditionDictionary[conditionOperator];
+        }
+
+        public object CreateConditionInstance(Type conditionType, params object[] operands)
+        {
+            // create an object of the type
+            return Activator.CreateInstance(conditionType, operands);
+        }
 
         private List<Type> _expectedTypes = new List<Type>
         {

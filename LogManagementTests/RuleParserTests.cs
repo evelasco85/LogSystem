@@ -29,13 +29,19 @@ namespace LogManagementTests
             IDictionary<string, Tuple<string, IData, bool>> variables = RuleParser.GetInstance().GetVariables(Syntax.SourceCode1);
             string condition = parser.GetConditionDeclaration(Syntax.SourceCode1);
             IList<string> postFixConditionTokens = parser.ParseConditionToPostFixTokenList(new StringBuilder(condition));
+            
+            IRule rule = new Rule(Guid.NewGuid().ToString());
+            Stack<IBooleanBase> conditions = new Stack<IBooleanBase>();
 
             for (int index = 0; index < postFixConditionTokens.Count; index++)
             {
                 string token = postFixConditionTokens[index];
 
-
+                if (parser.IsOperator(token))
+                {
+                }
             }
+
         }
     }
 }

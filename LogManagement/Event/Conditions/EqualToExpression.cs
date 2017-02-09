@@ -13,7 +13,7 @@ namespace LogManagement.Event.Conditions
             return new EqualToExpression(operand1, operand2);
         }
 
-        private EqualToExpression(IData operand1, IData operand2)
+        public EqualToExpression(IData operand1, IData operand2)
         {
             _operand1 = operand1;
             _operand2 = operand2;

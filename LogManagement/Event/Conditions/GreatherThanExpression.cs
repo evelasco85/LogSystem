@@ -13,7 +13,7 @@ namespace LogManagement.Event.Conditions
             return new GreatherThanExpression(operand1, operand2);
         }
 
-        private GreatherThanExpression(IData operand1, IData operand2)
+        public GreatherThanExpression(IData operand1, IData operand2)
         {
             _operand1 = operand1;
             _operand2 = operand2;

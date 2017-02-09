@@ -1,26 +1,36 @@
-﻿using LogManagement.Event.Parameters;
+﻿using System.Collections.Generic;
+using System.Linq;
+using LogManagement.Event.Parameters;
 
 namespace LogManagement.Event.Conditions
 {
     public class AndExpression : BooleanBase
     {
-        private IBooleanBase _operand1;
-        private IBooleanBase _operand2;
+        private List<IBooleanBase> _operands;
 
-        public static IBooleanBase New(IBooleanBase operand1, IBooleanBase operand2)
+        public static IBooleanBase New(params IBooleanBase[] operands)
         {
-            return new AndExpression(operand1, operand2);
+            return new AndExpression(operands);
         }
 
-        private AndExpression(IBooleanBase operand1, IBooleanBase operand2)
+        public AndExpression(params IBooleanBase[] operands)
         {
-            _operand1 = operand1;
-            _operand2 = operand2;
+            _operands = operands.ToList();
         }
 
         public override bool Evaluate(IContext context)
         {
-            return _operand1.Evaluate(context) && _operand2.Evaluate(context);
+            bool isTrue = true;
+
+            _operands.ForEach(operand =>
+            {
+                isTrue = isTrue && operand.Evaluate(context);
+
+                if (!isTrue)
+                    return;
+            });
+
+            return isTrue;
         }
 
         public static string Operator
@@ -30,10 +40,12 @@ namespace LogManagement.Event.Conditions
 
         public override string GetSyntax(IContext context)
         {
-            string syntax1 = _operand1.GetSyntax(context);
-            string syntax2 = _operand2.GetSyntax(context);
+            string syntax = string.Join(
+                string.Format(" {0} ", Operator),
+                _operands
+                    .Select(x => x.GetSyntax(context)));
 
-            return string.Format("({0} {1} {2})", syntax1, Operator, syntax2);
+            return syntax;
         }
     }
 }
