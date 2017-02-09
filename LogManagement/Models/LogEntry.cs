@@ -4,8 +4,9 @@ namespace LogManagement.Models
 {
     public enum Status
     {
-        Success,
-        Failure
+        None = 0,
+        Success = 1,
+        Failure = 2
     }
 
     public enum Priority
@@ -53,37 +54,64 @@ namespace LogManagement.Models
 
     public interface ILogEntry
     {
-        DateTime Occurence { get; set; }
+        TimeZoneInfo TimeZone { get; }
+        DateTime Occurence { get; }
+        string User { get; }
+        string SessionId { get; }
+        string TransactionId { get; }
+
         string System { get; set; }
         string Application { get; set; }
         string Component { get; set; }
         string Event { get; set; }
+
         Status Status { get; set; }
-        string User { get; set; }
-        string SessionId { get; set; }
-        string TransactionId { get; set; }
         string Description { get; set; }
-        string Reason { get; set; }
+        
         string Source { get; set; }
         string Destination { get; set; }
+
         string RuleId { get; set; }
+        string Reason { get; set; }
     }
 
     public class LogEntry : ILogEntry
     {
-        public DateTime Occurence { get; set; }
+        TimeZoneInfo _timeZoneInfo;
+        private DateTime _occurence;
+        string _user;
+         string _sessionId;
+         string _transactionId;
+
+         public TimeZoneInfo TimeZone { get { return _timeZoneInfo; } }
+         public DateTime Occurence { get { return _occurence; } }
+
+         public string User { get { return _user; } }
+         public string SessionId { get { return _sessionId; } }
+         public string TransactionId { get { return _transactionId; } }
+
         public string System { get; set; }
         public string Application { get; set; }
         public string Component { get; set; }
         public string Event { get; set; }
+
         public Status Status { get; set; }
-        public string User { get; set; }
-        public string SessionId { get; set; }
-        public string TransactionId { get; set; }
         public string Description { get; set; }
-        public string Reason { get; set; }
+        
         public string Source { get; set; }
         public string Destination { get; set; }
+
         public string RuleId { get; set; }
+        public string Reason { get; set; }
+
+        public LogEntry(TimeZoneInfo timeZoneInfo, DateTime occurence,
+            string user, string sessionId, string transactionId)
+        {
+            _timeZoneInfo = timeZoneInfo;
+            _occurence = occurence;
+            _user = user;
+            _sessionId = sessionId;
+            _transactionId = transactionId;
+        }
     }
 }

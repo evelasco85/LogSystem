@@ -57,6 +57,7 @@
     <Compile Include="Event\Conditions\BooleanExpression.cs" />
     <Compile Include="Event\Parameters\Variable.cs" />
     <Compile Include="Event\RuleParser.cs" />
+    <Compile Include="Managers\LogManager.cs" />
     <Compile Include="Models\LogEntry.cs" />
     <Compile Include="Managers\ActivityManager.cs" />
     <Compile Include="Managers\RuleManager.cs" />
