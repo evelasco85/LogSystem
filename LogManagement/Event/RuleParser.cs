@@ -11,11 +11,8 @@ namespace LogManagement.Event
 {
     public interface IRuleParser
     {
+        IRule CreateRule(string sourceCode, out string successAction, out string failAction);
         IList<string> ParseConditionToPostFixTokenList(StringBuilder data);
-        bool IsOperator(string input);
-        IDictionary<string, Tuple<string, IData, bool>> GetVariables(string sourceCode);
-        string GetConditionDeclaration(string sourceCode);
-        Type GetOperatorType(string conditionOperator);
     }
 
     public delegate IBooleanBase InstantiationDelegate<T>(T operand1, T operand2);
@@ -27,6 +24,11 @@ namespace LogManagement.Event
         const string SPACE = " ";
         public const string LABEL_PARAM = "param";
         public const string LABEL_LITERAL = "literal";
+        public const string LABEL_TEST_DATA = "param-test-data";
+        public const string LABEL_CONDITION = "condition";
+        public const string LABEL_SUCCESS = "success";
+        public const string LABEL_FAILED = "failure";
+        public const string LABEL_ID = "id";
 
         static IRuleParser s_instance = new RuleParser();
 
@@ -61,17 +63,6 @@ namespace LogManagement.Event
             {BooleanExpression.Operator, typeof(BooleanExpression)},
         };
 
-        public Type GetOperatorType(string conditionOperator)
-        {
-            return _conditionDictionary[conditionOperator];
-        }
-
-        public object CreateConditionInstance(Type conditionType, params object[] operands)
-        {
-            // create an object of the type
-            return Activator.CreateInstance(conditionType, operands);
-        }
-
         private List<Type> _expectedTypes = new List<Type>
         {
             typeof(int),
@@ -90,6 +81,17 @@ namespace LogManagement.Event
 
         private RuleParser()
         {
+        }
+
+        Type GetOperatorType(string conditionOperator)
+        {
+            return _conditionDictionary[conditionOperator];
+        }
+
+        object CreateConditionInstance(Type conditionType, params object[] operands)
+        {
+            // create an object of the type
+            return Activator.CreateInstance(conditionType, operands);
         }
 
         public IList<string> ParseConditionToPostFixTokenList(StringBuilder data)
@@ -170,45 +172,6 @@ namespace LogManagement.Event
             return _operator.Any(op => op == input);
         }
 
-        public IDictionary<string, Tuple<string, IData, bool>> GetVariables(string sourceCode)
-        {
-            IDictionary<string, Tuple<string, IData, bool>> variables = new Dictionary<string, Tuple<string, IData, bool>>();
-
-            using (StringReader reader = new StringReader(sourceCode))
-            {
-                string line = string.Empty;
-
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (line.StartsWith(LABEL_PARAM) || line.StartsWith(LABEL_LITERAL))
-                    {
-                        Tuple<string, IData, bool> variable = ConstructVariable(line);
-
-                        variables.Add(variable.Item1, variable);
-                    }
-                }
-            }
-
-            return variables;
-        }
-
-        public string GetConditionDeclaration(string sourceCode)
-        {
-            string declaration = string.Empty;
-
-            if (string.IsNullOrEmpty(sourceCode) || (!sourceCode.Contains("condition")))
-                return declaration;
-
-            int startIndex = sourceCode.IndexOf("condition");
-
-            startIndex = startIndex + sourceCode.Substring(startIndex).IndexOf(":") + 1;
-
-            int endIndex = startIndex + sourceCode.Substring(startIndex).IndexOf(Environment.NewLine);
-
-            declaration = sourceCode.Substring(startIndex, endIndex - startIndex);
-
-            return declaration;
-        }
         Tuple<string, IData, bool> ConstructVariable(string declaration)
         {
             if(string.IsNullOrEmpty(declaration))
@@ -242,6 +205,21 @@ namespace LogManagement.Event
                 );
         }
 
+        void AddTestData(ref IContext context, string declaration)
+        {
+            if ((context == null) || (string.IsNullOrEmpty(declaration)))
+                return;
+
+            IList<string> segment = declaration
+                .Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
+
+            string varName = segment[1];
+            string value = segment[2];
+
+            context.Assign(varName, DetectType(value));
+        }
+
         object DetectType(string stringValue)
         {
             foreach (var type in _expectedTypes)
@@ -266,6 +244,136 @@ namespace LogManagement.Event
             }
 
             return null;
+        }
+
+        void GetDeclarationFromSourceCode(string sourceCode,
+            ref IDictionary<string, Tuple<string, IData, bool>> variables ,
+            ref IContext context,
+            ref string conditionString,
+            ref string successAction,
+            ref string failAction,
+            ref string id
+            )
+        {
+            using (StringReader reader = new StringReader(sourceCode))
+            {
+                string line = string.Empty;
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.StartsWith(LABEL_TEST_DATA))
+                    {
+                        AddTestData(ref context, line);
+                    }
+                    else if (line.StartsWith(LABEL_PARAM) || line.StartsWith(LABEL_LITERAL))
+                    {
+                        Tuple<string, IData, bool> variable = ConstructVariable(line);
+
+                        variables.Add(variable.Item1, variable);
+                    }
+                    else if (line.StartsWith(LABEL_CONDITION))
+                    {
+                        int startIndex = line.IndexOf(":") + 1;
+
+                        conditionString = line.Substring(startIndex);
+                    }
+                    else if (line.StartsWith(LABEL_SUCCESS))
+                    {
+                        int startIndex = line.IndexOf(":") + 1;
+
+                        successAction = line.Substring(startIndex);
+                    }
+                    else if (line.StartsWith(LABEL_FAILED))
+                    {
+                        int startIndex = line.IndexOf(":") + 1;
+
+                        failAction = line.Substring(startIndex);
+                    }
+                    else if (line.StartsWith(LABEL_ID))
+                    {
+                        int startIndex = line.IndexOf(":") + 1;
+
+                        id = line.Substring(startIndex);
+                    }
+                }
+            }
+        }
+
+        IBooleanBase ConvertTokenToCondition(string conditionTokens, IDictionary<string, Tuple<string, IData, bool>> variables, ref IRule rule)
+        {
+            IList<string> postFixConditionTokens = ParseConditionToPostFixTokenList(new StringBuilder(conditionTokens));
+
+            Stack<object> stack = new Stack<object>();
+
+            for (int index = 0; index < postFixConditionTokens.Count; index++)
+            {
+                string token = postFixConditionTokens[index];
+
+                if (IsOperator(token))
+                {
+                    IList<object> operands = new List<object>();
+
+                    if (((token == AndExpression.Operator) || (token == OrExpression.Operator)))
+                    {
+                        while (stack.Any())
+                        {
+                            operands.Add(stack.Pop());
+                        }
+                    }
+                    else
+                    {
+                        operands.Add(stack.Pop());
+                        operands.Add(stack.Pop());
+                    }
+
+                    Type operatorType = GetOperatorType(token);
+
+                    stack.Push(CreateConditionInstance(operatorType, operands.ToArray()));
+                }
+                else
+                {
+                    stack.Push(variables[token].Item2);
+                    rule.AddVariableScope(variables[token].Item2, variables[token].Item3);
+                }
+            }
+
+            IBooleanBase condition = (IBooleanBase)stack.Pop();
+
+            return condition;
+        }
+
+        public IRule CreateRule(string sourceCode, out string successAction, out string failAction)
+        {
+            IDictionary<string, Tuple<string, IData, bool>> variables = new Dictionary<string, Tuple<string, IData, bool>>();
+            IContext context = new Context();
+            string conditionTokens = string.Empty;
+            
+            successAction = string.Empty;
+            failAction = string.Empty;
+
+            IRule rule = null;
+
+            try
+            {
+                string id = string.Empty;
+
+                GetDeclarationFromSourceCode(sourceCode, ref variables, ref context, ref conditionTokens, ref successAction, ref failAction, ref id);
+
+                rule = new Rule(id);
+
+                IBooleanBase condition = ConvertTokenToCondition(conditionTokens, variables, ref rule);
+
+                if (!condition.Evaluate(context))
+                    throw new ArgumentException("Built-in self-test for rule creation failed.");
+
+                rule.SetCondition(condition);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException("Failed to parse source code, please see inner exception.", ex);
+            }
+            
+            return rule;
         }
     }
 }

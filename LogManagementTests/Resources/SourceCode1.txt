@@ -8,7 +8,13 @@ literal|f|"a"
 literal|g|2.2
 literal|h|false
 
+param-test-data|param 1|1
+param-test-data|param 2|"a"
+param-test-data|param 3|2.2
+param-test-data|param 4|false
+
+id:TEST ID 123
 condition: ((a == e) && (b==f)) && ((c == g) && (d == h))
 success:PREDEFINE_ACTION_1
-failure:PREDEFINE_ACTION_1
+failure:PREDEFINE_ACTION_2
 

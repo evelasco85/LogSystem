@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using LogManagement.Event;
+using LogManagement.Event.Conditions;
 using LogManagement.Event.Parameters;
 using LogManagementTests.Resources;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,25 +25,18 @@ namespace LogManagementTests
         }
 
         [TestMethod]
-        public void Test()
+        public void TestDynamicRuleCreation()
         {
             IRuleParser parser = RuleParser.GetInstance();
-            IDictionary<string, Tuple<string, IData, bool>> variables = RuleParser.GetInstance().GetVariables(Syntax.SourceCode1);
-            string condition = parser.GetConditionDeclaration(Syntax.SourceCode1);
-            IList<string> postFixConditionTokens = parser.ParseConditionToPostFixTokenList(new StringBuilder(condition));
-            
-            IRule rule = new Rule(Guid.NewGuid().ToString());
-            Stack<IBooleanBase> conditions = new Stack<IBooleanBase>();
 
-            for (int index = 0; index < postFixConditionTokens.Count; index++)
-            {
-                string token = postFixConditionTokens[index];
+            string successAction;
+            string failAction;
+            IRule rule = parser.CreateRule(Syntax.SourceCode1, out successAction, out failAction);
 
-                if (parser.IsOperator(token))
-                {
-                }
-            }
-
+            Assert.IsNotNull(rule);
+            Assert.AreEqual("TEST ID 123", rule.Id);
+            Assert.AreEqual("PREDEFINE_ACTION_1", successAction);
+            Assert.AreEqual("PREDEFINE_ACTION_2", failAction);
         }
     }
 }
