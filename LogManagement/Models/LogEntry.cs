@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LogManagement.Models
 {
@@ -74,6 +75,8 @@ namespace LogManagement.Models
 
         string RuleId { get; set; }
         string Reason { get; set; }
+
+        IList<Tuple<string, object>> Parameters { get; set; }
     }
 
     public class LogEntry : ILogEntry
@@ -81,31 +84,55 @@ namespace LogManagement.Models
         TimeZoneInfo _timeZoneInfo;
         private DateTime _occurence;
         string _user;
-         string _sessionId;
-         string _transactionId;
+        string _sessionId;
+        string _transactionId;
         private Priority _priority;
 
-         public TimeZoneInfo TimeZone { get { return _timeZoneInfo; } }
-         public DateTime Occurence { get { return _occurence; } }
+        public TimeZoneInfo TimeZone
+        {
+            get { return _timeZoneInfo; }
+        }
 
-         public string User { get { return _user; } }
-         public string SessionId { get { return _sessionId; } }
-         public string TransactionId { get { return _transactionId; } }
+        public DateTime Occurence
+        {
+            get { return _occurence; }
+        }
+
+        public string User
+        {
+            get { return _user; }
+        }
+
+        public string SessionId
+        {
+            get { return _sessionId; }
+        }
+
+        public string TransactionId
+        {
+            get { return _transactionId; }
+        }
 
         public string System { get; set; }
         public string Application { get; set; }
         public string Component { get; set; }
         public string Event { get; set; }
 
-        public Priority Priority { get { return _priority; } }
+        public Priority Priority
+        {
+            get { return _priority; }
+        }
+
         public Status Status { get; set; }
         public string Description { get; set; }
-        
+
         public string Source { get; set; }
         public string Destination { get; set; }
 
         public string RuleId { get; set; }
         public string Reason { get; set; }
+
+        public IList<Tuple<string, object>> Parameters { get; set; }
 
         public LogEntry(TimeZoneInfo timeZoneInfo, DateTime occurence,
             string user, string sessionId, string transactionId, Priority priority)

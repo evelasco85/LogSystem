@@ -31,7 +31,7 @@ namespace LogManagementTests
 
             string successAction;
             string failAction;
-            IRule rule = parser.CreateRule(Syntax.SourceCode1, out successAction, out failAction);
+            IRule rule = parser.CreateRule(Files.SourceCode1, out successAction, out failAction);
 
             Assert.IsNotNull(rule);
             Assert.AreEqual("TEST ID 123", rule.Id);

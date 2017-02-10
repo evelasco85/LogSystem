@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LogManagement.Models;
 
 namespace LogManagement.Managers
@@ -64,25 +65,29 @@ namespace LogManagement.Managers
 
         public ILogEntry CreateLogEntry(Priority priority)
         {
-            if(_retrieveUser == null)
-                throw new NotImplementedException(String.Format("Implementation for member '{0}' is required", "RetrieveUser"));
+            if (_retrieveUser == null)
+                throw new NotImplementedException(String.Format("Implementation for member '{0}' is required",
+                    "RetrieveUser"));
 
             if (_retrieveSessionId == null)
-                throw new NotImplementedException(String.Format("Implementation for member '{0}' is required", "RetrieveSessionId"));
+                throw new NotImplementedException(String.Format("Implementation for member '{0}' is required",
+                    "RetrieveSessionId"));
 
             if (_retrieveBusinessTransactionId == null)
-                throw new NotImplementedException(String.Format("Implementation for member '{0}' is required", "RetrieveBusinessTransactionId"));
+                throw new NotImplementedException(String.Format("Implementation for member '{0}' is required",
+                    "RetrieveBusinessTransactionId"));
 
             ILogEntry log = new LogEntry(
                 TimeZoneInfo.Local,
                 DateTime.Now,
                 _retrieveUser(),
                 _retrieveSessionId(),
-                 _retrieveBusinessTransactionId(),
-                 priority
+                _retrieveBusinessTransactionId(),
+                priority
                 )
             {
                 Status = Status.None,
+                Parameters = new List<Tuple<string, object>>()
             };
 
             return log;

@@ -22,14 +22,14 @@ namespace LogManagementTests.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Syntax {
+    internal class Files {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Syntax() {
+        internal Files() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace LogManagementTests.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("LogManagementTests.Resources.Syntax", typeof(Syntax).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("LogManagementTests.Resources.Files", typeof(Files).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -62,6 +62,35 @@ namespace LogManagementTests.Resources {
         
         /// <summary>
         ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string LogFormat {
+            get {
+                return ResourceManager.GetString("LogFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to param|a|param 1|true
+        ///param|b|param 2|false
+        ///param|c|param 3|true
+        ///param|d|param 4|false
+        ///
+        ///literal|e|1
+        ///literal|f|&quot;a&quot;
+        ///literal|g|2.2
+        ///literal|h|false
+        ///
+        ///param-test-data|param 1|1
+        ///param-test-data|param 2|&quot;a&quot;
+        ///param-test-data|param 3|2.2
+        ///param-test-data|param 4|false
+        ///
+        ///id:TEST ID 123
+        ///condition: ((a == e) &amp;&amp; (b==f)) &amp;&amp; ((c == g) &amp;&amp; (d == h))
+        ///success:PREDEFINE_ACTION_1
+        ///failure:PREDEFINE_ACTION_2
+        ///
+        ///.
         /// </summary>
         internal static string SourceCode1 {
             get {
