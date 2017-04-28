@@ -60,6 +60,7 @@
     <Compile Include="Models\LogEntry.cs" />
     <Compile Include="Managers\ActivityManager.cs" />
     <Compile Include="Managers\RuleManager.cs" />
+    <Compile Include="Models\StaticLogEntryWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registration\ApplicationRegistration.cs" />
     <Compile Include="Registration\ComponentRegistration.cs" />

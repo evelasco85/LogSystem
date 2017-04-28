@@ -49,7 +49,9 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -67,6 +69,7 @@
     </Compile>
     <Compile Include="RuleParserTests.cs" />
     <Compile Include="LogTests.cs" />
+    <Compile Include="StaticLogEntryWrapperTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LogManagement\LogManagement.csproj">

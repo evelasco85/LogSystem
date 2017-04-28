@@ -1,10 +1,8 @@
 ﻿using System;
 using LogManagement.Managers;
 using LogManagement.Models;
-using LogManagementTests.Resources;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace LogManagementTests
 {
