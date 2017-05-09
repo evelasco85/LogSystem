@@ -4,14 +4,22 @@ using LogManagement.Models;
 
 namespace LogManagement.Managers
 {
-    public interface ILogManager
+    public interface ILogCreator
+    {
+        void EmitLog(ILogEntry log);
+        ILogEntry CreateLogEntry(Priority priority);
+    }
+
+    public interface ILogEmitter
+    {
+        OnLogEmit LogEmit { get; set; }
+    }
+
+    public interface ILogManager : ILogEmitter, ILogCreator
     {
         RetrieveUserDelegate RetrieveUser { get; set; }
         RetrieveSessionIdDelegate RetrieveSessionId { get; set; }
         RetrieveBusinessTransactionIdDelegate RetrieveBusinessTransactionId { get; set; }
-        OnLogEmit LogEmit { get; set; }
-        void EmitLog(ILogEntry log);
-        ILogEntry CreateLogEntry(Priority priority);
     }
 
     public delegate string RetrieveUserDelegate();
