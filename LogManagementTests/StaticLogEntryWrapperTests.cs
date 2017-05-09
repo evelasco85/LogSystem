@@ -174,5 +174,30 @@ namespace LogManagementTests
 
             Assert.IsTrue(!string.IsNullOrEmpty(logString));
         }
+
+        [TestMethod]
+        public void Test_LogBuilder()
+        {
+            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager);
+
+            string logString = string.Empty;
+
+            _manager.LogEmit = log =>
+            {
+                if (log == null)
+                    return;
+
+                logString = JsonConvert.SerializeObject(log, Formatting.Indented);
+            };
+
+            staticLogCreator
+                .SetSystem("Security System")
+                .SetApplication("Security Tester")
+                .SetComponent("Authentication Component")
+                .SetEvent("Validation")
+                .EmitLog(Priority.Info, Status.Success);
+
+            Assert.IsTrue(!string.IsNullOrEmpty(logString));
+        }
     }
 }
