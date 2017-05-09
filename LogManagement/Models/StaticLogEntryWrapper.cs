@@ -4,14 +4,15 @@ using System.Collections.Generic;
 
 namespace LogManagement.Models
 {
-    public interface IStaticLogEntryWrapper_Emitter
+    public interface IStaticLogEntryWrapper_Emitter : ILogCreator
     {
         void EmitLog(Priority priority, String description, IList<Tuple<string, object>> parameters);
         void EmitLog(Priority priority, Status status);
         void EmitLog(Priority priority, Status status, IList<Tuple<string, object>> parameters);
+        ILogEntry CreateLogEntry(Priority priority, String description);
     }
 
-    public interface IStaticLogEntryWrapper : ILogCreator, IStaticLogEntryWrapper_Emitter
+    public interface IStaticLogEntryWrapper : IStaticLogEntryWrapper_Emitter
     {
         string System { set; }
         string Application { set; }
@@ -22,8 +23,6 @@ namespace LogManagement.Models
         IStaticLogEntryWrapper SetApplication(String application);
         IStaticLogEntryWrapper SetComponent(String component);
         IStaticLogEntryWrapper_Emitter SetEvent(String @event);
-
-        ILogEntry CreateLogEntry(Priority priority, String description);
     }
 
     public class StaticLogEntryWrapper : IStaticLogEntryWrapper
