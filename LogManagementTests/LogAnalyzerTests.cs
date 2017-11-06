@@ -12,7 +12,7 @@ namespace LogManagementTests
     [TestClass]
     public class LogAnalyzerTests
     {
-        private IList<LogEntryKVP> _inMemoryLogEntries = new List<LogEntryKVP>();
+        private List<LogEntryKVP> _inMemoryLogEntries = new List<LogEntryKVP>();
         private ILogRepository<LogEntryKVP> _logRepository;
         private ILogPersistency<LogEntryKVP> _logPersistency;
         private ILogAnalyzer<LogEntryKVP> _logAnalyzer;
@@ -28,16 +28,16 @@ namespace LogManagementTests
                 {new GetFailedValidationDescriptionLogsQuery(_inMemoryLogEntries)},
             });
             _logPersistency = new LogPersistency<LogEntryKVP>(_logRepository,
-                (logEntityToAdd, preInsertRepository) =>
+                (logEntitiesToAdd, preInsertRepository) =>
                 {
                     /*Pre-insert*/
                 },
-                (logEntityToAdd, currentRepository) =>
+                (logEntitiesToAdd, currentRepository) =>
                 {
                     /*Insert*/
-                    _inMemoryLogEntries.Add(logEntityToAdd);
+                    _inMemoryLogEntries.AddRange(logEntitiesToAdd);
                 },
-                (addedLogEntity, postInsertRepository) =>
+                (addedLogEntities, postInsertRepository) =>
                 {
                     /*Post-insert*/
                 }
@@ -47,7 +47,7 @@ namespace LogManagementTests
                 {
                     {
                         new LogTrigger<LogEntryKVP>("0001",
-                            (entity, repository) =>
+                            (entities, repository) =>
                             {
                                 /*Trigger Evaluation*/
                                 IEnumerable<LogEntryKVP> result = repository
@@ -55,7 +55,7 @@ namespace LogManagementTests
 
                                 return result.Any();
                             },
-                            (id, entity, repository) =>
+                            (id, entities, repository) =>
                             {
                                 /*Trigger Invocation*/
                                 _invokedRuleId = id;
@@ -63,7 +63,7 @@ namespace LogManagementTests
                     },
                     {
                         new LogTrigger<LogEntryKVP>("0002",
-                            (entity, repository) =>
+                            (entities, repository) =>
                             {
                                 /*Trigger Evaluation*/
                                 IEnumerable<LogEntryKVP> result = repository
@@ -71,7 +71,7 @@ namespace LogManagementTests
 
                                 return result.Any();
                             },
-                            (id, entity, repository) =>
+                            (id, entities, repository) =>
                             {
                                 /*Trigger Invocation*/
                                 _invokedRuleId = id;
@@ -125,7 +125,7 @@ namespace LogManagementTests
 
                 _logPersistency.Insert(logEntities);
 
-                IList<LogEntryKVP> allLogEntries = _inMemoryLogEntries;
+                List<LogEntryKVP> allLogEntries = _inMemoryLogEntries;
 
                 //Isolate analysis to newly inserted logs
                 _inMemoryLogEntries = _inMemoryLogEntries

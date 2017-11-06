@@ -5,30 +5,29 @@ namespace LogManagement
 {
     public interface ILogPersistency<TLogEntity>
     {
-        void Insert(TLogEntity logEntity);
         void Insert(IList<TLogEntity> logEntities);
     }
 
     public class LogPersistency<TLogEntity> : ILogPersistency<TLogEntity>
     {
-        public delegate void PreInsertOperationDelegate(TLogEntity logEntityToAdd,
+        public delegate void PreInsertOperationDelegate<TLog>(IList<TLog> logEntitiesToAdd,
             ILogRepository<TLogEntity> preInsertRepository);
 
-        public delegate void InsertOperationDelegate(TLogEntity logEntityToAdd,
+        public delegate void InsertOperationDelegate<TLog>(IList<TLog> logEntitiesToAdd,
             ILogRepository<TLogEntity> currentRepository);
 
-        public delegate void PostInsertOperationDelegate(TLogEntity addedLogEntity,
+        public delegate void PostInsertOperationDelegate<TLog>(IList<TLog> addedLogEntities,
             ILogRepository<TLogEntity> postInsertRepository);
 
         private ILogRepository<TLogEntity> _repository;
-        private PreInsertOperationDelegate _preInsertOperation;
-        private InsertOperationDelegate _insertOperation;
-        private PostInsertOperationDelegate _postInsertOperation;
+        private PreInsertOperationDelegate<TLogEntity> _preInsertOperation;
+        private InsertOperationDelegate<TLogEntity> _insertOperation;
+        private PostInsertOperationDelegate<TLogEntity> _postInsertOperation;
 
         public LogPersistency(ILogRepository<TLogEntity> repository,
-            PreInsertOperationDelegate preInsertOperation,
-            InsertOperationDelegate insertOperation,
-            PostInsertOperationDelegate postInsertOperation)
+            PreInsertOperationDelegate<TLogEntity> preInsertOperation,
+            InsertOperationDelegate<TLogEntity> insertOperation,
+            PostInsertOperationDelegate<TLogEntity> postInsertOperation)
         {
             _repository = repository;
             _preInsertOperation = preInsertOperation;
@@ -38,23 +37,11 @@ namespace LogManagement
 
         public void Insert(IList<TLogEntity> logEntities)
         {
-            if((logEntities == null) || (!logEntities.Any())) return;
+            if (_preInsertOperation != null) _preInsertOperation(logEntities, _repository);
 
-            for (int index = 0; index < logEntities.Count; index++)
-            {
-                TLogEntity logEntity = logEntities[index];
+            if (_insertOperation != null) _insertOperation(logEntities, _repository);
 
-                Insert(logEntity);
-            }
-        }
-
-        public void Insert(TLogEntity logEntity)
-        {
-            if (_preInsertOperation != null) _preInsertOperation(logEntity, _repository);
-
-            if (_insertOperation != null) _insertOperation(logEntity, _repository);
-
-            if (_postInsertOperation != null) _postInsertOperation(logEntity, _repository);
+            if (_postInsertOperation != null) _postInsertOperation(logEntities, _repository);
         }
     }
 }
