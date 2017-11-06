@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LogManagement;
 using LogManagement.Dynamic.Managers;
@@ -11,21 +12,22 @@ namespace LogManagementTests
     [TestClass]
     public class LogAnalyzerTests
     {
-        private IList<ILogEntry> _inMemoryLogEntries = new List<ILogEntry>();
-        private ILogRepository<ILogEntry> _repository;
-        private ILogPersistency<ILogEntry> _persistency;
-        private ILogAnalyzer<ILogEntry> _analyzer;
+        private IList<LogEntryKVP> _inMemoryLogEntries = new List<LogEntryKVP>();
+        private ILogRepository<LogEntryKVP> _logRepository;
+        private ILogPersistency<LogEntryKVP> _logPersistency;
+        private ILogAnalyzer<LogEntryKVP> _logAnalyzer;
         private ILogManager _manager = LogManager.GetInstance();
         private string _invokedRuleId = string.Empty;
 
         [TestInitialize]
         public void Initialize()
         {
-            _repository = new LogRepository<ILogEntry>(new List<IBaseLogQueryObject<ILogEntry>>
+            _logRepository = new LogRepository<LogEntryKVP>(new List<IBaseLogQueryObject<LogEntryKVP>>
             {
                 {new GetFailedInvocationLogsQuery(_inMemoryLogEntries)},
+                {new GetFailedValidationDescriptionLogsQuery(_inMemoryLogEntries)},
             });
-            _persistency = new LogPersistency<ILogEntry>(_repository,
+            _logPersistency = new LogPersistency<LogEntryKVP>(_logRepository,
                 (logEntityToAdd, preInsertRepository) =>
                 {
                     /*Pre-insert*/
@@ -40,39 +42,38 @@ namespace LogManagementTests
                     /*Post-insert*/
                 }
             );
-            _analyzer = new LogAnalyzer<ILogEntry>(_repository,
-                new List<ILogTrigger<ILogEntry>>
+            _logAnalyzer = new LogAnalyzer<LogEntryKVP>(_logRepository,
+                new List<ILogTrigger<LogEntryKVP>>
                 {
                     {
-                        new LogTrigger<ILogEntry>("0001",
+                        new LogTrigger<LogEntryKVP>("0001",
                             (entity, repository) =>
                             {
-                                /*Evaluation*/
-                                if (entity == null) return false;
+                                /*Trigger Evaluation*/
+                                IEnumerable<LogEntryKVP> result = repository
+                                    .Matching(new GetFailedValidationDescriptionLogsQuery.Criteria());
 
-                                return entity.Description == "Validation has been invoked but was failed";
+                                return result.Any();
                             },
                             (id, entity, repository) =>
                             {
-                                /*Invocation*/
+                                /*Trigger Invocation*/
                                 _invokedRuleId = id;
                             })
                     },
                     {
-                        new LogTrigger<ILogEntry>("0002",
+                        new LogTrigger<LogEntryKVP>("0002",
                             (entity, repository) =>
                             {
-                                /*Evaluation*/
-                                if (entity == null) return false;
-
-                                IEnumerable<ILogEntry> result = repository
+                                /*Trigger Evaluation*/
+                                IEnumerable<LogEntryKVP> result = repository
                                     .Matching(new GetFailedInvocationLogsQuery.Criteria());
 
                                 return result.Any();
                             },
                             (id, entity, repository) =>
                             {
-                                /*Invocation*/
+                                /*Trigger Invocation*/
                                 _invokedRuleId = id;
                             })
                     },
@@ -99,15 +100,36 @@ namespace LogManagementTests
                 if (log == null)
                     return;
 
-                _persistency.Insert(log);
-                _analyzer.Analyze(log);
+                string transactionId = log.TransactionId;
+                Priority priority = log.Priority;
+                IList<LogEntryKVP> logEntities = new List<LogEntryKVP>
+                {
+                    new LogEntryKVP {TransactionId = transactionId, Priority = priority, Key = "System", Value = log.System},
+                    new LogEntryKVP {TransactionId = transactionId, Priority = priority, Key = "Application", Value = log.Application},
+                    new LogEntryKVP {TransactionId = transactionId, Priority = priority, Key = "Component", Value = log.Component},
+                    new LogEntryKVP {TransactionId = transactionId, Priority = priority, Key = "Event", Value = log.Event},
+                    new LogEntryKVP {TransactionId = transactionId, Priority = priority, Key = "Description", Value = log.Description},
+                    new LogEntryKVP {TransactionId = transactionId, Priority = priority, Key = "Status", Value = log.Status.ToString()},
+                };
+
+                if ((log.Parameters != null) && (log.Parameters.Any()))
+                {
+                    foreach (Tuple<string, object> parameter in log.Parameters)
+                    {
+                        logEntities.Add(new LogEntryKVP { TransactionId = transactionId , Priority = priority, Key = parameter.Item1, Value = Convert.ToString(parameter.Item2)});
+                    }
+                }
+
+                _logPersistency.Insert(logEntities);
+                _logAnalyzer.Analyze();
+                _inMemoryLogEntries.Clear();
             };
         }
 
         [TestMethod]
         public void TestMethod1()
         {
-            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager)
+            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper("Test Log Creator", _manager)
             {
                 System = "Security System",
                 Application = "Security Tester",
@@ -122,7 +144,7 @@ namespace LogManagementTests
         [TestMethod]
         public void TestMethod2()
         {
-            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager)
+            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper("Test Log Creator", _manager)
             {
                 System = "Security System",
                 Application = "Security Tester",
@@ -130,7 +152,7 @@ namespace LogManagementTests
                 Event = "Validation"
             };
 
-            staticLogCreator.EmitLog(Priority.Info, Status.Failure, "Validation has been invoked but was failed");
+            staticLogCreator.EmitLog(Priority.Info, Status.Failure, string.Empty);
             Assert.AreEqual("0002", _invokedRuleId);
         }
     }

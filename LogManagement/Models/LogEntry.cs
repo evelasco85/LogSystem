@@ -55,6 +55,7 @@ namespace LogManagement.Models
 
     public interface ILogEntry
     {
+        string LogCreatorId { get; }
         TimeZoneInfo TimeZone { get; }
         DateTime Occurence { get; }
         string User { get; }
@@ -70,23 +71,20 @@ namespace LogManagement.Models
         Status Status { get; set; }
         string Description { get; set; }
         
-        string Source { get; set; }
-        string Destination { get; set; }
-
-        string RuleId { get; set; }
-        string Reason { get; set; }
-
         IList<Tuple<string, object>> Parameters { get; set; }
     }
 
     public class LogEntry : ILogEntry
     {
-        TimeZoneInfo _timeZoneInfo;
+        private string _logCreatorId;
+        private TimeZoneInfo _timeZoneInfo;
         private DateTime _occurence;
-        string _user;
-        string _sessionId;
-        string _transactionId;
+        private string _user;
+        private string _sessionId;
+        private string _transactionId;
         private Priority _priority;
+
+        public string LogCreatorId { get { return _logCreatorId; } }
 
         public TimeZoneInfo TimeZone
         {
@@ -126,17 +124,14 @@ namespace LogManagement.Models
         public Status Status { get; set; }
         public string Description { get; set; }
 
-        public string Source { get; set; }
-        public string Destination { get; set; }
-
-        public string RuleId { get; set; }
-        public string Reason { get; set; }
-
         public IList<Tuple<string, object>> Parameters { get; set; }
 
-        public LogEntry(TimeZoneInfo timeZoneInfo, DateTime occurence,
-            string user, string sessionId, string transactionId, Priority priority)
+        public LogEntry(string logCreatorId,
+            TimeZoneInfo timeZoneInfo, DateTime occurence,
+            string user, string sessionId, string transactionId,
+            Priority priority)
         {
+            _logCreatorId = logCreatorId;
             _timeZoneInfo = timeZoneInfo;
             _occurence = occurence;
             _user = user;

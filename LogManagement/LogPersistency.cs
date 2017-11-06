@@ -1,8 +1,12 @@
-﻿namespace LogManagement
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace LogManagement
 {
     public interface ILogPersistency<TLogEntity>
     {
         void Insert(TLogEntity logEntity);
+        void Insert(IList<TLogEntity> logEntities);
     }
 
     public class LogPersistency<TLogEntity> : ILogPersistency<TLogEntity>
@@ -30,6 +34,18 @@
             _preInsertOperation = preInsertOperation;
             _insertOperation = insertOperation;
             _postInsertOperation = postInsertOperation;
+        }
+
+        public void Insert(IList<TLogEntity> logEntities)
+        {
+            if((logEntities == null) || (!logEntities.Any())) return;
+
+            for (int index = 0; index < logEntities.Count; index++)
+            {
+                TLogEntity logEntity = logEntities[index];
+
+                Insert(logEntity);
+            }
         }
 
         public void Insert(TLogEntity logEntity)

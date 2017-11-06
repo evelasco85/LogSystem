@@ -50,11 +50,7 @@ namespace LogManagementTests
             entry.Component = "Authentication Component";
             entry.Event = "Validation";
             entry.Description = "Validation has been invoked but was failed";
-            entry.Reason = "Validation Rule Invocation";
-            entry.RuleId = "N/A";
             entry.Status = Status.Failure;
-            entry.Source = "N/A";
-            entry.Destination = "N/A";
 
             entry.Parameters.Add(new Tuple<string, object>("Param 1", "value 1"));
             entry.Parameters.Add(new Tuple<string, object>("Param 2", "value 2"));

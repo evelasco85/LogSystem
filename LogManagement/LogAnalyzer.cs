@@ -6,6 +6,7 @@ namespace LogManagement
     public interface ILogAnalyzer<TLogEntity>
     {
         void Analyze(TLogEntity log);
+        void Analyze();
     }
 
     public class LogAnalyzer<TLogEntity> : ILogAnalyzer<TLogEntity>
@@ -35,6 +36,11 @@ namespace LogManagement
                 if(mustInvoke)
                     trigger.InvokeEvent(log, _logRepository);
             }
+        }
+
+        public void Analyze()
+        {
+            Analyze(default(TLogEntity));
         }
     }
 }

@@ -8,6 +8,7 @@ namespace LogManagement.Dynamic.Managers
     {
         void EmitLog(ILogEntry log);
         ILogEntry CreateLogEntry(Priority priority);
+        ILogEntry CreateLogEntry(string logCreatorId, Priority priority);
     }
 
     public interface ILogEmitter
@@ -38,9 +39,7 @@ namespace LogManagement.Dynamic.Managers
 
         private OnLogEmit _onLogEmit;
 
-        private LogManager()
-        {
-        }
+        private LogManager() {}
 
         public RetrieveUserDelegate RetrieveUser
         {
@@ -71,7 +70,7 @@ namespace LogManagement.Dynamic.Managers
             return s_instance;
         }
 
-        public ILogEntry CreateLogEntry(Priority priority)
+        public ILogEntry CreateLogEntry(string logCreatorId, Priority priority)
         {
             if (_retrieveUser == null)
                 throw new NotImplementedException(String.Format("Implementation for member '{0}' is required",
@@ -85,20 +84,25 @@ namespace LogManagement.Dynamic.Managers
                 throw new NotImplementedException(String.Format("Implementation for member '{0}' is required",
                     "RetrieveBusinessTransactionId"));
 
-            ILogEntry log = new LogEntry(
+            ILogEntry log = new LogEntry(logCreatorId,
                 TimeZoneInfo.Local,
                 DateTime.Now,
                 _retrieveUser(),
                 _retrieveSessionId(),
                 _retrieveBusinessTransactionId(),
                 priority
-                )
+            )
             {
                 Status = Status.None,
                 Parameters = new List<Tuple<string, object>>()
             };
 
             return log;
+        }
+
+        public ILogEntry CreateLogEntry(Priority priority)
+        {
+            return CreateLogEntry(string.Empty, priority);
         }
 
         public void EmitLog(ILogEntry log)

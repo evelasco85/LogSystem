@@ -27,49 +27,51 @@ namespace LogManagement.Models
 
     public class StaticLogEntryWrapper : IStaticLogEntryWrapper
     {
-        ILogManager _manager;
+        private ILogManager _manager;
+        private string _logCreatorId;
 
         public string System { private get; set; }
         public string Application { private get; set; }
         public string Component { private get; set; }
         public string Event { private get; set; }
 
-        public StaticLogEntryWrapper(ILogManager manager) :
-            this(manager, string.Empty, string.Empty, string.Empty, string.Empty)
+        public StaticLogEntryWrapper(string logCreatorId, ILogManager manager) :
+            this(logCreatorId, manager, string.Empty, string.Empty, string.Empty, string.Empty)
         {
         }
 
-        public StaticLogEntryWrapper(ILogManager manager,
+        public StaticLogEntryWrapper(string logCreatorId, ILogManager manager,
           string system
           )
-            : this(manager, system, string.Empty, string.Empty, string.Empty)
+            : this(logCreatorId, manager, system, string.Empty, string.Empty, string.Empty)
         {
         }
 
-        public StaticLogEntryWrapper(ILogManager manager,
+        public StaticLogEntryWrapper(string logCreatorId, ILogManager manager,
           string system,
           string application
           )
-            : this(manager, system, application, string.Empty, string.Empty)
+            : this(logCreatorId, manager, system, application, string.Empty, string.Empty)
         {
         }
 
-        public StaticLogEntryWrapper(ILogManager manager,
+        public StaticLogEntryWrapper(string logCreatorId, ILogManager manager,
            string system,
            string application,
            string component
            )
-            : this(manager, system, application, component, string.Empty)
+            : this(logCreatorId, manager, system, application, component, string.Empty)
         {
         }
 
-        public StaticLogEntryWrapper(ILogManager manager,
+        public StaticLogEntryWrapper(string logCreatorId, ILogManager manager,
             string system,
             string application,
             string component,
             string @event
             )
         {
+            _logCreatorId = logCreatorId;
             _manager = manager;
 
             System = system;
@@ -108,7 +110,12 @@ namespace LogManagement.Models
 
         public ILogEntry CreateLogEntry(Priority priority)
         {
-            ILogEntry entry = _manager.CreateLogEntry(priority);
+            return CreateLogEntry(_logCreatorId, priority);
+        }
+
+        public ILogEntry CreateLogEntry(string logCreatorId, Priority priority)
+        {
+            ILogEntry entry = _manager.CreateLogEntry(logCreatorId, priority);
 
             entry.System = System;
             entry.Application = Application;
