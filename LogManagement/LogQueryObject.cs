@@ -11,13 +11,13 @@ namespace LogManagement
 
     public interface IBaseLogQueryObject<TEntity> : IBaseLogQueryObject
     {
-        IList<TEntity> Execute();
+        IEnumerable<TEntity> Execute();
     }
 
     public interface IBaseLogQueryObject<TEntity, TSearchInput> : IBaseLogQueryObject<TEntity>
     {
         TSearchInput SearchInput { get; set; }
-        IList<TEntity> PerformSearchOperation(TSearchInput searchInput);
+        IEnumerable<TEntity> PerformSearchOperation(TSearchInput searchInput);
     }
 
     public abstract class BaseLogQueryObject<TEntity, TSearchInput> :
@@ -36,13 +36,11 @@ namespace LogManagement
             get { return typeof(TSearchInput); }
         }
 
-        public abstract IList<TEntity> PerformSearchOperation(TSearchInput searchInput);
+        public abstract IEnumerable<TEntity> PerformSearchOperation(TSearchInput searchInput);
 
-        public IList<TEntity> Execute()
+        public IEnumerable<TEntity> Execute()
         {
-            IList<TEntity> ultimateResult = PerformSearchOperation(SearchInput);
-
-            return ultimateResult;
+            return PerformSearchOperation(SearchInput);
         }
     }
 }

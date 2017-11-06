@@ -5,24 +5,40 @@
         void Insert(TLogEntity logEntity);
     }
 
-    public abstract class LogPersistency<TLogEntity> : ILogPersistency<TLogEntity>
+    public class LogPersistency<TLogEntity> : ILogPersistency<TLogEntity>
     {
-        private ILogRepository<TLogEntity> _repository;
+        public delegate void PreInsertOperationDelegate(TLogEntity logEntityToAdd,
+            ILogRepository<TLogEntity> preInsertRepository);
 
-        public LogPersistency(ILogRepository<TLogEntity> repository)
+        public delegate void InsertOperationDelegate(TLogEntity logEntityToAdd,
+            ILogRepository<TLogEntity> currentRepository);
+
+        public delegate void PostInsertOperationDelegate(TLogEntity addedLogEntity,
+            ILogRepository<TLogEntity> postInsertRepository);
+
+        private ILogRepository<TLogEntity> _repository;
+        private PreInsertOperationDelegate _preInsertOperation;
+        private InsertOperationDelegate _insertOperation;
+        private PostInsertOperationDelegate _postInsertOperation;
+
+        public LogPersistency(ILogRepository<TLogEntity> repository,
+            PreInsertOperationDelegate preInsertOperation,
+            InsertOperationDelegate insertOperation,
+            PostInsertOperationDelegate postInsertOperation)
         {
             _repository = repository;
+            _preInsertOperation = preInsertOperation;
+            _insertOperation = insertOperation;
+            _postInsertOperation = postInsertOperation;
         }
 
         public void Insert(TLogEntity logEntity)
         {
-            PreInsertOperation(logEntity, _repository);
-            InsertOperation(logEntity, _repository);
-            PostInsertOperation(logEntity, _repository);
-        }
+            if (_preInsertOperation != null) _preInsertOperation(logEntity, _repository);
 
-        public abstract void PreInsertOperation(TLogEntity logEntityToAdd, ILogRepository<TLogEntity> preInsertRepository);
-        public abstract void InsertOperation(TLogEntity logEntityToAdd, ILogRepository<TLogEntity> currentRepository);
-        public abstract void PostInsertOperation(TLogEntity addedLogEntity, ILogRepository<TLogEntity> postInsertRepository);
+            if (_insertOperation != null) _insertOperation(logEntity, _repository);
+
+            if (_postInsertOperation != null) _postInsertOperation(logEntity, _repository);
+        }
     }
 }

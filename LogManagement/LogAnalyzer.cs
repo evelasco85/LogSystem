@@ -5,8 +5,6 @@ namespace LogManagement
 {
     public interface ILogAnalyzer<TLogEntity>
     {
-        void RegisterTrigger(ILogTrigger<TLogEntity> trigger);
-        void RegisterTriggers(List<ILogTrigger<TLogEntity>> triggers);
         void Analyze(TLogEntity log);
     }
 
@@ -15,23 +13,13 @@ namespace LogManagement
         ILogRepository<TLogEntity> _logRepository;
         private List<ILogTrigger<TLogEntity>> _triggers = new List<ILogTrigger<TLogEntity>>();
 
-        public LogAnalyzer(ILogRepository<TLogEntity> logRepository)
+        public LogAnalyzer(ILogRepository<TLogEntity> logRepository,
+            List<ILogTrigger<TLogEntity>> triggers
+            )
         {
             _logRepository = logRepository;
-        }
 
-        public void RegisterTrigger(ILogTrigger<TLogEntity> trigger)
-        {
-            if(trigger == null) return;
-
-            _triggers.Add(trigger);
-        }
-
-        public void RegisterTriggers(List<ILogTrigger<TLogEntity>> triggers)
-        {
-            if((triggers == null) || (!triggers.Any())) return;
-
-            _triggers.AddRange(triggers);
+            if ((triggers != null) && (triggers.Any())) _triggers.AddRange(triggers);
         }
 
         public void Analyze(TLogEntity log)

@@ -37,7 +37,7 @@ namespace LogManagement
             return queryDictionary;
         }
 
-        IList<TLogEntity> Matching(IBaseLogQueryObject<TLogEntity> query)
+        IEnumerable<TLogEntity> Matching(IBaseLogQueryObject<TLogEntity> query)
         {
             return query.Execute();
         }
