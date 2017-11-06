@@ -1,4 +1,4 @@
-﻿using LogManagement.Managers;
+﻿using LogManagement.Dynamic.Managers;
 using System;
 using System.Collections.Generic;
 

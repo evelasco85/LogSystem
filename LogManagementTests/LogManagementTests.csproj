@@ -58,16 +58,16 @@
   <ItemGroup>
     <Compile Include="Implementations\Authentication.cs" />
     <Compile Include="Implementations\SecurityCredential.cs" />
-    <Compile Include="ActivityManagerTests.cs" />
+    <Compile Include="Dynamic\ActivityManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="InterpreterTests.cs" />
-    <Compile Include="RuleTests.cs" />
-    <Compile Include="Resources\Files.Designer.cs">
+    <Compile Include="Dynamic\InterpreterTests.cs" />
+    <Compile Include="Dynamic\RuleTests.cs" />
+    <Compile Include="Dynamic\Resources\Files.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Files.resx</DependentUpon>
     </Compile>
-    <Compile Include="RuleParserTests.cs" />
+    <Compile Include="Dynamic\RuleParserTests.cs" />
     <Compile Include="LogTests.cs" />
     <Compile Include="StaticLogEntryWrapperTests.cs" />
   </ItemGroup>
@@ -78,14 +78,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Files.resx">
+    <EmbeddedResource Include="Dynamic\Resources\Files.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Files.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\LogFormat.txt" />
-    <Content Include="Resources\SourceCode1.txt" />
+    <Content Include="Dynamic\Resources\LogFormat.txt" />
+    <Content Include="Dynamic\Resources\SourceCode1.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
