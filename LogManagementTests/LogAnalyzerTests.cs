@@ -102,27 +102,41 @@ namespace LogManagementTests
 
                 string transactionId = log.TransactionId;
                 Priority priority = log.Priority;
+                string logId = log.Id;
+                string logCreatorId = log.LogCreatorId;
+
                 IList<LogEntryKVP> logEntities = new List<LogEntryKVP>
                 {
-                    new LogEntryKVP {TransactionId = transactionId, Priority = priority, Key = "System", Value = log.System},
-                    new LogEntryKVP {TransactionId = transactionId, Priority = priority, Key = "Application", Value = log.Application},
-                    new LogEntryKVP {TransactionId = transactionId, Priority = priority, Key = "Component", Value = log.Component},
-                    new LogEntryKVP {TransactionId = transactionId, Priority = priority, Key = "Event", Value = log.Event},
-                    new LogEntryKVP {TransactionId = transactionId, Priority = priority, Key = "Description", Value = log.Description},
-                    new LogEntryKVP {TransactionId = transactionId, Priority = priority, Key = "Status", Value = log.Status.ToString()},
+                    new LogEntryKVP {LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = "System", Value = log.System},
+                    new LogEntryKVP {LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = "Application", Value = log.Application},
+                    new LogEntryKVP {LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = "Component", Value = log.Component},
+                    new LogEntryKVP {LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = "Event", Value = log.Event},
+                    new LogEntryKVP {LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = "Description", Value = log.Description},
+                    new LogEntryKVP {LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = "Status", Value = log.Status.ToString()},
                 };
 
                 if ((log.Parameters != null) && (log.Parameters.Any()))
                 {
                     foreach (Tuple<string, object> parameter in log.Parameters)
                     {
-                        logEntities.Add(new LogEntryKVP { TransactionId = transactionId , Priority = priority, Key = parameter.Item1, Value = Convert.ToString(parameter.Item2)});
+                        logEntities.Add(new LogEntryKVP { LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = parameter.Item1, Value = Convert.ToString(parameter.Item2) });
                     }
                 }
 
                 _logPersistency.Insert(logEntities);
+
+                IList<LogEntryKVP> allLogEntries = _inMemoryLogEntries;
+
+                //Isolate analysis to newly inserted logs
+                _inMemoryLogEntries = _inMemoryLogEntries
+                    .Where(currentLog => currentLog.LogId == logId)
+                    .ToList();
+
+                //-->> Normalize log persistency table here (if necessary) prior to analysis of log entries
                 _logAnalyzer.Analyze();
-                _inMemoryLogEntries.Clear();
+                //-->> Clear log persistency table here (if necessary)
+
+                _inMemoryLogEntries = allLogEntries;        //Restore all log entries
             };
         }
 
@@ -152,6 +166,7 @@ namespace LogManagementTests
                 Event = "Validation"
             };
 
+            staticLogCreator.EmitLog(Priority.Info, Status.Failure, string.Empty);
             staticLogCreator.EmitLog(Priority.Info, Status.Failure, string.Empty);
             Assert.AreEqual("0002", _invokedRuleId);
         }

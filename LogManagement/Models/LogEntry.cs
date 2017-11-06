@@ -55,6 +55,7 @@ namespace LogManagement.Models
 
     public interface ILogEntry
     {
+        string Id { get; }
         string LogCreatorId { get; }
         TimeZoneInfo TimeZone { get; }
         DateTime Occurence { get; }
@@ -76,6 +77,7 @@ namespace LogManagement.Models
 
     public class LogEntry : ILogEntry
     {
+        private string _id;
         private string _logCreatorId;
         private TimeZoneInfo _timeZoneInfo;
         private DateTime _occurence;
@@ -83,6 +85,8 @@ namespace LogManagement.Models
         private string _sessionId;
         private string _transactionId;
         private Priority _priority;
+
+        public string Id { get { return _id; } }
 
         public string LogCreatorId { get { return _logCreatorId; } }
 
@@ -131,6 +135,8 @@ namespace LogManagement.Models
             string user, string sessionId, string transactionId,
             Priority priority)
         {
+            _id = Guid.NewGuid().ToString();
+
             _logCreatorId = logCreatorId;
             _timeZoneInfo = timeZoneInfo;
             _occurence = occurence;
