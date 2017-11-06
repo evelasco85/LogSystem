@@ -125,18 +125,9 @@ namespace LogManagementTests
 
                 _logPersistency.Insert(logEntities);
 
-                List<LogEntryKVP> allLogEntries = _inMemoryLogEntries;
-
-                //Isolate analysis to newly inserted logs
-                _inMemoryLogEntries = _inMemoryLogEntries
-                    .Where(currentLog => currentLog.LogId == logId)
-                    .ToList();
-
                 //-->> Normalize log persistency table here (if necessary) prior to analysis of log entries
-                _logAnalyzer.Analyze();
+                _logAnalyzer.Analyze(logEntities);
                 //-->> Clear log persistency table here (if necessary)
-
-                _inMemoryLogEntries = allLogEntries;        //Restore all log entries
             };
         }
 

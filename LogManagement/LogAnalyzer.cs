@@ -23,7 +23,7 @@ namespace LogManagement
             if ((triggers != null) && (triggers.Any())) _triggers.AddRange(triggers);
         }
 
-        //Analyze specific log entity
+        //Analyze specific log entities
         public void Analyze(IList<TLogEntity> logEntities)
         {
             for (int index = 0; index < _triggers.Count; index++)
