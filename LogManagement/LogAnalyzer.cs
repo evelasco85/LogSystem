@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using LogManagement.Dynamic.Managers;
 
 namespace LogManagement
 {
@@ -11,14 +12,17 @@ namespace LogManagement
 
     public class LogAnalyzer<TLogEntity> : ILogAnalyzer<TLogEntity>
     {
-        ILogRepository<TLogEntity> _logRepository;
+        private ILogRepository<TLogEntity> _logRepository;
         private List<ILogTrigger<TLogEntity>> _triggers = new List<ILogTrigger<TLogEntity>>();
+        private ILogCreator _logger;
 
-        public LogAnalyzer(ILogRepository<TLogEntity> logRepository,
+        public LogAnalyzer(ILogCreator logger,
+            ILogRepository<TLogEntity> logRepository,
             List<ILogTrigger<TLogEntity>> triggers
             )
         {
             _logRepository = logRepository;
+            _logger = logger;
 
             if ((triggers != null) && (triggers.Any())) _triggers.AddRange(triggers);
         }
@@ -32,10 +36,10 @@ namespace LogManagement
 
                 if(trigger == null) continue;
 
-                bool mustInvoke = trigger.Evaluate(logEntity, _logRepository);
+                bool mustInvoke = trigger.Evaluate(logEntity, _logRepository, _logger);
 
                 if(mustInvoke)
-                    trigger.InvokeEvent(logEntity, _logRepository);
+                    trigger.InvokeEvent(logEntity, _logRepository, _logger);
             }
         }
 

@@ -42,12 +42,13 @@ namespace LogManagementTests
                     /*Post-insert*/
                 }
             );
-            _logAnalyzer = new LogAnalyzer<ILogEntry>(_logRepository,
+            _logAnalyzer = new LogAnalyzer<ILogEntry>(_manager,
+                _logRepository,
                 new List<ILogTrigger<ILogEntry>>
                 {
                     {
                         new LogTrigger<ILogEntry>("0001",
-                            (entity, repository) =>
+                            (entity, repository, logger) =>
                             {
                                 /*Trigger Evaluation*/
                                 IEnumerable<ILogEntry> result = repository
@@ -55,7 +56,7 @@ namespace LogManagementTests
 
                                 return result.Any();
                             },
-                            (id, entity, repository) =>
+                            (id, entity, repository, logger) =>
                             {
                                 /*Trigger Invocation*/
                                 _invokedRuleId = id;
@@ -63,7 +64,7 @@ namespace LogManagementTests
                     },
                     {
                         new LogTrigger<ILogEntry>("0002",
-                            (entity, repository) =>
+                            (entity, repository, logger) =>
                             {
                                 /*Trigger Evaluation*/
                                 IEnumerable<ILogEntry> result = repository
@@ -71,7 +72,7 @@ namespace LogManagementTests
 
                                 return result.Any();
                             },
-                            (id, entity, repository) =>
+                            (id, entity, repository, logger) =>
                             {
                                 /*Trigger Invocation*/
                                 _invokedRuleId = id;
