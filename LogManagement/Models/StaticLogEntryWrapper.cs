@@ -22,56 +22,56 @@ namespace LogManagement.Models
         IStaticLogEntryWrapper SetSystem(String system);
         IStaticLogEntryWrapper SetApplication(String application);
         IStaticLogEntryWrapper SetComponent(String component);
+        IStaticLogEntryWrapper SetOutputType(LogOutputType outputType);
         IStaticLogEntryWrapper_Emitter SetEvent(String @event);
     }
 
     public class StaticLogEntryWrapper : IStaticLogEntryWrapper
     {
         private ILogManager _manager;
-        private string _logCreatorId;
+        private LogOutputType _outputType = LogOutputType.All;
 
         public string System { private get; set; }
         public string Application { private get; set; }
         public string Component { private get; set; }
         public string Event { private get; set; }
 
-        public StaticLogEntryWrapper(string logCreatorId, ILogManager manager) :
-            this(logCreatorId, manager, string.Empty, string.Empty, string.Empty, string.Empty)
+        public StaticLogEntryWrapper(ILogManager manager) :
+            this(manager, string.Empty, string.Empty, string.Empty, string.Empty)
         {
         }
 
-        public StaticLogEntryWrapper(string logCreatorId, ILogManager manager,
+        public StaticLogEntryWrapper(ILogManager manager,
           string system
           )
-            : this(logCreatorId, manager, system, string.Empty, string.Empty, string.Empty)
+            : this(manager, system, string.Empty, string.Empty, string.Empty)
         {
         }
 
-        public StaticLogEntryWrapper(string logCreatorId, ILogManager manager,
+        public StaticLogEntryWrapper(ILogManager manager,
           string system,
           string application
           )
-            : this(logCreatorId, manager, system, application, string.Empty, string.Empty)
+            : this(manager, system, application, string.Empty, string.Empty)
         {
         }
 
-        public StaticLogEntryWrapper(string logCreatorId, ILogManager manager,
+        public StaticLogEntryWrapper(ILogManager manager,
            string system,
            string application,
            string component
            )
-            : this(logCreatorId, manager, system, application, component, string.Empty)
+            : this(manager, system, application, component, string.Empty)
         {
         }
 
-        public StaticLogEntryWrapper(string logCreatorId, ILogManager manager,
+        public StaticLogEntryWrapper(ILogManager manager,
             string system,
             string application,
             string component,
             string @event
             )
         {
-            _logCreatorId = logCreatorId;
             _manager = manager;
 
             System = system;
@@ -101,6 +101,13 @@ namespace LogManagement.Models
             return this;
         }
 
+        public IStaticLogEntryWrapper SetOutputType(LogOutputType outputType)
+        {
+            _outputType = outputType;
+
+            return this;
+        }
+
         public IStaticLogEntryWrapper_Emitter SetEvent(String @event)
         {
             Event = @event;
@@ -110,12 +117,12 @@ namespace LogManagement.Models
 
         public ILogEntry CreateLogEntry(Priority priority)
         {
-            return CreateLogEntry(_logCreatorId, priority);
+            return CreateLogEntry(_outputType, priority);
         }
 
-        public ILogEntry CreateLogEntry(string logCreatorId, Priority priority)
+        public ILogEntry CreateLogEntry(LogOutputType outputType, Priority priority)
         {
-            ILogEntry entry = _manager.CreateLogEntry(logCreatorId, priority);
+            ILogEntry entry = _manager.CreateLogEntry(outputType, priority);
 
             entry.System = System;
             entry.Application = Application;

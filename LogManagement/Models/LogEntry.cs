@@ -3,6 +3,25 @@ using System.Collections.Generic;
 
 namespace LogManagement.Models
 {
+    public static class LogOutputTypeValidator
+    {
+        public static bool HasFlag(this LogOutputType thisEnum, LogOutputType checkFlag)
+        {
+            return (thisEnum & checkFlag) == checkFlag;
+        }
+    }
+
+    [Flags]
+    public enum LogOutputType
+    {
+        Default = 1,        //Timezone, occurence, priority, status, and description
+        IDs = Default | 2,            //User, session id, and transaction id
+        Module = Default | 4,         //System, application, and component
+        Event = Default | 6,          //Event
+        Params = Default | 16,         //Parameters
+        All = Default | IDs | Module | Event | Params,
+    }
+
     public enum Status
     {
         None = 0,
@@ -56,7 +75,7 @@ namespace LogManagement.Models
     public interface ILogEntry
     {
         string Id { get; }
-        string LogCreatorId { get; }
+        LogOutputType OutputType { get; set; }
         TimeZoneInfo TimeZone { get; }
         DateTime Occurence { get; }
         string User { get; }
@@ -78,7 +97,7 @@ namespace LogManagement.Models
     public class LogEntry : ILogEntry
     {
         private string _id;
-        private string _logCreatorId;
+        private LogOutputType _outputType;
         private TimeZoneInfo _timeZoneInfo;
         private DateTime _occurence;
         private string _user;
@@ -88,7 +107,11 @@ namespace LogManagement.Models
 
         public string Id { get { return _id; } }
 
-        public string LogCreatorId { get { return _logCreatorId; } }
+        public LogOutputType OutputType
+        {
+            get { return _outputType; }
+            set { _outputType = value; }
+        }
 
         public TimeZoneInfo TimeZone
         {
@@ -130,14 +153,14 @@ namespace LogManagement.Models
 
         public IList<Tuple<string, object>> Parameters { get; set; }
 
-        public LogEntry(string logCreatorId,
+        public LogEntry(LogOutputType outputType,
             TimeZoneInfo timeZoneInfo, DateTime occurence,
             string user, string sessionId, string transactionId,
             Priority priority)
         {
             _id = Guid.NewGuid().ToString();
 
-            _logCreatorId = logCreatorId;
+            _outputType = outputType;
             _timeZoneInfo = timeZoneInfo;
             _occurence = occurence;
             _user = user;

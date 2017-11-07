@@ -35,7 +35,7 @@ namespace LogManagementTests
         [TestMethod]
         public void TestLogEmission()
         {
-            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper("Test Log Creator", _manager)
+            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager)
             {
                 System = "Security System",
                 Application = "Security Tester",
@@ -63,8 +63,7 @@ namespace LogManagementTests
         [TestMethod]
         public void TestLogEmission2()
         {
-            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper("Test Log Creator", 
-                _manager, "Security System")
+            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager, "Security System")
             {
                 Application = "Security Tester",
                 Component = "Authentication Component",
@@ -91,8 +90,7 @@ namespace LogManagementTests
         [TestMethod]
         public void TestLogEmission3()
         {
-            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper("Test Log Creator", 
-                _manager,
+            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager,
                 "Security System",
                 "Security Tester")
             {
@@ -120,8 +118,7 @@ namespace LogManagementTests
         [TestMethod]
         public void TestLogEmission4()
         {
-            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper("Test Log Creator", 
-                _manager,
+            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager,
                 "Security System",
                 "Security Tester",
                 "Authentication Component")
@@ -149,7 +146,7 @@ namespace LogManagementTests
         [TestMethod]
         public void TestLogEmission5()
         {
-            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper("Test Log Creator", 
+            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(
                 _manager,
                 "Security System",
                 "Security Tester",
@@ -178,7 +175,7 @@ namespace LogManagementTests
         [TestMethod]
         public void Test_LogBuilder()
         {
-            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper("Test Log Creator", _manager);
+            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager);
 
             string logString = string.Empty;
 

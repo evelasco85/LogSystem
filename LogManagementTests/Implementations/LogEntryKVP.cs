@@ -5,7 +5,7 @@ namespace LogManagementTests.Implementations
     public class LogEntryKVP
     {
         public string LogId { get; set; }
-        public string LogCreatorId { get; set; }
+        public LogOutputType LogCreatorId { get; set; }
         public string TransactionId { get; set; }
         public Priority Priority { get; set; }
         public string Key { get; set; }

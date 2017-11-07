@@ -103,23 +103,23 @@ namespace LogManagementTests
                 string transactionId = log.TransactionId;
                 Priority priority = log.Priority;
                 string logId = log.Id;
-                string logCreatorId = log.LogCreatorId;
+                LogOutputType outputType = log.OutputType;
 
                 IList<LogEntryKVP> logEntities = new List<LogEntryKVP>
                 {
-                    new LogEntryKVP {LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = "System", Value = log.System},
-                    new LogEntryKVP {LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = "Application", Value = log.Application},
-                    new LogEntryKVP {LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = "Component", Value = log.Component},
-                    new LogEntryKVP {LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = "Event", Value = log.Event},
-                    new LogEntryKVP {LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = "Description", Value = log.Description},
-                    new LogEntryKVP {LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = "Status", Value = log.Status.ToString()},
+                    new LogEntryKVP {LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = "System", Value = log.System},
+                    new LogEntryKVP {LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = "Application", Value = log.Application},
+                    new LogEntryKVP {LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = "Component", Value = log.Component},
+                    new LogEntryKVP {LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = "Event", Value = log.Event},
+                    new LogEntryKVP {LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = "Description", Value = log.Description},
+                    new LogEntryKVP {LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = "Status", Value = log.Status.ToString()},
                 };
 
                 if ((log.Parameters != null) && (log.Parameters.Any()))
                 {
                     foreach (Tuple<string, object> parameter in log.Parameters)
                     {
-                        logEntities.Add(new LogEntryKVP { LogId = logId, LogCreatorId = logCreatorId, TransactionId = transactionId, Priority = priority, Key = parameter.Item1, Value = Convert.ToString(parameter.Item2) });
+                        logEntities.Add(new LogEntryKVP { LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = parameter.Item1, Value = Convert.ToString(parameter.Item2) });
                     }
                 }
 
@@ -134,7 +134,7 @@ namespace LogManagementTests
         [TestMethod]
         public void TestMethod1()
         {
-            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper("Test Log Creator", _manager)
+            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager)
             {
                 System = "Security System",
                 Application = "Security Tester",
@@ -149,7 +149,7 @@ namespace LogManagementTests
         [TestMethod]
         public void TestMethod2()
         {
-            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper("Test Log Creator", _manager)
+            IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager)
             {
                 System = "Security System",
                 Application = "Security Tester",
