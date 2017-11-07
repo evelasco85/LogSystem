@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using LogManagement;
-using LogManagement.Dynamic.Managers;
+using LogManagement.Managers;
 using LogManagement.Models;
 using LogManagementTests.Implementations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

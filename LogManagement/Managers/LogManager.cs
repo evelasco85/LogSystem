@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using LogManagement.Models;
 
-namespace LogManagement.Dynamic.Managers
+namespace LogManagement.Managers
 {
     public interface ILogCreator
     {

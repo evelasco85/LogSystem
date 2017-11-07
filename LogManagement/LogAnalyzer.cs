@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using LogManagement.Dynamic.Managers;
+using LogManagement.Managers;
 
 namespace LogManagement
 {

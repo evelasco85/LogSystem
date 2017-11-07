@@ -1,5 +1,5 @@
 ﻿using System;
-using LogManagement.Dynamic.Managers;
+using LogManagement.Managers;
 
 namespace LogManagement
 {

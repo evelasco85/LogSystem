@@ -1,7 +1,6 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using LogManagement.Models;
-using LogManagement.Dynamic.Managers;
+using LogManagement.Managers;
 using Newtonsoft.Json;
 
 namespace LogManagementTests

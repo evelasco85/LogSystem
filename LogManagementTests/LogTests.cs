@@ -1,5 +1,5 @@
 ﻿using System;
-using LogManagement.Dynamic.Managers;
+using LogManagement.Managers;
 using LogManagement.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
