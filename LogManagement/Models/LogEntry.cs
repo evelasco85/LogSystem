@@ -15,10 +15,10 @@ namespace LogManagement.Models
     public enum LogOutputType
     {
         Default = 1,        //Timezone, occurence, priority, status, and description
-        IDs = Default | 2,            //User, session id, and transaction id
-        Module = Default | 4,         //System, application, and component
-        Event = Default | 6,          //Event
-        Params = Default | 16,         //Parameters
+        IDs = 2,            //User, session id, and transaction id
+        Module = 4,         //System, application, and component
+        Event = 6,          //Event
+        Params = 16,         //Parameters
         All = Default | IDs | Module | Event | Params,
     }
 
