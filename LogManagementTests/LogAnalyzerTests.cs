@@ -25,7 +25,7 @@ namespace LogManagementTests
             _logRepository = new LogRepository<ILogEntry>(new List<IBaseLogQueryObject<ILogEntry>>
             {
                 {new GetFailedInvocationLogsQuery(_inMemoryLogEntries)},
-                {new GetFailedValidationDescriptionLogsQuery(_inMemoryLogEntries)},
+                {new GetSuccessValidationDescriptionLogsQuery(_inMemoryLogEntries)},
             });
             _logPersistency = new LogPersistency<ILogEntry>(_logRepository,
                 (logEntityToAdd, preInsertRepository) =>
@@ -52,9 +52,11 @@ namespace LogManagementTests
                             {
                                 /*Trigger Evaluation*/
                                 IEnumerable<ILogEntry> result = repository
-                                    .Matching(new GetFailedValidationDescriptionLogsQuery.Criteria());
+                                    .Matching(new GetSuccessValidationDescriptionLogsQuery.Criteria());
 
-                                return result.Any();
+                                bool isMatched = result.Any() && (entity.Description == GetSuccessValidationDescriptionLogsQuery.DESCRIPTION);
+
+                                return isMatched;
                             },
                             (id, entity, repository, logger) =>
                             {
@@ -70,7 +72,9 @@ namespace LogManagementTests
                                 IEnumerable<ILogEntry> result = repository
                                     .Matching(new GetFailedInvocationLogsQuery.Criteria());
 
-                                return result.Any();
+                                bool isMatched = result.Any() && (entity.Status == GetFailedInvocationLogsQuery.FAILED_STATUS);
+
+                                return isMatched;
                             },
                             (id, entity, repository, logger) =>
                             {
@@ -120,7 +124,7 @@ namespace LogManagementTests
                 Event = "Validation"
             };
 
-            staticLogCreator.EmitLog(Priority.Info, Status.Success, "Validation has been invoked but was failed");
+            staticLogCreator.EmitLog(Priority.Info, Status.Success, "Validation has been invoked successfully");
             Assert.AreEqual("0001", _invokedRuleId);
         }
 

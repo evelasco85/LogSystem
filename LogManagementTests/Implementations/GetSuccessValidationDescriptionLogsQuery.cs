@@ -5,11 +5,13 @@ using LogManagement.Models;
 
 namespace LogManagementTests.Implementations
 {
-    public class GetFailedValidationDescriptionLogsQuery : BaseLogQueryObject<ILogEntry, GetFailedValidationDescriptionLogsQuery.Criteria>
+    public class GetSuccessValidationDescriptionLogsQuery : BaseLogQueryObject<ILogEntry, GetSuccessValidationDescriptionLogsQuery.Criteria>
     {
+        public const string DESCRIPTION = "Validation has been invoked successfully";
+
         private IList<ILogEntry> _inMemoryLogEntries;
 
-        public GetFailedValidationDescriptionLogsQuery(IList<ILogEntry> inMemoryLogEntries)
+        public GetSuccessValidationDescriptionLogsQuery(IList<ILogEntry> inMemoryLogEntries)
         {
             _inMemoryLogEntries = inMemoryLogEntries;
         }
@@ -21,7 +23,7 @@ namespace LogManagementTests.Implementations
         public override IEnumerable<ILogEntry> PerformSearchOperation(Criteria searchInput)
         {
             return _inMemoryLogEntries
-                .Where(log => (log.Description == "Validation has been invoked but was failed"));
+                .Where(log => (log.Description == DESCRIPTION));
         }
     }
 }

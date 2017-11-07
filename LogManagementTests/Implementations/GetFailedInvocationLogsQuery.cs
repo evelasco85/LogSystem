@@ -8,6 +8,8 @@ namespace LogManagementTests.Implementations
 {
     public class GetFailedInvocationLogsQuery : BaseLogQueryObject<ILogEntry, GetFailedInvocationLogsQuery.Criteria>
     {
+        public const Status FAILED_STATUS = Status.Failure;
+
         private IList<ILogEntry> _inMemoryLogEntries;
 
         public GetFailedInvocationLogsQuery(IList<ILogEntry> inMemoryLogEntries)
@@ -22,7 +24,7 @@ namespace LogManagementTests.Implementations
         public override IEnumerable<ILogEntry> PerformSearchOperation(Criteria searchInput)
         {
             return _inMemoryLogEntries
-                .Where(log => (log.Status == Status.Failure));
+                .Where(log => (log.Status == FAILED_STATUS));
         }
     }
 }
