@@ -191,7 +191,7 @@ namespace LogManagementTests
                 .SetApplication("Security Tester")
                 .SetComponent("Authentication Component")
                 .SetEvent("Validation")
-                .EmitLog(Priority.Info, Status.Success, string.Empty);
+                .EmitLog(Priority.Info, Status.Success);
 
             Assert.IsTrue(!string.IsNullOrEmpty(logString));
         }

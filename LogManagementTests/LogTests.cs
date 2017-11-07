@@ -49,11 +49,11 @@ namespace LogManagementTests
             entry.Application = "Security Tester";
             entry.Component = "Authentication Component";
             entry.Event = "Validation";
-            entry.Description = "Validation has been invoked but was failed";
             entry.Status = Status.Failure;
 
-            entry.Parameters.Add(new Tuple<string, object>("Param 1", "value 1"));
-            entry.Parameters.Add(new Tuple<string, object>("Param 2", "value 2"));
+            entry.Parameters.Add("Param 1", "value 1");
+            entry.Parameters.Add("Param 2", "value 2");
+            entry.Parameters.Add("Description", "Validation has been invoked but was failed");
 
             _manager.EmitLog(entry);
 

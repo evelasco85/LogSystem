@@ -94,7 +94,7 @@ namespace LogManagement.Managers
             )
             {
                 Status = Status.None,
-                Parameters = new List<Tuple<string, object>>()
+                Parameters = new Dictionary<string, object>()
             };
 
             return log;

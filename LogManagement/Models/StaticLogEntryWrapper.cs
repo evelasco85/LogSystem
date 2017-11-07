@@ -6,9 +6,11 @@ namespace LogManagement.Models
 {
     public interface IStaticLogEntryWrapper_Emitter : ILogCreator
     {
-        void EmitLog(Priority priority, Status status, String description);
-        void EmitLog(bool retainParameters, Priority priority, Status status, String description);
-        ILogEntry CreateLogEntry(Priority priority, Status status, String description);
+        IStaticLogEntryWrapper_Emitter SetOutputType(LogOutputType outputType);
+        IStaticLogEntryWrapper_Emitter AddParameters(string parameterName, object parameterValue);
+        void EmitLog(Priority priority, Status status);
+        void EmitLog(bool retainParameters, Priority priority, Status status);
+        ILogEntry CreateLogEntry(Priority priority, Status status);
     }
 
     public interface IStaticLogEntryWrapper : IStaticLogEntryWrapper_Emitter
@@ -21,8 +23,7 @@ namespace LogManagement.Models
         IStaticLogEntryWrapper SetSystem(String system);
         IStaticLogEntryWrapper SetApplication(String application);
         IStaticLogEntryWrapper SetComponent(String component);
-        IStaticLogEntryWrapper SetOutputType(LogOutputType outputType);
-        IStaticLogEntryWrapper AddParameters(string parameterName, object parameterValue);
+        
         IStaticLogEntryWrapper_Emitter SetEvent(String @event);
     }
 
@@ -30,7 +31,7 @@ namespace LogManagement.Models
     {
         private ILogManager _manager;
         private LogOutputType _outputType = LogOutputType.All;
-        IList<Tuple<string, object>> _parameterList = new List<Tuple<string, object>>();
+        IDictionary<string, object> _parameterList = new Dictionary<string, object>();
 
         public string System { private get; set; }
         public string Application { private get; set; }
@@ -102,13 +103,6 @@ namespace LogManagement.Models
             return this;
         }
 
-        public IStaticLogEntryWrapper SetOutputType(LogOutputType outputType)
-        {
-            _outputType = outputType;
-
-            return this;
-        }
-
         public IStaticLogEntryWrapper_Emitter SetEvent(String @event)
         {
             Event = @event;
@@ -133,12 +127,11 @@ namespace LogManagement.Models
             return entry;
         }
 
-        public ILogEntry CreateLogEntry(Priority priority, Status status, String description)
+        public ILogEntry CreateLogEntry(Priority priority, Status status)
         {
             ILogEntry entry = CreateLogEntry(priority);
 
             entry.Status = status;
-            entry.Description = description;
 
             return entry;
         }
@@ -148,14 +141,14 @@ namespace LogManagement.Models
             _manager.EmitLog(log);
         }
 
-        public void EmitLog(Priority priority, Status status, String description)
+        public void EmitLog(Priority priority, Status status)
         {
-            EmitLog(false, priority, status, description);
+            EmitLog(false, priority, status);
         }
 
-        public void EmitLog(bool retainParameters, Priority priority, Status status, String description)
+        public void EmitLog(bool retainParameters, Priority priority, Status status)
         {
-            ILogEntry entry = CreateLogEntry(priority, status, description);
+            ILogEntry entry = CreateLogEntry(priority, status);
 
             entry.Status = status;
             entry.Parameters = _parameterList;
@@ -165,9 +158,16 @@ namespace LogManagement.Models
             if (!retainParameters) _parameterList.Clear();
         }
 
-        public IStaticLogEntryWrapper AddParameters(string parameterName, object parameterValue)
+        public IStaticLogEntryWrapper_Emitter AddParameters(string parameterName, object parameterValue)
         {
-            _parameterList.Add(new Tuple<string, object>(parameterName, parameterValue));
+            _parameterList.Add(parameterName, parameterValue);
+
+            return this;
+        }
+
+        public IStaticLogEntryWrapper_Emitter SetOutputType(LogOutputType outputType)
+        {
+            _outputType = outputType;
 
             return this;
         }

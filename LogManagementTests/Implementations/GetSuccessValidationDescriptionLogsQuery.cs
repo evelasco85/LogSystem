@@ -22,8 +22,9 @@ namespace LogManagementTests.Implementations
 
         public override IEnumerable<ILogEntry> PerformSearchOperation(Criteria searchInput)
         {
+            string key = "Description";
             return _inMemoryLogEntries
-                .Where(log => (log.Description == DESCRIPTION));
+                .Where(log => (log.Parameters.ContainsKey(key)) && (log.Parameters[key].ToString() == DESCRIPTION));
         }
     }
 }

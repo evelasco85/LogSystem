@@ -53,7 +53,7 @@ namespace LogManagementTests
                                 IEnumerable<ILogEntry> result = repository
                                     .Matching(new GetSuccessValidationDescriptionLogsQuery.Criteria());
 
-                                bool isMatched = result.Any() && (entity.Description == GetSuccessValidationDescriptionLogsQuery.DESCRIPTION);
+                                bool isMatched = result.Any() && (entity.Parameters["Description"].ToString() == GetSuccessValidationDescriptionLogsQuery.DESCRIPTION);
 
                                 return isMatched;
                             },
@@ -123,7 +123,10 @@ namespace LogManagementTests
                 Event = "Validation"
             };
 
-            staticLogCreator.EmitLog(Priority.Info, Status.Success, "Validation has been invoked successfully");
+            staticLogCreator
+                .AddParameters("Description", "Validation has been invoked successfully")
+                .EmitLog(Priority.Info, Status.Success);
+
             Assert.AreEqual("0001", _invokedRuleId);
         }
 
@@ -138,8 +141,8 @@ namespace LogManagementTests
                 Event = "Validation"
             };
 
-            staticLogCreator.EmitLog(Priority.Info, Status.Failure, string.Empty);
-            staticLogCreator.EmitLog(Priority.Info, Status.Failure, string.Empty);
+            staticLogCreator.EmitLog(Priority.Info, Status.Failure);
+            staticLogCreator.EmitLog(Priority.Info, Status.Failure);
             Assert.AreEqual("0002", _invokedRuleId);
         }
     }

@@ -89,9 +89,8 @@ namespace LogManagement.Models
 
         Priority Priority { get; }
         Status Status { get; set; }
-        string Description { get; set; }
         
-        IList<Tuple<string, object>> Parameters { get; set; }
+        IDictionary<string, object> Parameters { get; set; }
     }
 
     public class LogEntry : ILogEntry
@@ -149,9 +148,8 @@ namespace LogManagement.Models
         }
 
         public Status Status { get; set; }
-        public string Description { get; set; }
 
-        public IList<Tuple<string, object>> Parameters { get; set; }
+        public IDictionary<string, object> Parameters { get; set; }
 
         public LogEntry(LogOutputType outputType,
             TimeZoneInfo timeZoneInfo, DateTime occurence,
