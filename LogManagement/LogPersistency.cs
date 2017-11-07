@@ -1,33 +1,31 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
+﻿
 namespace LogManagement
 {
     public interface ILogPersistency<TLogEntity>
     {
-        void Insert(IList<TLogEntity> logEntities);
+        void Insert(TLogEntity logEntity);
     }
 
     public class LogPersistency<TLogEntity> : ILogPersistency<TLogEntity>
     {
-        public delegate void PreInsertOperationDelegate<TLog>(IList<TLog> logEntitiesToAdd,
+        public delegate void PreInsertOperationDelegate(TLogEntity logEntityToAdd,
             ILogRepository<TLogEntity> preInsertRepository);
 
-        public delegate void InsertOperationDelegate<TLog>(IList<TLog> logEntitiesToAdd,
+        public delegate void InsertOperationDelegate(TLogEntity logEntityToAdd,
             ILogRepository<TLogEntity> currentRepository);
 
-        public delegate void PostInsertOperationDelegate<TLog>(IList<TLog> addedLogEntities,
+        public delegate void PostInsertOperationDelegate(TLogEntity addedLogEntity,
             ILogRepository<TLogEntity> postInsertRepository);
 
         private ILogRepository<TLogEntity> _repository;
-        private PreInsertOperationDelegate<TLogEntity> _preInsertOperation;
-        private InsertOperationDelegate<TLogEntity> _insertOperation;
-        private PostInsertOperationDelegate<TLogEntity> _postInsertOperation;
+        private PreInsertOperationDelegate _preInsertOperation;
+        private InsertOperationDelegate _insertOperation;
+        private PostInsertOperationDelegate _postInsertOperation;
 
         public LogPersistency(ILogRepository<TLogEntity> repository,
-            PreInsertOperationDelegate<TLogEntity> preInsertOperation,
-            InsertOperationDelegate<TLogEntity> insertOperation,
-            PostInsertOperationDelegate<TLogEntity> postInsertOperation)
+            PreInsertOperationDelegate preInsertOperation,
+            InsertOperationDelegate insertOperation,
+            PostInsertOperationDelegate postInsertOperation)
         {
             _repository = repository;
             _preInsertOperation = preInsertOperation;
@@ -35,13 +33,13 @@ namespace LogManagement
             _postInsertOperation = postInsertOperation;
         }
 
-        public void Insert(IList<TLogEntity> logEntities)
+        public void Insert(TLogEntity logEntity)
         {
-            if (_preInsertOperation != null) _preInsertOperation(logEntities, _repository);
+            if (_preInsertOperation != null) _preInsertOperation(logEntity, _repository);
 
-            if (_insertOperation != null) _insertOperation(logEntities, _repository);
+            if (_insertOperation != null) _insertOperation(logEntity, _repository);
 
-            if (_postInsertOperation != null) _postInsertOperation(logEntities, _repository);
+            if (_postInsertOperation != null) _postInsertOperation(logEntity, _repository);
         }
     }
 }

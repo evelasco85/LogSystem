@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace LogManagement
 {
@@ -7,14 +6,14 @@ namespace LogManagement
     {
         string RuleId { get; }
 
-        bool Evaluate(IList<TLogEntity> logEntities, ILogRepository<TLogEntity> logRepository);
-        void InvokeEvent(IList<TLogEntity> logEntities, ILogRepository<TLogEntity> logRepository);
+        bool Evaluate(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository);
+        void InvokeEvent(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository);
     }
 
     public class LogTrigger<TLogEntity> : ILogTrigger<TLogEntity>
     {
-        public delegate bool EvaluationDelegate(IList<TLogEntity> logEntities, ILogRepository<TLogEntity> repository);
-        public delegate void EventInvocationDelegate(string ruleId, IList<TLogEntity> logEntities, ILogRepository<TLogEntity> repository);
+        public delegate bool EvaluationDelegate(TLogEntity logEntity, ILogRepository<TLogEntity> repository);
+        public delegate void EventInvocationDelegate(string ruleId, TLogEntity logEntity, ILogRepository<TLogEntity> repository);
 
         private string _ruleId;
         private EvaluationDelegate _evaluationFunc;
@@ -33,18 +32,18 @@ namespace LogManagement
             _invocationFunc = invocationFunc;
         }
 
-        public bool Evaluate(IList<TLogEntity> logEntities, ILogRepository<TLogEntity> logRepository)
+        public bool Evaluate(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository)
         {
             if (_evaluationFunc == null) return false;
 
-            return _evaluationFunc(logEntities, logRepository);
+            return _evaluationFunc(logEntity, logRepository);
         }
 
-        public void InvokeEvent(IList<TLogEntity> logEntities, ILogRepository<TLogEntity> logRepository)
+        public void InvokeEvent(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository)
         {
             if (_invocationFunc == null) return;
 
-            _invocationFunc(_ruleId, logEntities, logRepository);
+            _invocationFunc(_ruleId, logEntity, logRepository);
         }
     }
 }

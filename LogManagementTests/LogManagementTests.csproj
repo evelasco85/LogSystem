@@ -59,7 +59,6 @@
     <Compile Include="Implementations\Authentication.cs" />
     <Compile Include="Implementations\GetFailedValidationDescriptionLogsQuery.cs" />
     <Compile Include="Implementations\GetFailedInvocationLogsQuery.cs" />
-    <Compile Include="Implementations\LogEntryKVP.cs" />
     <Compile Include="Implementations\SecurityCredential.cs" />
     <Compile Include="Dynamic\ActivityManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

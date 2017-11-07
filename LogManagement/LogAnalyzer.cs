@@ -5,7 +5,7 @@ namespace LogManagement
 {
     public interface ILogAnalyzer<TLogEntity>
     {
-        void Analyze(IList<TLogEntity> logEntities);
+        void Analyze(TLogEntity logEntity);
         void Analyze();
     }
 
@@ -24,7 +24,7 @@ namespace LogManagement
         }
 
         //Analyze specific log entities
-        public void Analyze(IList<TLogEntity> logEntities)
+        public void Analyze(TLogEntity logEntity)
         {
             for (int index = 0; index < _triggers.Count; index++)
             {
@@ -32,17 +32,17 @@ namespace LogManagement
 
                 if(trigger == null) continue;
 
-                bool mustInvoke = trigger.Evaluate(logEntities, _logRepository);
+                bool mustInvoke = trigger.Evaluate(logEntity, _logRepository);
 
                 if(mustInvoke)
-                    trigger.InvokeEvent(logEntities, _logRepository);
+                    trigger.InvokeEvent(logEntity, _logRepository);
             }
         }
 
         //Analyze all log entities in log repository
         public void Analyze()
         {
-            Analyze(new List<TLogEntity>());
+            Analyze(default(TLogEntity));
         }
     }
 }

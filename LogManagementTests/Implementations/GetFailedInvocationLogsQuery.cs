@@ -6,11 +6,11 @@ using LogManagement.Models;
 
 namespace LogManagementTests.Implementations
 {
-    public class GetFailedInvocationLogsQuery : BaseLogQueryObject<LogEntryKVP, GetFailedInvocationLogsQuery.Criteria>
+    public class GetFailedInvocationLogsQuery : BaseLogQueryObject<ILogEntry, GetFailedInvocationLogsQuery.Criteria>
     {
-        private IList<LogEntryKVP> _inMemoryLogEntries;
+        private IList<ILogEntry> _inMemoryLogEntries;
 
-        public GetFailedInvocationLogsQuery(IList<LogEntryKVP> inMemoryLogEntries)
+        public GetFailedInvocationLogsQuery(IList<ILogEntry> inMemoryLogEntries)
         {
             _inMemoryLogEntries = inMemoryLogEntries;
         }
@@ -19,10 +19,10 @@ namespace LogManagementTests.Implementations
         {
         }
 
-        public override IEnumerable<LogEntryKVP> PerformSearchOperation(Criteria searchInput)
+        public override IEnumerable<ILogEntry> PerformSearchOperation(Criteria searchInput)
         {
             return _inMemoryLogEntries
-                .Where(log => (log.Key == "Status") && (log.Value == Status.Failure.ToString()));
+                .Where(log => (log.Status == Status.Failure));
         }
     }
 }

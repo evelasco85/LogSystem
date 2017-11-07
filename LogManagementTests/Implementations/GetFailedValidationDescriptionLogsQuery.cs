@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using LogManagement;
+using LogManagement.Models;
 
 namespace LogManagementTests.Implementations
 {
-    public class GetFailedValidationDescriptionLogsQuery : BaseLogQueryObject<LogEntryKVP, GetFailedValidationDescriptionLogsQuery.Criteria>
+    public class GetFailedValidationDescriptionLogsQuery : BaseLogQueryObject<ILogEntry, GetFailedValidationDescriptionLogsQuery.Criteria>
     {
-        private IList<LogEntryKVP> _inMemoryLogEntries;
+        private IList<ILogEntry> _inMemoryLogEntries;
 
-        public GetFailedValidationDescriptionLogsQuery(IList<LogEntryKVP> inMemoryLogEntries)
+        public GetFailedValidationDescriptionLogsQuery(IList<ILogEntry> inMemoryLogEntries)
         {
             _inMemoryLogEntries = inMemoryLogEntries;
         }
@@ -17,10 +18,10 @@ namespace LogManagementTests.Implementations
         {
         }
 
-        public override IEnumerable<LogEntryKVP> PerformSearchOperation(Criteria searchInput)
+        public override IEnumerable<ILogEntry> PerformSearchOperation(Criteria searchInput)
         {
             return _inMemoryLogEntries
-                .Where(log => (log.Key == "Description") && (log.Value == "Validation has been invoked but was failed"));
+                .Where(log => (log.Description == "Validation has been invoked but was failed"));
         }
     }
 }

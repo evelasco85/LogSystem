@@ -12,66 +12,66 @@ namespace LogManagementTests
     [TestClass]
     public class LogAnalyzerTests
     {
-        private List<LogEntryKVP> _inMemoryLogEntries = new List<LogEntryKVP>();
-        private ILogRepository<LogEntryKVP> _logRepository;
-        private ILogPersistency<LogEntryKVP> _logPersistency;
-        private ILogAnalyzer<LogEntryKVP> _logAnalyzer;
+        private List<ILogEntry> _inMemoryLogEntries = new List<ILogEntry>();
+        private ILogRepository<ILogEntry> _logRepository;
+        private ILogPersistency<ILogEntry> _logPersistency;
+        private ILogAnalyzer<ILogEntry> _logAnalyzer;
         private ILogManager _manager = LogManager.GetInstance();
         private string _invokedRuleId = string.Empty;
 
         [TestInitialize]
         public void Initialize()
         {
-            _logRepository = new LogRepository<LogEntryKVP>(new List<IBaseLogQueryObject<LogEntryKVP>>
+            _logRepository = new LogRepository<ILogEntry>(new List<IBaseLogQueryObject<ILogEntry>>
             {
                 {new GetFailedInvocationLogsQuery(_inMemoryLogEntries)},
                 {new GetFailedValidationDescriptionLogsQuery(_inMemoryLogEntries)},
             });
-            _logPersistency = new LogPersistency<LogEntryKVP>(_logRepository,
-                (logEntitiesToAdd, preInsertRepository) =>
+            _logPersistency = new LogPersistency<ILogEntry>(_logRepository,
+                (logEntityToAdd, preInsertRepository) =>
                 {
                     /*Pre-insert*/
                 },
-                (logEntitiesToAdd, currentRepository) =>
+                (logEntityToAdd, currentRepository) =>
                 {
                     /*Insert*/
-                    _inMemoryLogEntries.AddRange(logEntitiesToAdd);
+                    _inMemoryLogEntries.Add(logEntityToAdd);
                 },
-                (addedLogEntities, postInsertRepository) =>
+                (addedLogEntity, postInsertRepository) =>
                 {
                     /*Post-insert*/
                 }
             );
-            _logAnalyzer = new LogAnalyzer<LogEntryKVP>(_logRepository,
-                new List<ILogTrigger<LogEntryKVP>>
+            _logAnalyzer = new LogAnalyzer<ILogEntry>(_logRepository,
+                new List<ILogTrigger<ILogEntry>>
                 {
                     {
-                        new LogTrigger<LogEntryKVP>("0001",
-                            (entities, repository) =>
+                        new LogTrigger<ILogEntry>("0001",
+                            (entity, repository) =>
                             {
                                 /*Trigger Evaluation*/
-                                IEnumerable<LogEntryKVP> result = repository
+                                IEnumerable<ILogEntry> result = repository
                                     .Matching(new GetFailedValidationDescriptionLogsQuery.Criteria());
 
                                 return result.Any();
                             },
-                            (id, entities, repository) =>
+                            (id, entity, repository) =>
                             {
                                 /*Trigger Invocation*/
                                 _invokedRuleId = id;
                             })
                     },
                     {
-                        new LogTrigger<LogEntryKVP>("0002",
-                            (entities, repository) =>
+                        new LogTrigger<ILogEntry>("0002",
+                            (entity, repository) =>
                             {
                                 /*Trigger Evaluation*/
-                                IEnumerable<LogEntryKVP> result = repository
+                                IEnumerable<ILogEntry> result = repository
                                     .Matching(new GetFailedInvocationLogsQuery.Criteria());
 
                                 return result.Any();
                             },
-                            (id, entities, repository) =>
+                            (id, entity, repository) =>
                             {
                                 /*Trigger Invocation*/
                                 _invokedRuleId = id;
@@ -100,33 +100,10 @@ namespace LogManagementTests
                 if (log == null)
                     return;
 
-                string transactionId = log.TransactionId;
-                Priority priority = log.Priority;
-                string logId = log.Id;
-                LogOutputType outputType = log.OutputType;
-
-                IList<LogEntryKVP> logEntities = new List<LogEntryKVP>
-                {
-                    new LogEntryKVP {LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = "System", Value = log.System},
-                    new LogEntryKVP {LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = "Application", Value = log.Application},
-                    new LogEntryKVP {LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = "Component", Value = log.Component},
-                    new LogEntryKVP {LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = "Event", Value = log.Event},
-                    new LogEntryKVP {LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = "Description", Value = log.Description},
-                    new LogEntryKVP {LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = "Status", Value = log.Status.ToString()},
-                };
-
-                if ((log.Parameters != null) && (log.Parameters.Any()))
-                {
-                    foreach (Tuple<string, object> parameter in log.Parameters)
-                    {
-                        logEntities.Add(new LogEntryKVP { LogId = logId, LogCreatorId = outputType, TransactionId = transactionId, Priority = priority, Key = parameter.Item1, Value = Convert.ToString(parameter.Item2) });
-                    }
-                }
-
-                _logPersistency.Insert(logEntities);
+                _logPersistency.Insert(log);
 
                 //-->> Normalize log persistency table here (if necessary) prior to analysis of log entries
-                _logAnalyzer.Analyze(logEntities);
+                _logAnalyzer.Analyze(log);
                 //-->> Clear log persistency table here (if necessary)
             };
         }
