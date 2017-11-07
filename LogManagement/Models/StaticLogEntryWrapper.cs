@@ -7,8 +7,7 @@ namespace LogManagement.Models
     public interface IStaticLogEntryWrapper_Emitter : ILogCreator
     {
         void EmitLog(Priority priority, Status status, String description);
-        void EmitLog(Priority priority, Status status, String description, Tuple<string, object> parameter);
-        void EmitLog(Priority priority, Status status, String description, IList<Tuple<string, object>> parameters);
+        void EmitLog(bool retainParameters, Priority priority, Status status, String description);
         ILogEntry CreateLogEntry(Priority priority, Status status, String description);
     }
 
@@ -23,6 +22,7 @@ namespace LogManagement.Models
         IStaticLogEntryWrapper SetApplication(String application);
         IStaticLogEntryWrapper SetComponent(String component);
         IStaticLogEntryWrapper SetOutputType(LogOutputType outputType);
+        IStaticLogEntryWrapper AddParameters(string parameterName, object parameterValue);
         IStaticLogEntryWrapper_Emitter SetEvent(String @event);
     }
 
@@ -30,6 +30,7 @@ namespace LogManagement.Models
     {
         private ILogManager _manager;
         private LogOutputType _outputType = LogOutputType.All;
+        IList<Tuple<string, object>> _parameterList = new List<Tuple<string, object>>();
 
         public string System { private get; set; }
         public string Application { private get; set; }
@@ -149,26 +150,26 @@ namespace LogManagement.Models
 
         public void EmitLog(Priority priority, Status status, String description)
         {
-            ILogEntry entry = CreateLogEntry(priority, status, description);
-
-            entry.Status = status;
-
-            EmitLog(entry);
+            EmitLog(false, priority, status, description);
         }
 
-        public void EmitLog(Priority priority, Status status, String description, Tuple<string, object> parameter)
-        {
-            EmitLog(priority, status, description, new List<Tuple<string, object>>{parameter});
-        }
-
-        public void EmitLog(Priority priority, Status status, String description, IList<Tuple<string, object>> parameters)
+        public void EmitLog(bool retainParameters, Priority priority, Status status, String description)
         {
             ILogEntry entry = CreateLogEntry(priority, status, description);
 
             entry.Status = status;
-            entry.Parameters = parameters;
+            entry.Parameters = _parameterList;
 
             EmitLog(entry);
+
+            if (!retainParameters) _parameterList.Clear();
+        }
+
+        public IStaticLogEntryWrapper AddParameters(string parameterName, object parameterValue)
+        {
+            _parameterList.Add(new Tuple<string, object>(parameterName, parameterValue));
+
+            return this;
         }
     }
 }
