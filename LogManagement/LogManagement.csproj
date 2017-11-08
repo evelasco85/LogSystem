@@ -57,7 +57,7 @@
     <Compile Include="Dynamic\Event\Parameters\Variable.cs" />
     <Compile Include="Dynamic\Event\RuleParser.cs" />
     <Compile Include="LogMonitor.cs" />
-    <Compile Include="LogPersistency.cs" />
+    <Compile Include="LogInserter.cs" />
     <Compile Include="LogQueryObject.cs" />
     <Compile Include="LogRepository.cs" />
     <Compile Include="LogTrigger.cs" />

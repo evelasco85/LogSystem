@@ -13,7 +13,7 @@ namespace LogManagementTests
     {
         private List<ILogEntry> _inMemoryLogEntries = new List<ILogEntry>();
         private ILogRepository<ILogEntry> _logRepository;
-        private ILogPersistency<ILogEntry> _logPersistency;
+        private ILogInserter<ILogEntry> _logInserter;
         private ILogMonitor<ILogEntry> _logMonitor;
         private ILogManager _manager = LogManager.GetInstance();
         private string _invokedRuleId = string.Empty;
@@ -26,7 +26,7 @@ namespace LogManagementTests
                 {new GetFailedInvocationLogsQuery(_inMemoryLogEntries)},
                 {new GetSuccessValidationDescriptionLogsQuery(_inMemoryLogEntries)},
             });
-            _logPersistency = new LogPersistency<ILogEntry>(_logRepository,
+            _logInserter = new LogInserter<ILogEntry>(_logRepository,
                 (logEntityToAdd, preInsertRepository) =>
                 {
                     /*Pre-insert*/
@@ -104,7 +104,7 @@ namespace LogManagementTests
                 if (log == null)
                     return;
 
-                _logPersistency.Insert(log);
+                _logInserter.Insert(log);
 
                 //-->> Normalize log persistency table here (if necessary) prior to analysis of log entries
                 _logMonitor.Evaluate(log);

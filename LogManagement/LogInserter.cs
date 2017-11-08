@@ -1,12 +1,11 @@
-﻿
-namespace LogManagement
+﻿namespace LogManagement
 {
-    public interface ILogPersistency<TLogEntity>
+    public interface ILogInserter<TLogEntity>
     {
         void Insert(TLogEntity logEntity);
     }
 
-    public class LogPersistency<TLogEntity> : ILogPersistency<TLogEntity>
+    public class LogInserter<TLogEntity> : ILogInserter<TLogEntity>
     {
         public delegate void PreInsertOperationDelegate(TLogEntity logEntityToAdd,
             ILogRepository<TLogEntity> preInsertRepository);
@@ -22,7 +21,7 @@ namespace LogManagement
         private InsertOperationDelegate _insertOperation;
         private PostInsertOperationDelegate _postInsertOperation;
 
-        public LogPersistency(ILogRepository<TLogEntity> repository,
+        public LogInserter(ILogRepository<TLogEntity> repository,
             PreInsertOperationDelegate preInsertOperation,
             InsertOperationDelegate insertOperation,
             PostInsertOperationDelegate postInsertOperation)
