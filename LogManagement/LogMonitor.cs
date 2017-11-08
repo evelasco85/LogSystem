@@ -4,19 +4,19 @@ using LogManagement.Managers;
 
 namespace LogManagement
 {
-    public interface ILogAnalyzer<TLogEntity>
+    public interface ILogMonitor<TLogEntity>
     {
-        void Analyze(TLogEntity logEntity);
-        void Analyze();
+        void Evaluate(TLogEntity logEntity);
+        void EvaluateAll();
     }
 
-    public class LogAnalyzer<TLogEntity> : ILogAnalyzer<TLogEntity>
+    public class LogMonitor<TLogEntity> : ILogMonitor<TLogEntity>
     {
         private ILogRepository<TLogEntity> _logRepository;
         private List<ILogTrigger<TLogEntity>> _triggers = new List<ILogTrigger<TLogEntity>>();
         private ILogCreator _logger;
 
-        public LogAnalyzer(ILogCreator logger,
+        public LogMonitor(ILogCreator logger,
             ILogRepository<TLogEntity> logRepository,
             List<ILogTrigger<TLogEntity>> triggers
             )
@@ -28,7 +28,7 @@ namespace LogManagement
         }
 
         //Analyze specific log entities
-        public void Analyze(TLogEntity logEntity)
+        public void Evaluate(TLogEntity logEntity)
         {
             for (int index = 0; index < _triggers.Count; index++)
             {
@@ -44,9 +44,9 @@ namespace LogManagement
         }
 
         //Analyze all log entities in log repository
-        public void Analyze()
+        public void EvaluateAll()
         {
-            Analyze(default(TLogEntity));
+            Evaluate(default(TLogEntity));
         }
     }
 }

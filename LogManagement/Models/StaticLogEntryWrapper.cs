@@ -6,11 +6,12 @@ namespace LogManagement.Models
 {
     public interface IStaticLogEntryWrapper_Emitter : ILogCreator
     {
-        IStaticLogEntryWrapper_Emitter SetOutputType(LogOutputType outputType);
         IStaticLogEntryWrapper_Emitter AddParameters(string parameterName, object parameterValue);
         void EmitLog(Priority priority, Status status);
         void EmitLog(bool retainParameters, Priority priority, Status status);
-        ILogEntry CreateLogEntry(Priority priority, Status status);
+        void EmitLog(LogOutputType outputType, Priority priority, Status status);
+        void EmitLog(bool retainParameters, LogOutputType outputType, Priority priority, Status status);
+        ILogEntry CreateLogEntry(LogOutputType outputType, Priority priority, Status status);
     }
 
     public interface IStaticLogEntryWrapper : IStaticLogEntryWrapper_Emitter
@@ -30,7 +31,6 @@ namespace LogManagement.Models
     public class StaticLogEntryWrapper : IStaticLogEntryWrapper
     {
         private ILogManager _manager;
-        private LogOutputType _outputType = LogOutputType.All;
         IDictionary<string, object> _parameterList = new Dictionary<string, object>();
 
         public string System { private get; set; }
@@ -110,30 +110,29 @@ namespace LogManagement.Models
             return this;
         }
 
-        public ILogEntry CreateLogEntry(Priority priority)
-        {
-            return CreateLogEntry(_outputType, priority);
-        }
-
-        public ILogEntry CreateLogEntry(LogOutputType outputType, Priority priority)
+        public ILogEntry CreateLogEntry(LogOutputType outputType, Priority priority, Status status)
         {
             ILogEntry entry = _manager.CreateLogEntry(outputType, priority);
 
             entry.System = System;
             entry.Application = Application;
             entry.Component = Component;
+
             entry.Event = Event;
-
-            return entry;
-        }
-
-        public ILogEntry CreateLogEntry(Priority priority, Status status)
-        {
-            ILogEntry entry = CreateLogEntry(priority);
 
             entry.Status = status;
 
             return entry;
+        }
+
+        public ILogEntry CreateLogEntry(Priority priority)
+        {
+            return CreateLogEntry(LogOutputType.All, priority, Status.None);
+        }
+
+        public ILogEntry CreateLogEntry(LogOutputType outputType, Priority priority)
+        {
+            return CreateLogEntry(outputType, priority, Status.None);
         }
 
         public void EmitLog(ILogEntry log)
@@ -141,14 +140,9 @@ namespace LogManagement.Models
             _manager.EmitLog(log);
         }
 
-        public void EmitLog(Priority priority, Status status)
+       public void EmitLog(bool retainParameters, LogOutputType outputType, Priority priority, Status status)
         {
-            EmitLog(false, priority, status);
-        }
-
-        public void EmitLog(bool retainParameters, Priority priority, Status status)
-        {
-            ILogEntry entry = CreateLogEntry(priority, status);
+            ILogEntry entry = CreateLogEntry(outputType, priority, status);
 
             entry.Status = status;
             entry.Parameters = _parameterList;
@@ -158,16 +152,24 @@ namespace LogManagement.Models
             if (!retainParameters) _parameterList.Clear();
         }
 
+        public void EmitLog(LogOutputType outputType, Priority priority, Status status)
+        {
+            EmitLog(false, outputType, priority, status);
+        }
+
+        public void EmitLog(bool retainParameters, Priority priority, Status status)
+        {
+            EmitLog(retainParameters, LogOutputType.All, priority, status);
+        }
+
+        public void EmitLog(Priority priority, Status status)
+        {
+            EmitLog(false, LogOutputType.All, priority, status);
+        }
+
         public IStaticLogEntryWrapper_Emitter AddParameters(string parameterName, object parameterValue)
         {
             _parameterList.Add(parameterName, parameterValue);
-
-            return this;
-        }
-
-        public IStaticLogEntryWrapper_Emitter SetOutputType(LogOutputType outputType)
-        {
-            _outputType = outputType;
 
             return this;
         }
