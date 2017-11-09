@@ -31,7 +31,7 @@ namespace LogManagement.Models
     public class StaticLogEntryWrapper : IStaticLogEntryWrapper
     {
         private ILogManager _manager;
-        IDictionary<string, object> _parameterList = new Dictionary<string, object>();
+        Dictionary<string, object> _parameterList = new Dictionary<string, object>();
 
         public string System { private get; set; }
         public string Application { private get; set; }
@@ -140,16 +140,31 @@ namespace LogManagement.Models
             _manager.EmitLog(log);
         }
 
-       public void EmitLog(bool retainParameters, LogOutputType outputType, Priority priority, Status status)
+        public void EmitLog(bool retainParameters, LogOutputType outputType, Priority priority, Status status)
         {
             ILogEntry entry = CreateLogEntry(outputType, priority, status);
 
             entry.Status = status;
-            entry.Parameters = _parameterList;
+            entry.Parameters = CloneParameters(_parameterList);
 
             EmitLog(entry);
 
             if (!retainParameters) _parameterList.Clear();
+        }
+
+        IDictionary<string, object> CloneParameters(Dictionary<string, object> originalDictionary)
+        {
+            Dictionary<string, object> newDictionary = new Dictionary<string, object>(
+                originalDictionary.Count,
+                originalDictionary.Comparer
+            );
+
+            foreach (KeyValuePair<string, object> entry in originalDictionary)
+            {
+                newDictionary.Add(entry.Key, entry.Value);
+            }
+
+            return newDictionary;
         }
 
         public void EmitLog(LogOutputType outputType, Priority priority, Status status)
