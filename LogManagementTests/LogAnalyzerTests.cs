@@ -20,16 +20,25 @@ namespace LogManagementTests
         private ILogManager _manager = LogManager.GetInstance();
         private string _invokedRuleId = string.Empty;
         private ProducerConsumerLogQueue<ILogEntry> _logMonitorQueue;
+        private ProducerConsumerLogQueue<ILogEntry>.QueuedItemProcessedDelegate _processCompleteAction;
 
-        [TestInitialize]
-        public void Initialize()
+        public LogAnalyzerTests()
         {
             SetIdRetriever();
             SetLogRepository();
             SetLogInserter();
             SetLogMonitor();
             SetLogMonitorQueue();
+        }
 
+        ~LogAnalyzerTests()
+        {
+            DestroyLogMonitorQueue();
+        }
+
+        [TestInitialize]
+        public void Initialize()
+        {
             _manager.LogEmit = log =>
             {
                 if (log == null)
@@ -38,15 +47,10 @@ namespace LogManagementTests
                 _logInserter.Insert(log);
 
                 //-->> Normalize log persistency table here (if necessary) prior to analysis of log entries
-                _logMonitor.Evaluate(log);
+                _logMonitorQueue.EnqueueLog(log);
+                //_logMonitor.Evaluate(log);
                 //-->> Clear log persistency table here (if necessary)
             };
-        }
-
-        [TestCleanup]
-        public void MockedDestructor()
-        {
-            DestroyLogMonitorQueue();
         }
 
         void SetIdRetriever()
@@ -144,7 +148,8 @@ namespace LogManagementTests
         #region Monitor Queue Intricacies
         void SetLogMonitorQueue()
         {
-            if (_logMonitorQueue == null) _logMonitorQueue = new ProducerConsumerLogQueue<ILogEntry>(_logMonitor);
+            if (_logMonitorQueue == null)
+                _logMonitorQueue = new ProducerConsumerLogQueue<ILogEntry>(_logMonitor, _processCompleteAction);
         }
 
         void DestroyLogMonitorQueue()
@@ -166,6 +171,11 @@ namespace LogManagementTests
         [TestMethod]
         public void TestMethod1()
         {
+            _processCompleteAction = () =>
+            {
+                Assert.AreEqual("0001", _invokedRuleId);
+            };
+
             IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager)
             {
                 System = "Security System",
@@ -177,13 +187,16 @@ namespace LogManagementTests
             staticLogCreator
                 .AddParameters("Description", "Validation has been invoked successfully")
                 .EmitLog(Priority.Info, Status.Success);
-
-            Assert.AreEqual("0001", _invokedRuleId);
         }
 
         [TestMethod]
         public void TestMethod2()
         {
+            _processCompleteAction = () =>
+            {
+                Assert.AreEqual("0002", _invokedRuleId);
+            };
+
             IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager)
             {
                 System = "Security System",
@@ -194,7 +207,6 @@ namespace LogManagementTests
 
             staticLogCreator.EmitLog(Priority.Info, Status.Failure);
             staticLogCreator.EmitLog(Priority.Info, Status.Failure);
-            Assert.AreEqual("0002", _invokedRuleId);
         }
     }
 }
