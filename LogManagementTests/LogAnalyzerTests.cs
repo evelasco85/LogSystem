@@ -47,7 +47,7 @@ namespace LogManagementTests
                 {
                     {
                         new LogTrigger<ILogEntry>("0001",
-                            (entity, repository, logger) =>
+                            (id, entity, repository, logger) =>
                             {
                                 /*Trigger Evaluation*/
                                 IEnumerable<ILogEntry> result = repository
@@ -65,7 +65,7 @@ namespace LogManagementTests
                     },
                     {
                         new LogTrigger<ILogEntry>("0002",
-                            (entity, repository, logger) =>
+                            (id, entity, repository, logger) =>
                             {
                                 /*Trigger Evaluation*/
                                 IEnumerable<ILogEntry> result = repository

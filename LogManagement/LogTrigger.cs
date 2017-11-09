@@ -13,7 +13,7 @@ namespace LogManagement
 
     public class LogTrigger<TLogEntity> : ILogTrigger<TLogEntity>
     {
-        public delegate bool EvaluationDelegate(TLogEntity logEntity, ILogRepository<TLogEntity> repository, ILogCreator logger);
+        public delegate bool EvaluationDelegate(string ruleId, TLogEntity logEntity, ILogRepository<TLogEntity> repository, ILogCreator logger);
         public delegate void EventInvocationDelegate(string ruleId, TLogEntity logEntity, ILogRepository<TLogEntity> repository, ILogCreator logger);
 
         private string _ruleId;
@@ -37,7 +37,7 @@ namespace LogManagement
         {
             if (_evaluationFunc == null) return false;
 
-            return _evaluationFunc(logEntity, logRepository, logger);
+            return _evaluationFunc(_ruleId, logEntity, logRepository, logger);
         }
 
         public void InvokeEvent(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger)
