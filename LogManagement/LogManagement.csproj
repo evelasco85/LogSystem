@@ -66,7 +66,8 @@
     <Compile Include="Dynamic\Managers\ActivityManager.cs" />
     <Compile Include="Dynamic\Managers\RuleManager.cs" />
     <Compile Include="Models\StaticLogEntryWrapper.cs" />
-    <Compile Include="ProducerConsumerLogQueue.cs" />
+    <Compile Include="ProducerConsumerLogQueue\LogMonitorQueue.cs" />
+    <Compile Include="ProducerConsumerLogQueue\IProducerConsumerLogQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Dynamic\Registration\ApplicationRegistration.cs" />
     <Compile Include="Dynamic\Registration\ComponentRegistration.cs" />

@@ -5,6 +5,7 @@ using System.Linq;
 using LogManagement;
 using LogManagement.Managers;
 using LogManagement.Models;
+using LogManagement.ProducerConsumerLogQueue;
 using LogManagementTests.Implementations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -19,7 +20,7 @@ namespace LogManagementTests
         private ILogMonitor<ILogEntry> _logMonitor;
         private ILogManager _manager = LogManager.GetInstance();
         private string _invokedRuleId = string.Empty;
-        private ProducerConsumerLogQueue<ILogEntry> _logMonitorQueue;
+        private LogMonitorQueue<ILogEntry> _logMonitorMonitorQueue;
 
         public LogMonitorTests()
         {
@@ -46,7 +47,7 @@ namespace LogManagementTests
                 _logInserter.Insert(log);
 
                 //-->> Normalize log persistency table here (if necessary) prior to analysis of log entries
-                _logMonitorQueue.EnqueueLog(log);
+                _logMonitorMonitorQueue.EnqueueLog(log);
                 //_logMonitor.Evaluate(log);
                 //-->> Clear log persistency table here (if necessary)
             };
@@ -147,17 +148,17 @@ namespace LogManagementTests
         #region Monitor Queue Intricacies
         void SetLogMonitorQueue()
         {
-            if (_logMonitorQueue == null)
-                _logMonitorQueue = new ProducerConsumerLogQueue<ILogEntry>(_logMonitor);
+            if (_logMonitorMonitorQueue == null)
+                _logMonitorMonitorQueue = new LogMonitorQueue<ILogEntry>(_logMonitor);
         }
 
         void DestroyLogMonitorQueue()
         {
-            if (_logMonitorQueue != null)
+            if (_logMonitorMonitorQueue != null)
             {
-                _logMonitorQueue.Dispose();
+                _logMonitorMonitorQueue.Dispose();
 
-                _logMonitorQueue = null;
+                _logMonitorMonitorQueue = null;
 
                 string message = "Log monitor queue disposed";
 
@@ -182,7 +183,7 @@ namespace LogManagementTests
                 .AddParameters("Description", "Validation has been invoked successfully")
                 .EmitLog(Priority.Info, Status.Success);
 
-            while (!_logMonitorQueue.IsEmpty) ;     //Wait for queue to complete
+            while (!_logMonitorMonitorQueue.IsEmpty) ;     //Wait for queue to complete
 
             Assert.AreEqual("0001", _invokedRuleId);
         }
@@ -201,7 +202,7 @@ namespace LogManagementTests
             staticLogCreator.EmitLog(Priority.Info, Status.Failure);
             staticLogCreator.EmitLog(Priority.Info, Status.Failure);
 
-            while (!_logMonitorQueue.IsEmpty) ;     //Wait for queue to complete
+            while (!_logMonitorMonitorQueue.IsEmpty) ;     //Wait for queue to complete
 
             Assert.AreEqual("0002", _invokedRuleId);
         }

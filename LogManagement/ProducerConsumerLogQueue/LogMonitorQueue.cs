@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 
-namespace LogManagement
+namespace LogManagement.ProducerConsumerLogQueue
 {
-    public class ProducerConsumerLogQueue<TLogEntity> : IDisposable
+    public class LogMonitorQueue<TLogEntity> : IProducerConsumerLogQueue<TLogEntity>
     {
         private EventWaitHandle _waitHandle;
         private Thread _worker;
@@ -14,7 +13,7 @@ namespace LogManagement
         private bool _isEmpty = true;
         private bool _isClose = false;
 
-        public ProducerConsumerLogQueue(ILogMonitor<TLogEntity> logMonitor)
+        public LogMonitorQueue(ILogMonitor<TLogEntity> logMonitor)
         {
             _waitHandle = new AutoResetEvent(false);
             _worker = new Thread(Work);
