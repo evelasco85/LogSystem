@@ -20,7 +20,6 @@ namespace LogManagementTests
         private ILogManager _manager = LogManager.GetInstance();
         private string _invokedRuleId = string.Empty;
         private ProducerConsumerLogQueue<ILogEntry> _logMonitorQueue;
-        private ProducerConsumerLogQueue<ILogEntry>.QueuedItemProcessedDelegate _processCompleteAction;
 
         public LogAnalyzerTests()
         {
@@ -149,7 +148,7 @@ namespace LogManagementTests
         void SetLogMonitorQueue()
         {
             if (_logMonitorQueue == null)
-                _logMonitorQueue = new ProducerConsumerLogQueue<ILogEntry>(_logMonitor, _processCompleteAction);
+                _logMonitorQueue = new ProducerConsumerLogQueue<ILogEntry>(_logMonitor);
         }
 
         void DestroyLogMonitorQueue()
@@ -171,11 +170,6 @@ namespace LogManagementTests
         [TestMethod]
         public void TestMethod1()
         {
-            _processCompleteAction = () =>
-            {
-                Assert.AreEqual("0001", _invokedRuleId);
-            };
-
             IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager)
             {
                 System = "Security System",
@@ -187,16 +181,15 @@ namespace LogManagementTests
             staticLogCreator
                 .AddParameters("Description", "Validation has been invoked successfully")
                 .EmitLog(Priority.Info, Status.Success);
+
+            while (!_logMonitorQueue.IsEmpty) ;     //Wait for queue to complete
+
+            Assert.AreEqual("0001", _invokedRuleId);
         }
 
         [TestMethod]
         public void TestMethod2()
         {
-            _processCompleteAction = () =>
-            {
-                Assert.AreEqual("0002", _invokedRuleId);
-            };
-
             IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager)
             {
                 System = "Security System",
@@ -207,6 +200,10 @@ namespace LogManagementTests
 
             staticLogCreator.EmitLog(Priority.Info, Status.Failure);
             staticLogCreator.EmitLog(Priority.Info, Status.Failure);
+
+            while (!_logMonitorQueue.IsEmpty) ;     //Wait for queue to complete
+
+            Assert.AreEqual("0002", _invokedRuleId);
         }
     }
 }

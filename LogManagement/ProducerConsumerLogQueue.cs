@@ -6,22 +6,14 @@ namespace LogManagement
 {
     public class ProducerConsumerLogQueue<TLogEntity> : IDisposable
     {
-        public delegate void QueuedItemProcessedDelegate();
-
         private EventWaitHandle _waitHandle;
         private Thread _worker;
         private readonly object _lockerObject;
         private Queue<TLogEntity> _logTasks;
         private ILogMonitor<TLogEntity> _logMonitor;
-
-        private QueuedItemProcessedDelegate _processCompleteAction;
+        private bool _isEmpty = true;
 
         public ProducerConsumerLogQueue(ILogMonitor<TLogEntity> logMonitor)
-            :this(logMonitor, null)
-        {
-        }
-
-        public ProducerConsumerLogQueue(ILogMonitor<TLogEntity> logMonitor, QueuedItemProcessedDelegate processCompleteAction)
         {
             _waitHandle = new AutoResetEvent(false);
             _worker = new Thread(Work);
@@ -29,15 +21,22 @@ namespace LogManagement
             _logTasks = new Queue<TLogEntity>();
             _logMonitor = logMonitor;
 
-            _processCompleteAction = processCompleteAction;
-
             _worker.Start();
+        }
+
+        public bool IsEmpty
+        {
+            get { return _isEmpty; }
         }
 
         public void EnqueueLog(TLogEntity log)
         {
-            lock (_lockerObject) _logTasks.Enqueue(log);
+            lock (_lockerObject)
+            {
+                _logTasks.Enqueue(log);
+            }
 
+            _isEmpty = false;
             _waitHandle.Set();
         }
 
@@ -65,11 +64,13 @@ namespace LogManagement
                 if (log != null)
                 {
                     if (_logMonitor != null) _logMonitor.Evaluate(log);
-
-                    if (_processCompleteAction != null) _processCompleteAction();
                 }
                 else
-                    _waitHandle.WaitOne();         // No more tasks, block current thread - wait for a signal
+                {
+                    _isEmpty = true;
+
+                    _waitHandle.WaitOne(); // No more tasks, block current thread - wait for a signal
+                }
             }
         }
     }
