@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using LogManagement;
 using LogManagement.Managers;
 using LogManagement.Models;
@@ -35,7 +34,7 @@ namespace LogManagementTests
 
         ~LogMonitorTests()
         {
-            DestroyLogMonitorQueue();
+            DestroyLogProcessorQueue();
         }
 
         [TestInitialize]
@@ -50,6 +49,7 @@ namespace LogManagementTests
             };
         }
 
+        #region Setup
         void SetIdRetriever()
         {
             _manager.RetrieveBusinessTransactionId = () =>
@@ -107,7 +107,9 @@ namespace LogManagementTests
 
             _logMonitor = new LogMonitor<ILogEntry>(_manager, _logRepository, triggers);
         }
+#endregion
 
+        #region Triggers
         ILogTrigger<ILogEntry> GetSuccessfulValidationTrigger()
         {
             return new LogTrigger<ILogEntry>("0001",
@@ -148,15 +150,16 @@ namespace LogManagementTests
                     _invokedRuleId = id;
                 });
         }
-
-        #region Monitor Queue Intricacies
+#endregion
+       
+        #region Log Processor Queue Setup and Destruction
         void SetLogProcessorQueue()
         {
             if (_logProcessorQueue == null)
                 _logProcessorQueue = new LogProcessorQueue<ILogEntry>(_logInserter, _logMonitor);
         }
 
-        void DestroyLogMonitorQueue()
+        void DestroyLogProcessorQueue()
         {
             if (_logProcessorQueue != null)
             {
@@ -164,7 +167,7 @@ namespace LogManagementTests
 
                 _logProcessorQueue = null;
 
-                string message = "Log monitor queue disposed";
+                string message = "Log processor queue disposed";
 
                 Debug.WriteLine(message);
                 Console.WriteLine(message);
