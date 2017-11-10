@@ -12,6 +12,7 @@ namespace LogManagement
         private Queue<TLogEntity> _logTasks;
         private ILogMonitor<TLogEntity> _logMonitor;
         private bool _isEmpty = true;
+        private bool _isClose = false;
 
         public ProducerConsumerLogQueue(ILogMonitor<TLogEntity> logMonitor)
         {
@@ -31,6 +32,8 @@ namespace LogManagement
 
         public void EnqueueLog(TLogEntity log)
         {
+            if(_isClose) return;
+            
             lock (_lockerObject)
             {
                 _logTasks.Enqueue(log);
@@ -40,11 +43,21 @@ namespace LogManagement
             _waitHandle.Set();
         }
 
+        public void Close()
+        {
+            if (!_isClose)
+            {
+                EnqueueLog(default(TLogEntity));     // Signal the consumer to exit.
+                _worker.Join();         // Wait for the consumer's thread to finish.
+                _waitHandle.Close();            // Release any OS resources.
+
+                _isClose = true;
+            }
+        }
+
         public void Dispose()
         {
-            EnqueueLog(default(TLogEntity));     // Signal the consumer to exit.
-            _worker.Join();         // Wait for the consumer's thread to finish.
-            _waitHandle.Close();            // Release any OS resources.
+            Close();
         }
 
         void Work()     //Run on separate thread
