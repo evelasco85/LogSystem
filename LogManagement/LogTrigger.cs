@@ -3,10 +3,13 @@ using LogManagement.Managers;
 
 namespace LogManagement
 {
-    public interface ILogTrigger<TLogEntity>
+    public interface ILogTriggerInfo
     {
         string RuleId { get; }
+    }
 
+    public interface ILogTrigger<TLogEntity> : ILogTriggerInfo
+    {
         bool Evaluate(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger);
         void InvokeEvent(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger);
     }
