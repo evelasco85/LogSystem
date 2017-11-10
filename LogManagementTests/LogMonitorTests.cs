@@ -23,6 +23,10 @@ namespace LogManagementTests
         private string _invokedRuleId = string.Empty;
         private IProducerConsumerLogQueue<ILogEntry> _logProcessorQueue;
 
+        private string _businessTransactionId = "123";
+        private string _sessionId = "abc";
+        private string _user = String.Empty;
+
         public LogMonitorTests()
         {
             SetIdRetriever();
@@ -54,17 +58,17 @@ namespace LogManagementTests
         {
             _manager.RetrieveBusinessTransactionId = () =>
             {
-                return "123";
+                return _businessTransactionId;
             };
 
             _manager.RetrieveSessionId = () =>
             {
-                return "abc";
+                return _sessionId;
             };
 
             _manager.RetrieveUser = () =>
             {
-                return "sa";
+                return _user;
             };
         }
 
@@ -186,6 +190,8 @@ namespace LogManagementTests
                 Event = "Validation"
             };
 
+            _user = "sa";
+
             staticLogCreator
                 .AddParameters("Description", "Validation has been invoked successfully")
                 .EmitLog(Priority.Info, Status.Success);
@@ -205,6 +211,8 @@ namespace LogManagementTests
                 Component = "Authentication Component",
                 Event = "Validation"
             };
+
+            _user = "sa";
 
             staticLogCreator.EmitLog(Priority.Info, Status.Failure);
             staticLogCreator.EmitLog(Priority.Info, Status.Failure);
