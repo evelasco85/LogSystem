@@ -4,22 +4,20 @@ using Microsoft.Win32.SafeHandles;
 
 namespace LogManagement.ProducerConsumerLogQueue
 {
-    public class LogMonitorQueue<TLogEntity> : ProducerConsumerLogQueue<TLogEntity>
+    public class LogInserterQueue<TLogEntity> : ProducerConsumerLogQueue<TLogEntity>
     {
         bool _disposed = false;
         SafeHandle _handle = new SafeFileHandle(IntPtr.Zero, true);
-        private ILogMonitor<TLogEntity> _logMonitor;
+        private ILogInserter<TLogEntity> _logInserter;
 
-        public LogMonitorQueue(
-            ILogMonitor<TLogEntity> logMonitor
-            )
+        public LogInserterQueue(ILogInserter<TLogEntity> logInserter)
         {
-            _logMonitor = logMonitor;
+            _logInserter = logInserter;
         }
 
         public override void ProcessLog(TLogEntity log)
         {
-            if (_logMonitor != null) _logMonitor.Evaluate(log);
+            if (_logInserter != null) _logInserter.Insert(log);
         }
 
         protected override void Dispose(bool disposing)

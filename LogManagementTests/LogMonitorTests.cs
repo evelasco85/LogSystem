@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using LogManagement;
 using LogManagement.Managers;
 using LogManagement.Models;
 using LogManagement.ProducerConsumerLogQueue;
 using LogManagementTests.Implementations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 
 namespace LogManagementTests
 {
@@ -20,7 +22,7 @@ namespace LogManagementTests
         private ILogMonitor<ILogEntry> _logMonitor;
         private ILogManager _manager = LogManager.GetInstance();
         private string _invokedRuleId = string.Empty;
-        private LogMonitorQueue<ILogEntry> _logMonitorMonitorQueue;
+        private IProducerConsumerLogQueue<ILogEntry> _logProcessorQueue;
 
         public LogMonitorTests()
         {
@@ -28,7 +30,7 @@ namespace LogManagementTests
             SetLogRepository();
             SetLogInserter();
             SetLogMonitor();
-            SetLogMonitorQueue();
+            SetLogProcessorQueue();
         }
 
         ~LogMonitorTests()
@@ -44,12 +46,7 @@ namespace LogManagementTests
                 if (log == null)
                     return;
 
-                _logInserter.Insert(log);
-
-                //-->> Normalize log persistency table here (if necessary) prior to analysis of log entries
-                _logMonitorMonitorQueue.EnqueueLog(log);
-                //_logMonitor.Evaluate(log);
-                //-->> Clear log persistency table here (if necessary)
+                _logProcessorQueue.EnqueueLog(log);
             };
         }
 
@@ -91,6 +88,7 @@ namespace LogManagementTests
                 {
                     /*Insert*/
                     _inMemoryLogEntries.Add(logEntityToAdd);
+                    Debug.WriteLine(JsonConvert.SerializeObject(logEntityToAdd));
                 },
                 (addedLogEntity, postInsertRepository) =>
                 {
@@ -146,19 +144,19 @@ namespace LogManagementTests
         }
 
         #region Monitor Queue Intricacies
-        void SetLogMonitorQueue()
+        void SetLogProcessorQueue()
         {
-            if (_logMonitorMonitorQueue == null)
-                _logMonitorMonitorQueue = new LogMonitorQueue<ILogEntry>(_logMonitor);
+            if (_logProcessorQueue == null)
+                _logProcessorQueue = new LogProcessorQueue<ILogEntry>(_logInserter, _logMonitor);
         }
 
         void DestroyLogMonitorQueue()
         {
-            if (_logMonitorMonitorQueue != null)
+            if (_logProcessorQueue != null)
             {
-                _logMonitorMonitorQueue.Dispose();
+                _logProcessorQueue.Dispose();
 
-                _logMonitorMonitorQueue = null;
+                _logProcessorQueue = null;
 
                 string message = "Log monitor queue disposed";
 
@@ -183,7 +181,7 @@ namespace LogManagementTests
                 .AddParameters("Description", "Validation has been invoked successfully")
                 .EmitLog(Priority.Info, Status.Success);
 
-            while (!_logMonitorMonitorQueue.IsEmpty) ;     //Wait for queue to complete
+            while (!_logProcessorQueue.IsEmpty) ;     //Wait for queue to complete
 
             Assert.AreEqual("0001", _invokedRuleId);
         }
@@ -202,7 +200,7 @@ namespace LogManagementTests
             staticLogCreator.EmitLog(Priority.Info, Status.Failure);
             staticLogCreator.EmitLog(Priority.Info, Status.Failure);
 
-            while (!_logMonitorMonitorQueue.IsEmpty) ;     //Wait for queue to complete
+            while (!_logProcessorQueue.IsEmpty) ;     //Wait for queue to complete
 
             Assert.AreEqual("0002", _invokedRuleId);
         }
