@@ -72,7 +72,7 @@
     <Compile Include="Dynamic\RuleParserTests.cs" />
     <Compile Include="LogTests.cs" />
     <Compile Include="StaticLogEntryWrapperTests.cs" />
-    <Compile Include="LogAnalyzerTests.cs" />
+    <Compile Include="LogMonitorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LogManagement\LogManagement.csproj">

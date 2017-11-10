@@ -11,7 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace LogManagementTests
 {
     [TestClass]
-    public class LogAnalyzerTests
+    public class LogMonitorTests
     {
         private List<ILogEntry> _inMemoryLogEntries = new List<ILogEntry>();
         private ILogRepository<ILogEntry> _logRepository;
@@ -21,7 +21,7 @@ namespace LogManagementTests
         private string _invokedRuleId = string.Empty;
         private ProducerConsumerLogQueue<ILogEntry> _logMonitorQueue;
 
-        public LogAnalyzerTests()
+        public LogMonitorTests()
         {
             SetIdRetriever();
             SetLogRepository();
@@ -30,7 +30,7 @@ namespace LogManagementTests
             SetLogMonitorQueue();
         }
 
-        ~LogAnalyzerTests()
+        ~LogMonitorTests()
         {
             DestroyLogMonitorQueue();
         }
