@@ -9,7 +9,7 @@ namespace LogManagement
         void Evaluate(TLogEntity logEntity);
         void EvaluateAll();
         LogMonitor<TLogEntity>.TriggerEvaluationCompleteDelegate EvaluationCompleteAction { get; set; }
-        LogMonitor<TLogEntity>.TriggerInvokedCompletionDelegate TriggerInvokedCompletionCompletionAction { get; set; }
+        LogMonitor<TLogEntity>.TriggerInvokedCompletionDelegate TriggerInvokedCompletionAction { get; set; }
     }
 
     public class LogMonitor<TLogEntity> : ILogMonitor<TLogEntity>
@@ -22,7 +22,7 @@ namespace LogManagement
         private ILogCreator _logger;
 
         public TriggerEvaluationCompleteDelegate EvaluationCompleteAction { get; set; }
-        public TriggerInvokedCompletionDelegate TriggerInvokedCompletionCompletionAction { get; set; }
+        public TriggerInvokedCompletionDelegate TriggerInvokedCompletionAction { get; set; }
 
         public LogMonitor(ILogCreator logger,
             ILogRepository<TLogEntity> logRepository,
@@ -50,7 +50,7 @@ namespace LogManagement
                 {
                     trigger.InvokeEvent(logEntity, _logRepository, _logger);
 
-                    if (TriggerInvokedCompletionCompletionAction != null) TriggerInvokedCompletionCompletionAction(trigger, _logger, logEntity);
+                    if (TriggerInvokedCompletionAction != null) TriggerInvokedCompletionAction(trigger, _logger, logEntity);
                 }
             }
 
