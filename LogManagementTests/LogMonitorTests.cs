@@ -99,48 +99,54 @@ namespace LogManagementTests
 
         void SetLogMonitor()
         {
-            _logMonitor = new LogMonitor<ILogEntry>(_manager,
-               _logRepository,
-               new List<ILogTrigger<ILogEntry>>
+            List<ILogTrigger<ILogEntry>> triggers = new List<ILogTrigger<ILogEntry>>
+            {
+                GetSuccessfulValidationTrigger(),
+                GetFailedInvocationTrigger(),
+            };
+
+            _logMonitor = new LogMonitor<ILogEntry>(_manager, _logRepository, triggers);
+        }
+
+        ILogTrigger<ILogEntry> GetSuccessfulValidationTrigger()
+        {
+            return new LogTrigger<ILogEntry>("0001",
+                (id, entity, repository, logger) =>
                 {
-                    {
-                        new LogTrigger<ILogEntry>("0001",
-                            (id, entity, repository, logger) =>
-                            {
-                                /*Trigger Evaluation*/
-                                IEnumerable<ILogEntry> result = repository
-                                    .Matching(new GetSuccessValidationDescriptionLogsQuery.Criteria());
+                    /*Trigger Evaluation*/
+                    IEnumerable<ILogEntry> result = repository
+                        .Matching(new GetSuccessValidationDescriptionLogsQuery.Criteria());
 
-                                bool isMatched = result.Any() && (entity.Parameters["Description"].ToString() == GetSuccessValidationDescriptionLogsQuery.DESCRIPTION);
+                    bool isMatched = result.Any() && (entity.Parameters["Description"].ToString() ==
+                                                      GetSuccessValidationDescriptionLogsQuery.DESCRIPTION);
 
-                                return isMatched;
-                            },
-                            (id, entity, repository, logger) =>
-                            {
-                                /*Trigger Invocation*/
-                                _invokedRuleId = id;
-                            })
-                    },
-                    {
-                        new LogTrigger<ILogEntry>("0002",
-                            (id, entity, repository, logger) =>
-                            {
-                                /*Trigger Evaluation*/
-                                IEnumerable<ILogEntry> result = repository
-                                    .Matching(new GetFailedInvocationLogsQuery.Criteria());
+                    return isMatched;
+                },
+                (id, entity, repository, logger) =>
+                {
+                    /*Trigger Invocation*/
+                    _invokedRuleId = id;
+                });
+        }
 
-                                bool isMatched = result.Any() && (entity.Status == GetFailedInvocationLogsQuery.FAILED_STATUS);
+        ILogTrigger<ILogEntry> GetFailedInvocationTrigger()
+        {
+            return new LogTrigger<ILogEntry>("0002",
+                (id, entity, repository, logger) =>
+                {
+                    /*Trigger Evaluation*/
+                    IEnumerable<ILogEntry> result = repository
+                        .Matching(new GetFailedInvocationLogsQuery.Criteria());
 
-                                return isMatched;
-                            },
-                            (id, entity, repository, logger) =>
-                            {
-                                /*Trigger Invocation*/
-                                _invokedRuleId = id;
-                            })
-                    },
-                }
-           );
+                    bool isMatched = result.Any() && (entity.Status == GetFailedInvocationLogsQuery.FAILED_STATUS);
+
+                    return isMatched;
+                },
+                (id, entity, repository, logger) =>
+                {
+                    /*Trigger Invocation*/
+                    _invokedRuleId = id;
+                });
         }
 
         #region Monitor Queue Intricacies
