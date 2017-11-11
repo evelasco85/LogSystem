@@ -8,21 +8,21 @@ namespace LogManagement
     {
         void Evaluate(TLogEntity logEntity);
         void EvaluateAll();
-        LogMonitor<TLogEntity>.TriggerEvaluationCompleteDelegate EvaluationCompleteAction { get; set; }
-        LogMonitor<TLogEntity>.TriggerInvokedCompletionDelegate TriggerInvokedCompletionAction { get; set; }
+        LogMonitor<TLogEntity>.LogEvaluationCompleteDelegate LogEvaluationComplete { get; set; }
+        LogMonitor<TLogEntity>.TriggerInvocationCompleteDelegate TriggerInvocationComplete { get; set; }
     }
 
     public class LogMonitor<TLogEntity> : ILogMonitor<TLogEntity>
     {
-        public delegate void TriggerInvokedCompletionDelegate(ILogTriggerInfo triggerInfo, ILogCreator logger, TLogEntity logEntity);
-        public delegate void TriggerEvaluationCompleteDelegate();
+        public delegate void TriggerInvocationCompleteDelegate(ILogTriggerInfo triggerInfo, ILogCreator logger, TLogEntity logEntity, ILogRepository<TLogEntity> logRepository);
+        public delegate void LogEvaluationCompleteDelegate(IList<ILogTriggerInfo> invokedTriggerList, TLogEntity logEntity, ILogRepository<TLogEntity> logRepository);
 
         private ILogRepository<TLogEntity> _logRepository;
         private List<ILogTrigger<TLogEntity>> _triggers = new List<ILogTrigger<TLogEntity>>();
         private ILogCreator _logger;
 
-        public TriggerEvaluationCompleteDelegate EvaluationCompleteAction { get; set; }
-        public TriggerInvokedCompletionDelegate TriggerInvokedCompletionAction { get; set; }
+        public LogEvaluationCompleteDelegate LogEvaluationComplete { get; set; }
+        public TriggerInvocationCompleteDelegate TriggerInvocationComplete { get; set; }
 
         public LogMonitor(ILogCreator logger,
             ILogRepository<TLogEntity> logRepository,
@@ -38,6 +38,8 @@ namespace LogManagement
         //Analyze specific log entities
         public void Evaluate(TLogEntity logEntity)
         {
+            IList<ILogTriggerInfo> listOfTriggeredTriggers = new List<ILogTriggerInfo>();
+
             for (int index = 0; index < _triggers.Count; index++)
             {
                 ILogTrigger<TLogEntity> trigger = _triggers[index];
@@ -49,12 +51,13 @@ namespace LogManagement
                 if (mustInvoke)
                 {
                     trigger.InvokeEvent(logEntity, _logRepository, _logger);
+                    listOfTriggeredTriggers.Add(trigger);
 
-                    if (TriggerInvokedCompletionAction != null) TriggerInvokedCompletionAction(trigger, _logger, logEntity);
+                    if (TriggerInvocationComplete != null) TriggerInvocationComplete(trigger, _logger, logEntity, _logRepository);
                 }
             }
 
-            if (EvaluationCompleteAction != null) EvaluationCompleteAction();
+            if (LogEvaluationComplete != null) LogEvaluationComplete(listOfTriggeredTriggers, logEntity, _logRepository);
         }
 
         //Analyze all log entities in log repository
