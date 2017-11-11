@@ -11,7 +11,7 @@ namespace LogManagement
 
     public interface ILogTriggerValueRetriever<TLogEntity>
     {
-        TLogEntity TemporaryLogDataHolder { get; set; }
+        TLogEntity TemporaryLogDataHolder { set; }
         TResult GetValue<TResult>(Expression<Func<TLogEntity, TResult>> queryExpression);
     }
 
@@ -35,7 +35,7 @@ namespace LogManagement
         private InvokeEventDelegate _invokeEvent;
 
         public string TriggerId { get { return _triggerId; } }
-        public TLogEntity TemporaryLogDataHolder { get; set; }
+        public TLogEntity TemporaryLogDataHolder { private get; set; }
 
         public LogTrigger(string triggerId,
             EvaluateDelegate evaluationFunction,
@@ -52,9 +52,7 @@ namespace LogManagement
         {
             if (queryExpression == null) return default(TResult);
 
-            ILogTriggerValueRetriever<TLogEntity> retriever = this;
-
-            return queryExpression.Compile().Invoke(retriever.TemporaryLogDataHolder);
+            return queryExpression.Compile().Invoke(TemporaryLogDataHolder);
         }
 
         public bool Evaluate(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger)
