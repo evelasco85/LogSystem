@@ -6,7 +6,7 @@ namespace LogManagement
 {
     public interface ILogTriggerInfo
     {
-        string RuleId { get; }
+        string TriggerId { get; }
     }
 
     public interface ILogTrigger<TLogEntity> : ILogTriggerInfo
@@ -17,22 +17,26 @@ namespace LogManagement
 
     public class LogTrigger<TLogEntity> : ILogTrigger<TLogEntity>
     {
-        public delegate bool EvaluateDelegate(string ruleId, TLogEntity logEntity, ILogRepository<TLogEntity> repository, ILogCreator logger);
-        public delegate void InvokeEventDelegate(string ruleId, TLogEntity logEntity, ILogRepository<TLogEntity> repository, ILogCreator logger);
+        public delegate bool EvaluateDelegate(string triggerId,
+            Func<Expression<Func<TLogEntity, dynamic>>, dynamic> getLogValue,
+            ILogRepository<TLogEntity> repository, ILogCreator logger);
+        public delegate void InvokeEventDelegate(string ruleId,
+            Func<Expression<Func<TLogEntity, dynamic>>, dynamic> getLogValue,
+            ILogRepository<TLogEntity> repository, ILogCreator logger);
 
-        private string _ruleId;
+        private string _triggerId;
         private EvaluateDelegate _evaluate;
         private InvokeEventDelegate _invokeEvent;
 
-        public string RuleId { get { return _ruleId; } }
+        public string TriggerId { get { return _triggerId; } }
 
-        public LogTrigger(string ruleId,
+        public LogTrigger(string triggerId,
             EvaluateDelegate evaluationFunction,
             InvokeEventDelegate invokeEvent)
         {
-            if(string.IsNullOrEmpty(ruleId)) throw new ArgumentNullException("'ruleId' parameter is required");
+            if(string.IsNullOrEmpty(triggerId)) throw new ArgumentNullException("'ruleId' parameter is required");
 
-            _ruleId = ruleId;
+            this._triggerId = triggerId;
             _evaluate = evaluationFunction;
             _invokeEvent = invokeEvent;
         }
@@ -41,14 +45,24 @@ namespace LogManagement
         {
             if (_evaluate == null) return false;
 
-            return _evaluate(_ruleId, logEntity, logRepository, logger);
+            Func<Expression<Func<TLogEntity, dynamic>>, dynamic> getLogValue = expr =>
+            {
+                return expr.Compile().Invoke(logEntity);
+            };
+
+            return _evaluate(_triggerId, getLogValue, logRepository, logger);
         }
 
         public void InvokeEvent(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger)
         {
             if (_invokeEvent == null) return;
 
-            _invokeEvent(_ruleId, logEntity, logRepository, logger);
+            Func<Expression<Func<TLogEntity, dynamic>>, dynamic> getLogValue = expr =>
+            {
+                return expr.Compile().Invoke(logEntity);
+            };
+
+            _invokeEvent(_triggerId, getLogValue, logRepository, logger);
         }
     }
 }

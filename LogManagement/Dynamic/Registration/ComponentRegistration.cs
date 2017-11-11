@@ -108,7 +108,7 @@ namespace LogManagement.Dynamic.Registration
                 .FirstOrDefault();
         }
 
-        public IList<Tuple<string, object>> GetObservedParameterValues<T>(T instance)
+        public IList<Tuple<string, object>> GetObservedParameterValues<T2>(T2 instance)
         {
             IList<Tuple<string, object>> parameters = new List<Tuple<string, object>>();
 

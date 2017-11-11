@@ -117,34 +117,38 @@ namespace LogManagementTests
         ILogTrigger<ILogEntry> GetSuccessfulValidationTrigger()
         {
             return new LogTrigger<ILogEntry>("0001",
-                (id, entity, repository, logger) =>
-                {
+                (triggerId, getLogValue, repository, logger) =>
+                { 
+                    IDictionary<string, object> parameters = getLogValue(log => log.Parameters);
+
                     /*Trigger Evaluation*/
                     IEnumerable<ILogEntry> result = repository
                         .Matching(new GetSuccessValidationDescriptionLogsQuery.Criteria());
 
-                    bool isMatched = result.Any() && (entity.Parameters["Description"].ToString() ==
+                    bool isMatched = result.Any() && (parameters["Description"].ToString() ==
                                                       GetSuccessValidationDescriptionLogsQuery.DESCRIPTION);
 
                     return isMatched;
                 },
-                (id, entity, repository, logger) =>
+                (triggerId, getLogValue, repository, logger) =>
                 {
                     /*Trigger Invocation*/
-                    _invokedRuleId = id;
+                    _invokedRuleId = triggerId;
                 });
         }
 
         ILogTrigger<ILogEntry> GetFailedInvocationTrigger()
         {
             return new LogTrigger<ILogEntry>("0002",
-                (id, entity, repository, logger) =>
+                (triggerId, getLogValue, repository, logger) =>
                 {
+                    Status status = getLogValue(log => log.Status);
+
                     /*Trigger Evaluation*/
                     IEnumerable<ILogEntry> result = repository
                         .Matching(new GetFailedInvocationLogsQuery.Criteria());
 
-                    bool isMatched = result.Any() && (entity.Status == GetFailedInvocationLogsQuery.FAILED_STATUS);
+                    bool isMatched = result.Any() && (status == GetFailedInvocationLogsQuery.FAILED_STATUS);
 
                     return isMatched;
                 },
