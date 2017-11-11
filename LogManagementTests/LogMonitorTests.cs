@@ -117,6 +117,10 @@ namespace LogManagementTests
         ILogTrigger<ILogEntry> GetSuccessfulValidationTrigger()
         {
             return new LogTrigger<ILogEntry>("0001",
+                (registerLogMemberAccess) =>
+                {
+                    registerLogMemberAccess(logField => logField.Parameters);
+                },
                 (triggerId, logRetriever, repository, logger) =>
                 { 
                     IDictionary<string, object> parameters = logRetriever.GetValue(log => log.Parameters);
@@ -130,7 +134,7 @@ namespace LogManagementTests
 
                     return isMatched;
                 },
-                (triggerId, getLogValue, repository, logger) =>
+                (triggerId, logRetriever, repository, logger) =>
                 {
                     /*Trigger Invocation*/
                     _invokedRuleId = triggerId;
@@ -140,6 +144,10 @@ namespace LogManagementTests
         ILogTrigger<ILogEntry> GetFailedInvocationTrigger()
         {
             return new LogTrigger<ILogEntry>("0002",
+                (registerLogMemberAccess) =>
+                {
+                    registerLogMemberAccess(logField => logField.Status);
+                },
                 (triggerId, logRetriever, repository, logger) =>
                 {
                     Status status = logRetriever.GetValue(log => log.Status);

@@ -23,6 +23,7 @@ namespace LogManagement
 
     public class LogTrigger<TLogEntity> : ILogTrigger<TLogEntity>
     {
+        public delegate void RegisterLogMemberAccessDelegate(Action<Expression<Func<TLogEntity, object>>> registerLogMemberToAccess);
         public delegate bool EvaluateDelegate(string triggerId,
             ILogTriggerValueRetriever<TLogEntity> logRetriever,
             ILogRepository<TLogEntity> repository, ILogCreator logger);
@@ -38,14 +39,24 @@ namespace LogManagement
         public TLogEntity TemporaryLogDataHolder { private get; set; }
 
         public LogTrigger(string triggerId,
-            EvaluateDelegate evaluationFunction,
+            RegisterLogMemberAccessDelegate registerLogMemberAccess,
+            EvaluateDelegate evaluation,
             InvokeEventDelegate invokeEvent)
         {
             if(string.IsNullOrEmpty(triggerId)) throw new ArgumentNullException("'ruleId' parameter is required");
 
-            this._triggerId = triggerId;
-            _evaluate = evaluationFunction;
+            _triggerId = triggerId;
+
+            if (registerLogMemberAccess != null)
+                registerLogMemberAccess(RegisterFieldAccess);
+
+            _evaluate = evaluation;
             _invokeEvent = invokeEvent;
+        }
+
+        void RegisterFieldAccess(Expression<Func<TLogEntity, object>> registerExpression)
+        {
+            //Register here
         }
 
         public TResult GetValue<TResult>(Expression<Func<TLogEntity, TResult>> queryExpression)
