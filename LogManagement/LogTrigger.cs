@@ -36,6 +36,8 @@ namespace LogManagement
 
         public string TriggerId { get { return _triggerId; } }
         TLogEntity _temporaryLogDataHolder;
+        List<string> _allowablePropertyAccess = new List<string>();
+        IList<string> _registeredPropertyAccess = new List<string>();
 
         public LogTrigger(string triggerId,
             RegisterLogPropertyAccessDelegate registerLogPropertyAccess,
@@ -45,6 +47,7 @@ namespace LogManagement
             if(string.IsNullOrEmpty(triggerId)) throw new ArgumentNullException("'ruleId' parameter is required");
 
             _triggerId = triggerId;
+            _allowablePropertyAccess.AddRange(GetAllowablePropertyAccess());
 
             if (registerLogPropertyAccess != null)
                 registerLogPropertyAccess(RegisterPropertyAccess);
@@ -53,21 +56,40 @@ namespace LogManagement
             _invokeEvent = invokeEvent;
         }
 
-        public static IList<string> GetAllowablePropertyAccessAccess()
+        public static IList<string> GetAllowablePropertyAccess()
         {
-            throw new NotImplementedException();
+            return new List<string>();
         }
 
         void RegisterPropertyAccess(Expression<Func<TLogEntity, object>> registerExpression)
         {
-            //Register here
+            //if (registerExpression == null) return;
+
+            //string propertyName = string.Empty;
+
+            //if (!_allowablePropertyAccess.Contains(propertyName))
+            //    throw new Exception(string.Format("Property '{0}' is not valid for registration", propertyName));
+
+            //if (_registeredPropertyAccess.Contains(propertyName)) return;
+
+            //_registeredPropertyAccess.Add(propertyName);
         }
 
         public TResult GetValue<TResult>(Expression<Func<TLogEntity, TResult>> queryExpression)
         {
             if (queryExpression == null) return default(TResult);
 
+            string propertyName = string.Empty;
+
+            //if (!AllowPropertyAccess(string.Empty))
+            //    throw new FieldAccessException(string.Format("Access to '{0}' property is not registered", propertyName));
+
             return queryExpression.Compile().Invoke(_temporaryLogDataHolder);
+        }
+
+        bool AllowPropertyAccess(string propertyName)
+        {
+            return true;
         }
 
         public bool Process(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger)
