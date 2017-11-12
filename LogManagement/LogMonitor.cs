@@ -38,7 +38,7 @@ namespace LogManagement
         //Analyze specific log entities
         public void Evaluate(TLogEntity logEntity)
         {
-            IList<ILogTriggerInfo> listOfTriggeredTriggers = new List<ILogTriggerInfo>();
+            IList<ILogTriggerInfo> listOfTriggersProcessed = new List<ILogTriggerInfo>();
 
             for (int index = 0; index < _triggers.Count; index++)
             {
@@ -46,18 +46,15 @@ namespace LogManagement
 
                 if(trigger == null) continue;
 
-                bool mustInvoke = trigger.Evaluate(logEntity, _logRepository, _logger);
-
-                if (mustInvoke)
+                if (trigger.Process(logEntity, _logRepository, _logger))
                 {
-                    trigger.InvokeEvent(logEntity, _logRepository, _logger);
-                    listOfTriggeredTriggers.Add(trigger);
+                    listOfTriggersProcessed.Add(trigger);
 
                     if (TriggerInvocationComplete != null) TriggerInvocationComplete(trigger, _logger, logEntity, _logRepository);
                 }
             }
 
-            if (LogEvaluationComplete != null) LogEvaluationComplete(listOfTriggeredTriggers, logEntity, _logRepository);
+            if (LogEvaluationComplete != null) LogEvaluationComplete(listOfTriggersProcessed, logEntity, _logRepository);
         }
 
         //Analyze all log entities in log repository

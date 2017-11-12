@@ -1,6 +1,7 @@
 ﻿using System;
 using LogManagement.Managers;
 using System.Linq.Expressions;
+using System.Collections.Generic;
 
 namespace LogManagement
 {
@@ -11,19 +12,17 @@ namespace LogManagement
 
     public interface ILogTriggerValueRetriever<TLogEntity>
     {
-        TLogEntity TemporaryLogDataHolder { set; }
         TResult GetValue<TResult>(Expression<Func<TLogEntity, TResult>> queryExpression);
     }
 
     public interface ILogTrigger<TLogEntity> : ILogTriggerInfo, ILogTriggerValueRetriever<TLogEntity>
     {
-        bool Evaluate(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger);
-        void InvokeEvent(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger);
+        bool Process(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger);
     }
 
     public class LogTrigger<TLogEntity> : ILogTrigger<TLogEntity>
     {
-        public delegate void RegisterLogMemberAccessDelegate(Action<Expression<Func<TLogEntity, object>>> registerLogMemberToAccess);
+        public delegate void RegisterLogPropertyAccessDelegate(Action<Expression<Func<TLogEntity, object>>> registerLogPropertyToAccess);
         public delegate bool EvaluateDelegate(string triggerId,
             ILogTriggerValueRetriever<TLogEntity> logRetriever,
             ILogRepository<TLogEntity> repository, ILogCreator logger);
@@ -36,10 +35,10 @@ namespace LogManagement
         private InvokeEventDelegate _invokeEvent;
 
         public string TriggerId { get { return _triggerId; } }
-        public TLogEntity TemporaryLogDataHolder { private get; set; }
+        TLogEntity _temporaryLogDataHolder;
 
         public LogTrigger(string triggerId,
-            RegisterLogMemberAccessDelegate registerLogMemberAccess,
+            RegisterLogPropertyAccessDelegate registerLogPropertyAccess,
             EvaluateDelegate evaluation,
             InvokeEventDelegate invokeEvent)
         {
@@ -47,14 +46,19 @@ namespace LogManagement
 
             _triggerId = triggerId;
 
-            if (registerLogMemberAccess != null)
-                registerLogMemberAccess(RegisterFieldAccess);
+            if (registerLogPropertyAccess != null)
+                registerLogPropertyAccess(RegisterPropertyAccess);
 
             _evaluate = evaluation;
             _invokeEvent = invokeEvent;
         }
 
-        void RegisterFieldAccess(Expression<Func<TLogEntity, object>> registerExpression)
+        public static IList<string> GetAllowablePropertyAccessAccess()
+        {
+            throw new NotImplementedException();
+        }
+
+        void RegisterPropertyAccess(Expression<Func<TLogEntity, object>> registerExpression)
         {
             //Register here
         }
@@ -63,35 +67,34 @@ namespace LogManagement
         {
             if (queryExpression == null) return default(TResult);
 
-            return queryExpression.Compile().Invoke(TemporaryLogDataHolder);
+            return queryExpression.Compile().Invoke(_temporaryLogDataHolder);
         }
 
-        public bool Evaluate(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger)
+        public bool Process(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger)
+        {
+            _temporaryLogDataHolder = logEntity;
+
+            if (Evaluate(logRepository, logger))
+            {
+                InvokeEvent(logRepository, logger);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        bool Evaluate(ILogRepository<TLogEntity> logRepository, ILogCreator logger)
         {
             if (_evaluate == null) return false;
-
-            ILogTriggerValueRetriever<TLogEntity> retriever = this;
-
-            retriever.TemporaryLogDataHolder = logEntity;
-
-            bool matched = _evaluate(_triggerId, retriever, logRepository, logger);
-
-            retriever.TemporaryLogDataHolder = default(TLogEntity);
-
-            return matched;
+            else return _evaluate(_triggerId, this, logRepository, logger);
         }
 
-        public void InvokeEvent(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger)
+        void InvokeEvent(ILogRepository<TLogEntity> logRepository, ILogCreator logger)
         {
             if (_invokeEvent == null) return;
 
-            ILogTriggerValueRetriever<TLogEntity> retriever = this;
-
-            retriever.TemporaryLogDataHolder = logEntity;
-
-            _invokeEvent(_triggerId, retriever, logRepository, logger);
-
-            retriever.TemporaryLogDataHolder = default(TLogEntity);
+            _invokeEvent(_triggerId, this, logRepository, logger);
         }
     }
 }
