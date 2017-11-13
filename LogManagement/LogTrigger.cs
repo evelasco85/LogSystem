@@ -2,6 +2,8 @@
 using LogManagement.Managers;
 using System.Linq.Expressions;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace LogManagement
 {
@@ -58,7 +60,11 @@ namespace LogManagement
 
         public static IList<string> GetAllowablePropertyAccess()
         {
-            return new List<string>();
+            BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+            Type entityType = typeof(TLogEntity);
+            IList<PropertyInfo> properties = entityType.GetProperties(flags);
+
+            return properties.Select(property => property.Name).ToList();
         }
 
         void RegisterPropertyAccess(Expression<Func<TLogEntity, object>> registerExpression)
@@ -93,6 +99,7 @@ namespace LogManagement
 
             return property.Member.Name;
         }
+
 
         bool AllowPropertyAccess(string propertyName)
         {
