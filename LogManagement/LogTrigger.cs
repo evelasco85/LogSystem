@@ -49,7 +49,7 @@ namespace LogManagement
             if(string.IsNullOrEmpty(triggerId)) throw new ArgumentNullException("'ruleId' parameter is required");
 
             _triggerId = triggerId;
-            _allowablePropertyAccess.AddRange(GetAllowablePropertyAccess());
+            _allowablePropertyAccess.AddRange(GetAllowablePropertyAccess());        //ToDo: Find efficient implement to call once per-type
 
             if (registerLogPropertyAccess != null)
                 registerLogPropertyAccess(RegisterPropertyAccess);
@@ -96,6 +96,8 @@ namespace LogManagement
         string GetMemberName<TEntity>(Expression<Func<TEntity, object>> propertyToSearch)
         {
             MemberExpression property = (propertyToSearch.Body as MemberExpression);
+
+            if ((property == null) || (property.Member == null)) return string.Empty;
 
             return property.Member.Name;
         }
