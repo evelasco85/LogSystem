@@ -87,6 +87,13 @@ namespace LogManagement
             return queryExpression.Compile().Invoke(_temporaryLogDataHolder);
         }
 
+        string GetMemberName<TEntity>(Expression<Func<TEntity, object>> propertyToSearch)
+        {
+            MemberExpression property = (propertyToSearch.Body as MemberExpression);
+
+            return property.Member.Name;
+        }
+
         bool AllowPropertyAccess(string propertyName)
         {
             return true;
