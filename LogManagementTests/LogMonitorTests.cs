@@ -117,19 +117,13 @@ namespace LogManagementTests
         ILogTrigger<ILogEntry> GetSuccessfulValidationTrigger()
         {
             return new LogTrigger<ILogEntry>("0001",
-                (registerLogMemberAccess) =>
-                {
-                    registerLogMemberAccess(logField => logField.Parameters);
-                },
-                (triggerId, logRetriever, repository, logger) =>
+                (triggerId, logEntity, repository, logger) =>
                 { 
-                    IDictionary<string, object> parameters = logRetriever.GetValue(log => log.Parameters);
-
                     /*Trigger Evaluation*/
                     IEnumerable<ILogEntry> result = repository
                         .Matching(new GetSuccessValidationDescriptionLogsQuery.Criteria());
 
-                    bool isMatched = result.Any() && (parameters["Description"].ToString() ==
+                    bool isMatched = result.Any() && (logEntity.Parameters["Description"].ToString() ==
                                                       GetSuccessValidationDescriptionLogsQuery.DESCRIPTION);
 
                     return isMatched;
@@ -144,19 +138,13 @@ namespace LogManagementTests
         ILogTrigger<ILogEntry> GetFailedInvocationTrigger()
         {
             return new LogTrigger<ILogEntry>("0002",
-                (registerLogMemberAccess) =>
+                (triggerId, logEntity, repository, logger) =>
                 {
-                    registerLogMemberAccess(logField => logField.Status);
-                },
-                (triggerId, logRetriever, repository, logger) =>
-                {
-                    Status status = logRetriever.GetValue(log => log.Status);
-
                     /*Trigger Evaluation*/
                     IEnumerable<ILogEntry> result = repository
                         .Matching(new GetFailedInvocationLogsQuery.Criteria());
 
-                    bool isMatched = result.Any() && (status == GetFailedInvocationLogsQuery.FAILED_STATUS);
+                    bool isMatched = result.Any() && (logEntity.Status == GetFailedInvocationLogsQuery.FAILED_STATUS);
 
                     return isMatched;
                 },

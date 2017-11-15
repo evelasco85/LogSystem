@@ -12,24 +12,18 @@ namespace LogManagement
         string TriggerId { get; }
     }
 
-    public interface ILogTriggerValueRetriever<TLogEntity>
-    {
-        TResult GetValue<TResult>(Expression<Func<TLogEntity, TResult>> queryExpression);
-    }
-
-    public interface ILogTrigger<TLogEntity> : ILogTriggerInfo, ILogTriggerValueRetriever<TLogEntity>
+    public interface ILogTrigger<TLogEntity> : ILogTriggerInfo
     {
         bool Process(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger);
     }
 
     public class LogTrigger<TLogEntity> : ILogTrigger<TLogEntity>
     {
-        public delegate void RegisterLogPropertyAccessDelegate(Action<Expression<Func<TLogEntity, object>>> registerLogPropertyToAccess);
         public delegate bool EvaluateDelegate(string triggerId,
-            ILogTriggerValueRetriever<TLogEntity> logRetriever,
+            TLogEntity logEntity,
             ILogRepository<TLogEntity> repository, ILogCreator logger);
         public delegate void InvokeEventDelegate(string ruleId,
-            ILogTriggerValueRetriever<TLogEntity> logRetriever,
+            TLogEntity logEntity,
             ILogRepository<TLogEntity> repository, ILogCreator logger);
 
         private string _triggerId;
@@ -37,102 +31,30 @@ namespace LogManagement
         private InvokeEventDelegate _invokeEvent;
 
         public string TriggerId { get { return _triggerId; } }
-        TLogEntity _temporaryLogDataHolder;
-        List<string> _allowablePropertyAccess = new List<string>();
-        IList<string> _registeredPropertyAccess = new List<string>();
 
         public LogTrigger(string triggerId,
-            RegisterLogPropertyAccessDelegate registerLogPropertyAccess,
             EvaluateDelegate evaluation,
             InvokeEventDelegate invokeEvent)
         {
             if(string.IsNullOrEmpty(triggerId)) throw new ArgumentNullException("'ruleId' parameter is required");
 
             _triggerId = triggerId;
-            _allowablePropertyAccess.AddRange(GetAllowablePropertyAccess());        //ToDo: Find efficient implement to call once per-type
-
-            if (registerLogPropertyAccess != null)
-                registerLogPropertyAccess(RegisterPropertyAccess);
-
             _evaluate = evaluation;
             _invokeEvent = invokeEvent;
         }
 
-        public static IList<string> GetAllowablePropertyAccess()
-        {
-            BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            Type entityType = typeof(TLogEntity);
-            IList<PropertyInfo> properties = entityType.GetProperties(flags);
-
-            return properties.Select(property => property.Name).ToList();
-        }
-
-        void RegisterPropertyAccess(Expression<Func<TLogEntity, object>> registerExpression)
-        {
-            //if (registerExpression == null) return;
-
-            //string propertyName = string.Empty;
-
-            //if (!_allowablePropertyAccess.Contains(propertyName))
-            //    throw new Exception(string.Format("Property '{0}' is not valid for registration", propertyName));
-
-            //if (_registeredPropertyAccess.Contains(propertyName)) return;
-
-            //_registeredPropertyAccess.Add(propertyName);
-        }
-
-        public TResult GetValue<TResult>(Expression<Func<TLogEntity, TResult>> queryExpression)
-        {
-            if (queryExpression == null) return default(TResult);
-
-            string propertyName = string.Empty;
-
-            //if (!AllowPropertyAccess(string.Empty))
-            //    throw new FieldAccessException(string.Format("Access to '{0}' property is not registered", propertyName));
-
-            return queryExpression.Compile().Invoke(_temporaryLogDataHolder);
-        }
-
-        string GetMemberName<TEntity>(Expression<Func<TEntity, object>> propertyToSearch)
-        {
-            MemberExpression property = (propertyToSearch.Body as MemberExpression);
-
-            if ((property == null) || (property.Member == null)) return string.Empty;
-
-            return property.Member.Name;
-        }
-
-
-        bool AllowPropertyAccess(string propertyName)
-        {
-            return true;
-        }
-
         public bool Process(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger)
         {
-            _temporaryLogDataHolder = logEntity;
+            if (_evaluate == null) return false;
 
-            if (Evaluate(logRepository, logger))
+            if (_evaluate(_triggerId, logEntity, logRepository, logger) && (_invokeEvent != null))
             {
-                InvokeEvent(logRepository, logger);
+                _invokeEvent(_triggerId, logEntity, logRepository, logger);
 
                 return true;
             }
 
             return false;
-        }
-
-        bool Evaluate(ILogRepository<TLogEntity> logRepository, ILogCreator logger)
-        {
-            if (_evaluate == null) return false;
-            else return _evaluate(_triggerId, this, logRepository, logger);
-        }
-
-        void InvokeEvent(ILogRepository<TLogEntity> logRepository, ILogCreator logger)
-        {
-            if (_invokeEvent == null) return;
-
-            _invokeEvent(_triggerId, this, logRepository, logger);
         }
     }
 }
