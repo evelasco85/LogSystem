@@ -22,7 +22,7 @@ namespace LogManagement
         public delegate bool EvaluateDelegate(string triggerId,
             TLogEntity logEntity,
             ILogRepository<TLogEntity> repository, ILogCreator logger);
-        public delegate void InvokeEventDelegate(string ruleId,
+        public delegate void InvokeEventDelegate(string triggerId,
             TLogEntity logEntity,
             ILogRepository<TLogEntity> repository, ILogCreator logger);
 
