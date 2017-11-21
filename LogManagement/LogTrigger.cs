@@ -1,9 +1,4 @@
 ﻿using System;
-using LogManagement.Managers;
-using System.Linq.Expressions;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace LogManagement
 {
@@ -14,17 +9,17 @@ namespace LogManagement
 
     public interface ILogTrigger<TLogEntity> : ILogTriggerInfo
     {
-        bool Process(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger);
+        bool Process(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository);
     }
 
     public class LogTrigger<TLogEntity> : ILogTrigger<TLogEntity>
     {
         public delegate bool EvaluateDelegate(string triggerId,
             TLogEntity logEntity,
-            ILogRepository<TLogEntity> repository, ILogCreator logger);
+            ILogRepository<TLogEntity> repository);
         public delegate void InvokeEventDelegate(string triggerId,
             TLogEntity logEntity,
-            ILogRepository<TLogEntity> repository, ILogCreator logger);
+            ILogRepository<TLogEntity> repository);
 
         private string _triggerId;
         private EvaluateDelegate _evaluate;
@@ -43,13 +38,13 @@ namespace LogManagement
             _invokeEvent = invokeEvent;
         }
 
-        public bool Process(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository, ILogCreator logger)
+        public bool Process(TLogEntity logEntity, ILogRepository<TLogEntity> logRepository)
         {
             if (_evaluate == null) return false;
 
-            if (_evaluate(_triggerId, logEntity, logRepository, logger) && (_invokeEvent != null))
+            if (_evaluate(_triggerId, logEntity, logRepository) && (_invokeEvent != null))
             {
-                _invokeEvent(_triggerId, logEntity, logRepository, logger);
+                _invokeEvent(_triggerId, logEntity, logRepository);
 
                 return true;
             }

@@ -117,7 +117,7 @@ namespace LogManagementTests
         ILogTrigger<ILogEntry> GetSuccessfulValidationTrigger()
         {
             return new LogTrigger<ILogEntry>("0001",
-                (triggerId, logEntity, repository, logger) =>
+                (triggerId, logEntity, repository) =>
                 { 
                     /*Trigger Evaluation*/
                     IEnumerable<ILogEntry> result = repository
@@ -128,7 +128,7 @@ namespace LogManagementTests
 
                     return isMatched;
                 },
-                (triggerId, logRetriever, repository, logger) =>
+                (triggerId, logRetriever, repository) =>
                 {
                     /*Trigger Invocation*/
                     _invokedRuleId = triggerId;
@@ -138,7 +138,7 @@ namespace LogManagementTests
         ILogTrigger<ILogEntry> GetFailedInvocationTrigger()
         {
             return new LogTrigger<ILogEntry>("0002",
-                (triggerId, logEntity, repository, logger) =>
+                (triggerId, logEntity, repository) =>
                 {
                     /*Trigger Evaluation*/
                     IEnumerable<ILogEntry> result = repository
@@ -148,7 +148,7 @@ namespace LogManagementTests
 
                     return isMatched;
                 },
-                (triggerId, logRetriever, repository, logger) =>
+                (triggerId, logRetriever, repository) =>
                 {
                     /*Trigger Invocation*/
                     _invokedRuleId = triggerId;
