@@ -110,6 +110,16 @@ namespace LogManagementTests
             };
 
             _logMonitor = new LogMonitor<ILogEntry>(_manager, _logRepository, triggers);
+
+            _logMonitor.LogEvaluationComplete = (list, entity, repository, logger) =>
+            {
+                //Completed per-log evaluation
+            };
+
+            _logMonitor.TriggerInvocationComplete = (info, entity, repository, logger) =>
+            {
+                //Completed per-trigger invoked in log evaluation
+            };
         }
 #endregion
 
@@ -128,7 +138,7 @@ namespace LogManagementTests
 
                     return isMatched;
                 },
-                (triggerId, logRetriever, repository) =>
+                (triggerId, entity, repository) =>
                 {
                     /*Trigger Invocation*/
                     _invokedRuleId = triggerId;
@@ -148,7 +158,7 @@ namespace LogManagementTests
 
                     return isMatched;
                 },
-                (triggerId, logRetriever, repository) =>
+                (triggerId, logEntity, repository) =>
                 {
                     /*Trigger Invocation*/
                     _invokedRuleId = triggerId;
