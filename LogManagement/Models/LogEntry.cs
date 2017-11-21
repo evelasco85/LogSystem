@@ -43,6 +43,7 @@ namespace LogManagement.Models
 
         /// <summary>
         /// Shows deviation from expectation
+        /// e.g. Assertion failures
         /// </summary>
         Notice = 3,
 

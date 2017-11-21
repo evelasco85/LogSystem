@@ -1,0 +1,22 @@
+﻿*Class Declaration
+--Declare 'IStaticLogEntryWrapper' instance as private
+
+*Class Constructor
+--Specify event
+--Specify params(if any)
+--Emit log with 'LogOutputType.All'
+
+*Method Invocation
+--Method entry
+----Specify event
+------Emit log with 'LogOutputType.Event' and 'Priority.Info'
+----Specify params(inputs)
+------Emit log with 'LogOutputType.Params' and 'Priority.Debug'
+--Method exit
+----Specify params(results)
+------Emit log with 'LogOutputType.Params' and 'Priority.Debug'
+
+*Exception
+--On Catch
+----Specify necessary params(inputs and/or results)
+----Emit log with 'LogOutputType.All' and 'Status.Failure' and 'Priority.Critical'

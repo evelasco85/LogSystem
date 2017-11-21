@@ -60,6 +60,7 @@
     <Compile Include="LogInserter.cs" />
     <Compile Include="LogQueryObject.cs" />
     <Compile Include="LogRepository.cs" />
+    <Content Include="00 - SUGGESTIONS.txt" />
     <Content Include="ComplexLogTrigger.cs.txt" />
     <Compile Include="LogTrigger.cs" />
     <Compile Include="Managers\LogManager.cs" />
