@@ -1,10 +1,11 @@
 ﻿*Class Declaration
 --Declare 'IStaticLogEntryWrapper' instance as private
+--Component is class-name
 
 *Class Constructor
---Specify event
+--Specify event(if any)
 --Specify params(if any)
---Emit log with 'LogOutputType.All'
+--Emit log with 'LogOutputType.All' and 'Priority.Info'
 
 *Method Invocation
 --Method entry
@@ -20,3 +21,12 @@
 --On Catch
 ----Specify necessary params(inputs and/or results)
 ----Emit log with 'LogOutputType.All' and 'Status.Failure' and 'Priority.Critical'
+
+[Summary]
+*Class
+--Constructor [EmitLog(LogOutputType.All, Priority.Info, Status.Success)]
+--Method
+-----Entry [EmitLog(LogOutputType.Event, Priority.Info, Status.Success)]
+-------Body [EmitLog(LogOutputType.Params, Priority.Debug, Status.Success)]
+-------Exception/Catch [EmitLog(LogOutputType.All, Priority.Critical, Status.Failure)]
+-----Exit [EmitLog(LogOutputType.Params, Priority.Debug, Status.Success)]
