@@ -20,12 +20,12 @@ namespace LogManagementTests
         private ILogInserter<ILogEntry> _logInserter;
         private ILogMonitor<ILogEntry> _logMonitor;
         private ILogManager _manager = LogManager.GetInstance();
-        private string _invokedRuleId = string.Empty;
+        private string _lastTriggerIdInvoked = string.Empty;
         private IProducerConsumerLogQueue<ILogEntry> _logProcessorQueue;
 
         private string _businessTransactionId = "123";
         private string _sessionId = "abc";
-        private string _user = String.Empty;
+        private string _user = "sa";
 
         public LogMonitorTests()
         {
@@ -76,8 +76,7 @@ namespace LogManagementTests
         {
             _logRepository = new LogRepository<ILogEntry>(new List<IBaseLogQueryObject<ILogEntry>>
             {
-                {new GetFailedInvocationLogsQuery(_inMemoryLogEntries)},
-                {new GetSuccessValidationDescriptionLogsQuery(_inMemoryLogEntries)},
+                {new GetFailedLoginAttemptsQuery(_inMemoryLogEntries)},
             });
         }
 
@@ -92,7 +91,9 @@ namespace LogManagementTests
                 {
                     /*Insert*/
                     _inMemoryLogEntries.Add(logEntityToAdd);
+
                     Debug.WriteLine(JsonConvert.SerializeObject(logEntityToAdd));
+                    Console.WriteLine(JsonConvert.SerializeObject(logEntityToAdd));
                 },
                 (addedLogEntity, postInsertRepository) =>
                 {
@@ -105,8 +106,8 @@ namespace LogManagementTests
         {
             List<ILogTrigger<ILogEntry>> triggers = new List<ILogTrigger<ILogEntry>>
             {
-                GetSuccessfulValidationTrigger(),
-                GetFailedInvocationTrigger(),
+                GetFailedLoginTrigger(),
+                GetAccountLockoutTrigger(),
             };
 
             _logMonitor = new LogMonitor<ILogEntry>(_manager, _logRepository, triggers);
@@ -114,54 +115,66 @@ namespace LogManagementTests
             _logMonitor.LogEvaluationComplete = (list, entity, repository, logger) =>
             {
                 //Completed per-log evaluation
+
+                Debug.WriteLine("Trigger(s) invoked against log entry");
+                Console.WriteLine("Trigger(s) invoked against log entry");
+
+                for (int index = 0; index < list.Count; index++)
+                {
+                    ILogTriggerInfo triggerInvoked = list[index];
+                    string description = string.Format("Trigger Id Invoked: {0}", triggerInvoked.TriggerId);
+
+                    Debug.WriteLine(description);
+                    Console.WriteLine(description);
+                }
             };
 
             _logMonitor.TriggerInvocationComplete = (info, entity, repository, logger) =>
             {
                 //Completed per-trigger invoked in log evaluation
+
+                _lastTriggerIdInvoked = info.TriggerId;
             };
         }
 #endregion
 
         #region Triggers
-        ILogTrigger<ILogEntry> GetSuccessfulValidationTrigger()
+        ILogTrigger<ILogEntry> GetFailedLoginTrigger()
         {
             return new LogTrigger<ILogEntry>("0001",
                 (triggerId, logEntity, repository) =>
                 { 
                     /*Trigger Evaluation*/
-                    IEnumerable<ILogEntry> result = repository
-                        .Matching(new GetSuccessValidationDescriptionLogsQuery.Criteria());
-
-                    bool isMatched = result.Any() && (logEntity.Parameters["Description"].ToString() ==
-                                                      GetSuccessValidationDescriptionLogsQuery.DESCRIPTION);
-
-                    return isMatched;
+                    return logEntity.Event == "Invalid Login";
                 },
                 (triggerId, entity, repository) =>
                 {
                     /*Trigger Invocation*/
-                    _invokedRuleId = triggerId;
+
+                    Debug.WriteLine(JsonConvert.SerializeObject(entity));
+                    Console.WriteLine(JsonConvert.SerializeObject(entity));
                 });
         }
 
-        ILogTrigger<ILogEntry> GetFailedInvocationTrigger()
+        ILogTrigger<ILogEntry> GetAccountLockoutTrigger()
         {
             return new LogTrigger<ILogEntry>("0002",
                 (triggerId, logEntity, repository) =>
                 {
                     /*Trigger Evaluation*/
                     IEnumerable<ILogEntry> result = repository
-                        .Matching(new GetFailedInvocationLogsQuery.Criteria());
+                        .Matching(new GetFailedLoginAttemptsQuery.Criteria());
 
-                    bool isMatched = result.Any() && (logEntity.Status == GetFailedInvocationLogsQuery.FAILED_STATUS);
+                    bool isLockout = result.Count() >= 3;
 
-                    return isMatched;
+                    return isLockout;
                 },
                 (triggerId, logEntity, repository) =>
                 {
                     /*Trigger Invocation*/
-                    _invokedRuleId = triggerId;
+
+                    Debug.WriteLine(JsonConvert.SerializeObject(logEntity));
+                    Console.WriteLine(JsonConvert.SerializeObject(logEntity));
                 });
         }
 #endregion
@@ -190,46 +203,50 @@ namespace LogManagementTests
         #endregion 
 
         [TestMethod]
-        public void TestMethod1()
+        public void TestMultipleLoginAttempt()
         {
             IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager)
             {
                 System = "Security System",
                 Application = "Security Tester",
                 Component = "Authentication Component",
-                Event = "Validation"
             };
 
-            _user = "sa";
-
             staticLogCreator
-                .AddParameters("Description", "Validation has been invoked successfully")
-                .EmitLog(Priority.Info, Status.Success);
+                .SetEvent("Invalid Login")
+                .EmitLog(Priority.Warning, Status.Failure);     //First attempt
+            staticLogCreator
+                .SetEvent("Invalid Login")
+                .EmitLog(Priority.Warning, Status.Failure);     //Second attempt
 
-            while (!_logProcessorQueue.IsEmpty) ;     //Wait for queue to complete
+            while (!_logProcessorQueue.IsEmpty) ;     //Wait for queue to complete(optional, but required during this test)
 
-            Assert.AreEqual("0001", _invokedRuleId);
+            Assert.AreEqual("0001", _lastTriggerIdInvoked);
         }
 
         [TestMethod]
-        public void TestMethod2()
+        public void TestLockout()
         {
             IStaticLogEntryWrapper staticLogCreator = new StaticLogEntryWrapper(_manager)
             {
                 System = "Security System",
                 Application = "Security Tester",
                 Component = "Authentication Component",
-                Event = "Validation"
             };
 
-            _user = "sa";
+            staticLogCreator
+                .SetEvent("Invalid Login")
+                .EmitLog(Priority.Warning, Status.Failure);     //First attempt
+            staticLogCreator
+                .SetEvent("Invalid Login")
+                .EmitLog(Priority.Warning, Status.Failure);     //Second attempt
+            staticLogCreator
+                .SetEvent("Invalid Login")
+                .EmitLog(Priority.Warning, Status.Failure);     //Third attempt.... LOCKOUT INVOCATION!!!
 
-            staticLogCreator.EmitLog(Priority.Info, Status.Failure);
-            staticLogCreator.EmitLog(Priority.Info, Status.Failure);
+            while (!_logProcessorQueue.IsEmpty) ;     //Wait for queue to complete(optional, but required during this test)
 
-            while (!_logProcessorQueue.IsEmpty) ;     //Wait for queue to complete
-
-            Assert.AreEqual("0002", _invokedRuleId);
+            Assert.AreEqual("0002", _lastTriggerIdInvoked);
         }
     }
 }

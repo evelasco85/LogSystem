@@ -58,8 +58,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Implementations\Authentication.cs" />
-    <Compile Include="Implementations\GetSuccessValidationDescriptionLogsQuery.cs" />
-    <Compile Include="Implementations\GetFailedInvocationLogsQuery.cs" />
+    <Compile Include="Implementations\GetFailedLoginAttemptsQuery.cs" />
     <Compile Include="Implementations\SecurityCredential.cs" />
     <Compile Include="Dynamic\ActivityManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

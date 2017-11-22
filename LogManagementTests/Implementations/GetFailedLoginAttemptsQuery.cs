@@ -6,13 +6,13 @@ using LogManagement.Models;
 
 namespace LogManagementTests.Implementations
 {
-    public class GetFailedInvocationLogsQuery : BaseLogQueryObject<ILogEntry, GetFailedInvocationLogsQuery.Criteria>
+    public class GetFailedLoginAttemptsQuery : BaseLogQueryObject<ILogEntry, GetFailedLoginAttemptsQuery.Criteria>
     {
-        public const Status FAILED_STATUS = Status.Failure;
+        public const String INVALID_LOGIN = "Invalid Login";
 
         private IList<ILogEntry> _inMemoryLogEntries;
 
-        public GetFailedInvocationLogsQuery(IList<ILogEntry> inMemoryLogEntries)
+        public GetFailedLoginAttemptsQuery(IList<ILogEntry> inMemoryLogEntries)
         {
             _inMemoryLogEntries = inMemoryLogEntries;
         }
@@ -24,7 +24,7 @@ namespace LogManagementTests.Implementations
         public override IEnumerable<ILogEntry> PerformSearchOperation(Criteria searchInput)
         {
             return _inMemoryLogEntries
-                .Where(log => (log.Status == FAILED_STATUS));
+                .Where(log => (log.Event == INVALID_LOGIN));
         }
     }
 }
