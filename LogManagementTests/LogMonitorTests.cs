@@ -9,6 +9,7 @@ using LogManagement.ProducerConsumerLogQueue;
 using LogManagementTests.Implementations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using NLog;
 
 namespace LogManagementTests
 {
@@ -16,11 +17,15 @@ namespace LogManagementTests
     public class LogMonitorTests
     {
         private List<ILogEntry> _inMemoryLogEntries = new List<ILogEntry>();
+
+        private Logger _nLogger = NLog.LogManager.GetLogger("LogMonitorTests");
+
         private ILogRepository<ILogEntry> _logRepository;
         private ILogInserter<ILogEntry> _logInserter;
         private ILogMonitor<ILogEntry> _logMonitor;
-        private ILogManager _manager = LogManager.GetInstance();
+        private ILogManager _manager = LogManagement.Managers.LogManager.GetInstance();
         private IProducerConsumerLogQueue<ILogEntry> _logProcessorQueue;
+
         private bool _isLockout = false;
         private int _failedLoginCount = 0;
 
@@ -97,6 +102,28 @@ namespace LogManagementTests
                     _inMemoryLogEntries.Add(logEntityToAdd);
 
                     string description = string.Format("Log: {0}", JsonConvert.SerializeObject(logEntityToAdd));
+
+                    switch(logEntityToAdd.Priority)
+                    {
+                        case Priority.Debug:
+                            _nLogger.Log(LogLevel.Debug, description);
+                            break;
+                        case Priority.Info:
+                            _nLogger.Log(LogLevel.Info, description);
+                            break;
+                        case Priority.Notice:
+                        case Priority.Warning:
+                            _nLogger.Log(LogLevel.Warn, description);
+                            break;
+                        case Priority.Error:
+                            _nLogger.Log(LogLevel.Error, description);
+                            break;
+                        case Priority.Critical:
+                        case Priority.Alert:
+                        case Priority.Emergency:
+                            _nLogger.Log(LogLevel.Fatal, description);
+                            break;
+                    }
 
                     Debug.WriteLine(string.Empty);
                     Debug.WriteLine(description);
