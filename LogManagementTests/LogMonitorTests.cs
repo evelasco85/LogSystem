@@ -20,7 +20,6 @@ namespace LogManagementTests
         private ILogInserter<ILogEntry> _logInserter;
         private ILogMonitor<ILogEntry> _logMonitor;
         private ILogManager _manager = LogManager.GetInstance();
-        private string _lastTriggerIdInvoked = string.Empty;
         private IProducerConsumerLogQueue<ILogEntry> _logProcessorQueue;
         private bool _isLockout = false;
         private int _failedLoginCount = 0;
@@ -97,8 +96,12 @@ namespace LogManagementTests
                     /*Insert*/
                     _inMemoryLogEntries.Add(logEntityToAdd);
 
-                    Debug.WriteLine(JsonConvert.SerializeObject(logEntityToAdd));
-                    Console.WriteLine(JsonConvert.SerializeObject(logEntityToAdd));
+                    string description = string.Format("Log: {0}", JsonConvert.SerializeObject(logEntityToAdd));
+
+                    Debug.WriteLine(string.Empty);
+                    Debug.WriteLine(description);
+                    Console.WriteLine(string.Empty);
+                    Console.WriteLine(description);
                 },
                 (addedLogEntity, postInsertRepository) =>
                 {
@@ -121,13 +124,15 @@ namespace LogManagementTests
             {
                 //Completed per-log evaluation
 
-                Debug.WriteLine(">>Trigger(s) invoked against log entry");
-                Console.WriteLine(">>Trigger(s) invoked against log entry");
+                string descriptionHeader = ">>[Trigger(s) invoked against log entry]";
+
+                Debug.WriteLine(descriptionHeader);
+                Console.WriteLine(descriptionHeader);
 
                 for (int index = 0; index < list.Count; index++)
                 {
                     ILogTriggerInfo triggerInvoked = list[index];
-                    string description = string.Format(">>>>Trigger Id Invoked: {0}", triggerInvoked.TriggerId);
+                    string description = string.Format(">>***Trigger Id Invoked: {0}", triggerInvoked.TriggerId);
 
                     Debug.WriteLine(description);
                     Console.WriteLine(description);
@@ -138,7 +143,21 @@ namespace LogManagementTests
             {
                 //Completed per-trigger invoked in log evaluation
 
-                _lastTriggerIdInvoked = info.TriggerId;
+                string description = string.Format(">>Trigger Id: {1} | Failed login count: {0:00}",
+                    _failedLoginCount,
+                    info.TriggerId);
+
+                Debug.WriteLine(description);
+                Console.WriteLine(description);
+
+                if (_isLockout)
+                {
+                    string lockoutMessage = ">>>!!!Lockout was performed!!!<<<";
+
+                    Debug.WriteLine(lockoutMessage);
+                    Console.WriteLine(lockoutMessage);
+                }
+
             };
         }
 #endregion
@@ -197,7 +216,7 @@ namespace LogManagementTests
 
                 _logProcessorQueue = null;
 
-                string message = "Log processor queue disposed";
+                string message = "[Log processor queue disposed]";
 
                 Debug.WriteLine(message);
                 Console.WriteLine(message);
@@ -224,8 +243,8 @@ namespace LogManagementTests
 
             while (!_logProcessorQueue.IsEmpty) ;     //Wait for queue to complete(optional, but required during this test)
 
-            Assert.AreEqual("0001", _lastTriggerIdInvoked);
             Assert.AreEqual(2, _failedLoginCount);
+            Assert.IsFalse(_isLockout);
         }
 
         [TestMethod]
@@ -250,7 +269,6 @@ namespace LogManagementTests
 
             while (!_logProcessorQueue.IsEmpty) ;     //Wait for queue to complete(optional, but required during this test)
 
-            Assert.AreEqual("0002", _lastTriggerIdInvoked);
             Assert.AreEqual(3, _failedLoginCount);
             Assert.IsTrue(_isLockout);
         }
